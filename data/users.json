@@ -160,5 +160,23 @@
       "fullAddress": "Baringo\nNairobi, baringo mogotio"
     },
     "updatedAt": "2025-11-09T10:32:24.878Z"
+  },
+  {
+    "id": 1762690244954,
+    "name": "Luis rotich",
+    "email": "l.rsptgjkacekenya@gmail.com",
+    "phone": "0745972565",
+    "password": "default-password",
+    "createdAt": "2025-11-09T12:10:44.954Z",
+    "orders": 0,
+    "totalSpent": 0,
+    "lastOrder": null,
+    "address": {
+      "street": "Baringo\nNairobi",
+      "landmark": "",
+      "city": "Nairobi",
+      "fullAddress": "Baringo\nNairobi, Nairobi"
+    },
+    "updatedAt": "2025-11-09T12:11:55.725Z"
   }
 ]

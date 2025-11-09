@@ -1,11 +1,11 @@
-// server.js - Fixed with proper image handling
+// server.js - Production Ready for Render.com
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000; // Render provides PORT
 const DATA_DIR = path.join(__dirname, 'data');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
@@ -35,7 +35,55 @@ async function ensureDirectories() {
         console.error('Error creating directories:', error);
     }
 }
-
+// Add this after ensureDirectories() function in server.js
+async function initializeDefaultProducts() {
+    try {
+        const products = await readJSON('products.json');
+        
+        if (products.length === 0) {
+            const defaultProducts = [
+                {
+                    id: 1,
+                    name: "iPhone 14 Pro",
+                    price: 999.99,
+                    description: "Latest Apple smartphone with advanced camera",
+                    category: "Apple",
+                    stock: 50,
+                    status: "active",
+                    image: "https://via.placeholder.com/300x200/007AFF/FFFFFF?text=iPhone+14",
+                    tags: "apple, smartphone, premium"
+                },
+                {
+                    id: 2,
+                    name: "Samsung Galaxy S23",
+                    price: 899.99,
+                    description: "Premium Android phone with great display",
+                    category: "samsung",
+                    stock: 30,
+                    status: "active",
+                    image: "https://via.placeholder.com/300x200/1428A0/FFFFFF?text=Galaxy+S23",
+                    tags: "samsung, android, smartphone"
+                },
+                {
+                    id: 3,
+                    name: "Oppo Reno 8",
+                    price: 499.99,
+                    description: "Great camera phone for photography",
+                    category: "oppo",
+                    stock: 25,
+                    status: "active",
+                    image: "https://via.placeholder.com/300x200/46C1BE/FFFFFF?text=Oppo+Reno+8",
+                    tags: "oppo, camera, android"
+                }
+            ];
+            
+            await writeJSON('products.json', defaultProducts);
+            console.log('✅ Default products created');
+        }
+    } catch (error) {
+        console.error('Error creating default products:', error);
+    }
+}
 // Helper functions
 async function readJSON(filename) {
     try {
@@ -70,13 +118,25 @@ async function saveBase64Image(base64Data, filename) {
     }
 }
 
+// ============ ROUTES ============
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({ 
         success: true, 
         message: 'Server is running',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
     });
+});
+
+// Serve frontend pages
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
 // ============ AUTHENTICATION ============
@@ -334,75 +394,6 @@ app.get('/api/admin/orders', async (req, res) => {
 app.post('/api/orders', async (req, res) => {
     try {
         const orders = await readJSON('orders.json');
-        
-        const newOrder = {
-            id: `order_${Date.now()}`,
-            orderNumber: `LL${String(orders.length + 1).padStart(4, '0')}`,
-            ...req.body,
-            status: 'pending',
-            paymentStatus: 'pending',
-            date: new Date().toISOString(),
-            completedAt: null
-        };
-        
-        orders.push(newOrder);
-        await writeJSON('orders.json', orders);
-        
-        res.json({
-            success: true,
-            order: newOrder,
-            message: 'Order created successfully'
-        });
-    } catch (error) {
-        console.error('Error creating order:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to create order'
-        });
-    }
-});
-
-// Update order status
-app.put('/api/orders/:id', async (req, res) => {
-    try {
-        const orders = await readJSON('orders.json');
-        const orderId = req.params.id;
-        const { status } = req.body;
-        
-        const orderIndex = orders.findIndex(o => o.id === orderId);
-        
-        if (orderIndex === -1) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-        
-        orders[orderIndex].status = status;
-        if (status === 'completed') {
-            orders[orderIndex].completedAt = new Date().toISOString();
-        }
-        
-        await writeJSON('orders.json', orders);
-        
-        res.json({
-            success: true,
-            order: orders[orderIndex],
-            message: 'Order status updated successfully'
-        });
-    } catch (error) {
-        console.error('Error updating order:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to update order'
-        });
-    }
-});
-// Add to server.js - Enhanced order handling
-
-app.post('/api/orders', async (req, res) => {
-    try {
-        const orders = await readJSON('orders.json');
         const orderData = req.body;
         
         const newOrder = {
@@ -410,7 +401,7 @@ app.post('/api/orders', async (req, res) => {
             orderNumber: `LL${String(orders.length + 1).padStart(4, '0')}`,
             ...orderData,
             status: 'pending',
-            paymentStatus: 'pending',
+            paymentStatus: orderData.paymentMethod === 'cash' ? 'pending_cod' : 'pending',
             date: new Date().toISOString(),
             completedAt: null
         };
@@ -446,7 +437,42 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
-// Get orders for specific user
+app.put('/api/orders/:id', async (req, res) => {
+    try {
+        const orders = await readJSON('orders.json');
+        const orderId = req.params.id;
+        const { status } = req.body;
+        
+        const orderIndex = orders.findIndex(o => o.id === orderId);
+        
+        if (orderIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+        
+        orders[orderIndex].status = status;
+        if (status === 'completed') {
+            orders[orderIndex].completedAt = new Date().toISOString();
+        }
+        
+        await writeJSON('orders.json', orders);
+        
+        res.json({
+            success: true,
+            order: orders[orderIndex],
+            message: 'Order status updated successfully'
+        });
+    } catch (error) {
+        console.error('Error updating order:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update order'
+        });
+    }
+});
+
 app.get('/api/user/orders/:userId', async (req, res) => {
     try {
         const orders = await readJSON('orders.json');
@@ -484,7 +510,9 @@ app.get('/api/user/orders/:userId', async (req, res) => {
         });
     }
 });
-// Get revenue statistics
+
+// ============ REVENUE & ANALYTICS ============
+
 app.get('/api/admin/revenue', async (req, res) => {
     try {
         const orders = await readJSON('orders.json');
@@ -564,38 +592,9 @@ app.get('/api/admin/customers', async (req, res) => {
         });
     }
 });
-// Add to server.js - Address and Order History Endpoints
 
-// Get user's order history
-app.get('/api/user/orders/:userId', async (req, res) => {
-    try {
-        const orders = await readJSON('orders.json');
-        const userId = parseInt(req.params.userId);
-        
-        const userOrders = orders.filter(order => {
-            // Match by phone or email
-            const users = require('./data/users.json');
-            const user = users.find(u => u.id === userId);
-            if (!user) return false;
-            
-            return order.customerPhone === user.phone || 
-                   order.customerEmail === user.email;
-        });
-        
-        res.json({
-            success: true,
-            orders: userOrders
-        });
-    } catch (error) {
-        console.error('Error fetching user orders:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch order history'
-        });
-    }
-});
+// ============ USER ADDRESS ============
 
-// Update user address
 app.put('/api/user/address/:userId', async (req, res) => {
     try {
         const users = await readJSON('users.json');
@@ -630,70 +629,25 @@ app.put('/api/user/address/:userId', async (req, res) => {
     }
 });
 
-// Update the orders endpoint in server.js to handle payment methods
-app.post('/api/orders', async (req, res) => {
-    try {
-        const orders = await readJSON('orders.json');
-        const orderData = req.body;
-        
-        const newOrder = {
-            id: `order_${Date.now()}`,
-            orderNumber: `LL${String(orders.length + 1).padStart(4, '0')}`,
-            ...orderData,
-            status: 'pending',
-            paymentStatus: orderData.paymentMethod === 'cash' ? 'pending_cod' : 'pending',
-            date: new Date().toISOString(),
-            completedAt: null
-        };
-        
-        orders.push(newOrder);
-        await writeJSON('orders.json', orders);
-        
-        // Update user's order count if customerId is provided
-        if (orderData.customerId) {
-            const users = await readJSON('users.json');
-            const userIndex = users.findIndex(u => u.id === orderData.customerId);
-            
-            if (userIndex !== -1) {
-                users[userIndex].orders = (users[userIndex].orders || 0) + 1;
-                users[userIndex].totalSpent = (users[userIndex].totalSpent || 0) + parseFloat(orderData.total);
-                users[userIndex].lastOrder = new Date().toISOString();
-                
-                await writeJSON('users.json', users);
-            }
-        }
-        
-        res.json({
-            success: true,
-            order: newOrder,
-            message: 'Order created successfully'
-        });
-    } catch (error) {
-        console.error('Error creating order:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to create order'
-        });
-    }
-});
+// ============ START SERVER ============
 
-
-// Start server
 async function startServer() {
     await ensureDirectories();
+      await initializeDefaultProducts(); // Add this line
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`
-🍋 Lily's Lemonade Backend Server
-================================
-✅ Server running on http://localhost:${PORT}
-✅ Health check: http://localhost:${PORT}/health
-✅ Data directory: ${DATA_DIR}
-✅ Uploads directory: ${UPLOADS_DIR}
+🍋 Lily's Lemonade Backend Server - PRODUCTION
+==============================================
+✅ Server running on port: ${PORT}
+✅ Environment: ${process.env.NODE_ENV || 'development'}
+✅ Health check: /health
+✅ Frontend: /
+✅ Admin Panel: /admin
 
-Available endpoints:
+📊 API Endpoints:
 - POST /api/auth/signup
-- POST /api/auth/login
+- POST /api/auth/login  
 - GET  /api/products
 - POST /api/products
 - PUT  /api/products/:id
@@ -703,6 +657,10 @@ Available endpoints:
 - PUT  /api/orders/:id
 - GET  /api/admin/revenue
 - GET  /api/admin/customers
+- GET  /api/user/orders/:userId
+- PUT  /api/user/address/:userId
+
+🌍 Your app will be available at: https://your-app-name.onrender.com
         `);
     });
 }

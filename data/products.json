@@ -34,5 +34,29 @@
     "image": "/uploads/product_1762621322238.png",
     "createdAt": "2025-11-08T17:02:02.242Z",
     "updatedAt": "2025-11-08T17:02:02.242Z"
+  },
+  {
+    "id": 1762689920205,
+    "name": "nknkn333",
+    "price": 567,
+    "description": "mn,ml;;",
+    "category": "Xiomi",
+    "stock": 678,
+    "status": "active",
+    "image": "/uploads/product_1762689920200.png",
+    "createdAt": "2025-11-09T12:05:20.205Z",
+    "updatedAt": "2025-11-09T12:05:20.206Z"
+  },
+  {
+    "id": 1762690510684,
+    "name": "nknkn333",
+    "price": 888,
+    "description": "dfghjkjhgfds",
+    "category": "Xiomi",
+    "stock": 567,
+    "status": "active",
+    "image": "/uploads/product_1762690510681.png",
+    "createdAt": "2025-11-09T12:15:10.684Z",
+    "updatedAt": "2025-11-09T12:15:10.684Z"
   }
 ]
