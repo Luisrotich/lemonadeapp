@@ -1,182 +1,20 @@
 [
   {
-    "id": 1762512252292,
+    "id": 1764269384074,
     "name": "Luis rotich",
-    "email": "l.rspacekenya@gmail.com",
-    "phone": "0745972350",
-    "password": "default-password",
-    "createdAt": "2025-11-07T10:44:12.292Z",
-    "orders": 0,
-    "totalSpent": 0
-  },
-  {
-    "id": 1762521894456,
-    "name": "Luis rotich",
-    "email": "l.rspacejjkenya@gmail.com",
-    "phone": "0745972357",
-    "password": "default-password",
-    "createdAt": "2025-11-07T13:24:54.456Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null
-  },
-  {
-    "id": 1762522080584,
-    "name": "Luis rotich",
-    "email": "l.rspacekehjjnya@gmail.com",
-    "phone": "0745972355",
-    "password": "default-password",
-    "createdAt": "2025-11-07T13:28:00.584Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null
-  },
-  {
-    "id": 1762522352604,
-    "name": "Luis rotich",
-    "email": "l.rshpacekenya@gmail.com",
-    "phone": "0748972350",
-    "password": "default-password",
-    "createdAt": "2025-11-07T13:32:32.604Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null
-  },
-  {
-    "id": 1762524805894,
-    "name": "Luis rotichyyt",
-    "email": "luisrotihhch@gmail.com",
-    "phone": "0745972352",
-    "password": "default-password",
-    "createdAt": "2025-11-07T14:13:25.894Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null,
-    "address": {
-      "street": "nairobi",
-      "landmark": "",
-      "city": "nyeri",
-      "fullAddress": "nairobi, nyeri"
-    },
-    "updatedAt": "2025-11-07T15:34:08.942Z"
-  },
-  {
-    "id": 1762549982375,
-    "name": "Luis rotich",
-    "email": "l.rspacrrekenya@gmail.com",
+    "email": "l.rspaceffenya@gmail.com",
     "phone": "0745972356",
     "password": "default-password",
-    "createdAt": "2025-11-07T21:13:02.375Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null
-  },
-  {
-    "id": 1762550127435,
-    "name": "Luis roticbbbb h",
-    "email": "l.rspacekencvcvya@gmail.com",
-    "phone": "0745962350",
-    "password": "default-password",
-    "createdAt": "2025-11-07T21:15:27.435Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null,
+    "createdAt": "2025-11-27T18:49:44.075Z",
+    "orders": 1,
+    "totalSpent": 120000,
+    "lastOrder": "2025-11-28T07:02:27.714Z",
     "address": {
-      "street": "mnkml",
-      "landmark": "",
-      "city": "nyeri",
-      "fullAddress": "mnkml, nyeri"
-    },
-    "updatedAt": "2025-11-07T21:17:09.014Z"
-  },
-  {
-    "id": 1762550421490,
-    "name": "Luis rotichyythjkk",
-    "email": "luisrotighjjnjbjhhhhch@gmail.com",
-    "phone": "074597566",
-    "password": "default-password",
-    "createdAt": "2025-11-07T21:20:21.490Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null,
-    "address": {
-      "street": "knklll",
-      "landmark": "lml,;,",
-      "city": "nyeri",
-      "fullAddress": "knklll (Near lml,;,), nyeri"
-    },
-    "updatedAt": "2025-11-07T21:20:36.962Z"
-  },
-  {
-    "id": 1762602868359,
-    "name": "Luis rotich",
-    "email": "l.rspacbnmnlmekenya@gmail.com",
-    "phone": "0745972456",
-    "password": "default-password",
-    "createdAt": "2025-11-08T11:54:28.359Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null,
-    "address": {
-      "street": "Baringo\nNairobi",
-      "landmark": "",
+      "street": "Baringo",
+      "landmark": "rtyu",
       "city": "Nairobi",
-      "fullAddress": "Baringo\nNairobi, Nairobi"
+      "fullAddress": "Baringo (Near rtyu), Nairobi - werewed"
     },
-    "updatedAt": "2025-11-08T13:58:37.785Z"
-  },
-  {
-    "id": 1762621192390,
-    "name": "Luis rotichtrrr",
-    "email": "luisrojbknknktich@gmail.com",
-    "phone": "0745976650",
-    "password": "default-password",
-    "createdAt": "2025-11-08T16:59:52.390Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null,
-    "address": {
-      "street": "Baringo\nNairobi",
-      "landmark": "",
-      "city": "Nairobi",
-      "fullAddress": "Baringo\nNairobi, Nairobi"
-    },
-    "updatedAt": "2025-11-08T17:01:03.881Z"
-  },
-  {
-    "id": 1762684040842,
-    "name": "ben",
-    "email": "benrotich@gmail.com",
-    "phone": "rotich",
-    "password": "default-password",
-    "createdAt": "2025-11-09T10:27:20.842Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null,
-    "address": {
-      "street": "Baringo\nNairobi",
-      "landmark": "",
-      "city": "baringo mogotio",
-      "fullAddress": "Baringo\nNairobi, baringo mogotio"
-    },
-    "updatedAt": "2025-11-09T10:32:24.878Z"
-  },
-  {
-    "id": 1762690244954,
-    "name": "Luis rotich",
-    "email": "l.rsptgjkacekenya@gmail.com",
-    "phone": "0745972565",
-    "password": "default-password",
-    "createdAt": "2025-11-09T12:10:44.954Z",
-    "orders": 0,
-    "totalSpent": 0,
-    "lastOrder": null,
-    "address": {
-      "street": "Baringo\nNairobi",
-      "landmark": "",
-      "city": "Nairobi",
-      "fullAddress": "Baringo\nNairobi, Nairobi"
-    },
-    "updatedAt": "2025-11-09T12:11:55.725Z"
+    "updatedAt": "2025-11-28T07:02:29.921Z"
   }
 ]

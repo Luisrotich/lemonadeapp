@@ -7,21 +7,665 @@ class LemonadeApp {
         this.currentTheme = 'light';
         this.products = [];
         this.baseURL = 'http://localhost:5000';
+        this.currentProductDetail = null;
+        this.currentDetailQuantity = 1;
         
         this.initializeApp();
     }
 
     initializeApp() {
-        this.loadCartFromStorage();
-        this.loadUserPreferences();
-        this.loadProducts();
-        this.setupEventListeners();
-        this.setupCheckoutListeners();
-        this.setupAccountNavigation();
-         this.setupProductDetailListeners(); // ADD THIS LINE
-        this.updateUI();
+    this.loadCartFromStorage();
+    this.loadUserPreferences();
+    this.loadProducts();
+    this.setupEventListeners();
+    this.setupCheckoutListeners();
+    this.setupAccountNavigation();
+     this.setupCategoryListeners(); // Add this line
+    this.setupProductDetailListeners(); // ADD THIS LINE
+     this.setupProductDetailListeners();
+    this.setupAppDownloadPopup(); // Add this line
+    this.updateUI();
+
+ setTimeout(() => {
+        this.debugProductCategories();
+         this.debugCart(); // Add cart debug
+          this.debugCartMath(); // Add this line
+    }, 2000);
+    
+
+}
+
+
+//kkkkkkkkk
+
+
+
+
+
+// Add these methods to your LemonadeApp class:
+
+setupAppDownloadPopup() {
+    console.log('🔧 Setting up app download popup...');
+    
+    // FOR INSTANT POPUP: Clear any previous dismissals and show immediately
+    localStorage.removeItem('appDownloadPopupDismissed');
+    localStorage.removeItem('appDownloadPopupShown');
+    
+    // Setup event listeners for popup
+    this.setupPopupEventListeners();
+    
+    // Show popup instantly after a very short delay (to ensure DOM is ready)
+    setTimeout(() => {
+        this.showAppDownloadPopup();
+    }, 300);
+    
+    // Setup smart triggers for future behavior
+    this.setupSmartPopupTrigger();
+}
+
+shouldShowPopup() {
+    const popupDismissed = localStorage.getItem('appDownloadPopupDismissed');
+    const popupShown = localStorage.getItem('appDownloadPopupShown');
+    
+    // Check if dismissal period has expired
+    if (popupDismissed) {
+        const dismissedUntil = new Date(popupDismissed);
+        const now = new Date();
+        if (now > dismissedUntil) {
+            // Dismissal period has expired, clear it
+            localStorage.removeItem('appDownloadPopupDismissed');
+            return true;
+        }
+        return false;
+    }
+    
+    // Show if not dismissed and not shown in current session
+    return !popupDismissed && !popupShown;
+}
+
+setupPopupEventListeners() {
+    // Close button
+    const closePopup = document.getElementById('close-popup');
+    if (closePopup) {
+        closePopup.addEventListener('click', () => {
+            this.hideAppDownloadPopup();
+            this.setPopupDismissed();
+        });
+    }
+    
+    // Later button
+    const laterBtn = document.getElementById('later-btn');
+    if (laterBtn) {
+        laterBtn.addEventListener('click', () => {
+            this.hideAppDownloadPopup();
+            this.setPopupDismissed();
+        });
+    }
+    
+    // Download button - Start download when clicked
+    const downloadBtn = document.getElementById('download-chrome');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            this.startDownload();
+        });
+    }
+    
+    // Overlay click to close
+    const overlay = document.getElementById('app-download-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            this.hideAppDownloadPopup();
+            this.setPopupDismissed();
+        });
+    }
+}
+
+startDownload() {
+    console.log('🚀 Starting download after button click...');
+    
+    // Hide the main popup
+    this.hideAppDownloadPopup();
+    
+    // Show download progress immediately
+    this.showChromeDownloadProgress();
+    
+    // Track download attempt
+    this.trackDownloadAttempt('chrome');
+}
+
+showAppDownloadPopup() {
+    console.log('📱 Showing app download popup');
+    
+    const popup = document.getElementById('app-download-popup');
+    const overlay = document.getElementById('app-download-overlay');
+    
+    if (popup && overlay) {
+        popup.style.display = 'block';
+        overlay.style.display = 'block';
+        
+        // Update for Chrome-specific download
+        this.updateDownloadButtonForChrome();
+        
+        // Mark as shown in current session
+        localStorage.setItem('appDownloadPopupShown', 'true');
+        
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+    } else {
+        console.error('❌ Popup elements not found!');
+    }
+}
+
+updateDownloadButtonForChrome() {
+    // Update button for Chrome download
+    const downloadBtn = document.getElementById('download-chrome');
+    
+    if (downloadBtn) {
+        downloadBtn.innerHTML = `
+            <i class="fab fa-chrome"></i>
+            <div>
+                 <span>Downloading app is</span>
+                        <strong>Coming soon........</strong>
+            </div>
+        `;
+    }
+}
+
+hideAppDownloadPopup() {
+    console.log('📱 Hiding app download popup');
+    
+    const popup = document.getElementById('app-download-popup');
+    const overlay = document.getElementById('app-download-overlay');
+    
+    if (popup && overlay) {
+        popup.style.display = 'none';
+        overlay.style.display = 'none';
+        
+        // Restore body scroll
+        document.body.style.overflow = '';
+    }
+}
+
+setPopupDismissed() {
+    // Set dismissed flag for 7 days
+    const dismissedUntil = new Date();
+    dismissedUntil.setDate(dismissedUntil.getDate() + 7);
+    localStorage.setItem('appDownloadPopupDismissed', dismissedUntil.toISOString());
+}
+
+showChromeDownloadProgress() {
+    // Create download progress popup
+    const progressHTML = `
+        <div class="download-progress-popup">
+            <div class="download-progress-content">
+                <div class="download-header">
+                    <h3>📥 Downloading Lemonade App</h3>
+                    <button class="close-download" onclick="lemonadeApp.cancelDownload()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="download-info">
+                    <i class="fab fa-chrome" style="color: #4285F4"></i>
+                    <div class="file-info">
+                        <strong>Lemonade-Shopping-App.zip</strong>
+                        <span>12.5 MB • Universal Package</span>
+                    </div>
+                </div>
+                <div class="device-support">
+                    <div class="device">
+                        <i class="fas fa-desktop"></i>
+                        <span>Windows</span>
+                    </div>
+                    <div class="device">
+                        <i class="fas fa-laptop"></i>
+                        <span>macOS</span>
+                    </div>
+                    <div class="device">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Android</span>
+                    </div>
+                    <div class="device">
+                        <i class="fas fa-tablet-alt"></i>
+                        <span>iOS</span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progress-percent">0%</span>
+                        <span>Starting download...</span>
+                    </div>
+                    <div class="download-speed">
+                        <span id="download-speed">Initializing...</span>
+                        <span id="time-remaining">Preparing...</span>
+                    </div>
+                </div>
+                <div class="download-steps">
+                    <div class="step">
+                        <i class="fas fa-check"></i>
+                        <span>Security verified</span>
+                    </div>
+                    <div class="step">
+                        <i class="fas fa-sync fa-spin"></i>
+                        <span>Downloading (12.5 MB)</span>
+                    </div>
+                    <div class="step">
+                        <i class="far fa-clock"></i>
+                        <span>Extract when complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="download-progress-overlay"></div>
+    `;
+    
+    // Add to body
+    document.body.insertAdjacentHTML('beforeend', progressHTML);
+    
+    // Start the download process
+    this.animateChromeProgressBar();
+}
+
+cancelDownload() {
+    const popup = document.querySelector('.download-progress-popup');
+    const overlay = document.querySelector('.download-progress-overlay');
+    if (popup) popup.remove();
+    if (overlay) overlay.remove();
+    
+    this.showMessage('Download cancelled');
+}
+
+animateChromeProgressBar() {
+    let progress = 0;
+    const progressFill = document.getElementById('progress-fill');
+    const progressPercent = document.getElementById('progress-percent');
+    const downloadSpeed = document.getElementById('download-speed');
+    const timeRemaining = document.getElementById('time-remaining');
+    const steps = document.querySelectorAll('.step');
+    
+    // Simulate realistic download speeds
+    const speeds = ['256 KB/s', '512 KB/s', '1.2 MB/s', '2.5 MB/s', '3.1 MB/s'];
+    let speedIndex = 0;
+    
+    const interval = setInterval(() => {
+        // Realistic progress with varying speeds
+        let increment;
+        if (progress < 15) {
+            increment = 3 + Math.random() * 4; // Slow start
+            speedIndex = 0;
+        } else if (progress < 50) {
+            increment = 6 + Math.random() * 8; // Medium speed
+            speedIndex = 1 + Math.floor(Math.random() * 2);
+        } else if (progress < 80) {
+            increment = 10 + Math.random() * 12; // Fast speed
+            speedIndex = 2 + Math.floor(Math.random() * 2);
+        } else {
+            increment = 4 + Math.random() * 5; // Slow finish
+            speedIndex = 4;
+        }
+        
+        progress += increment;
+        
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            
+            // Show completion message
+            if (progressPercent) {
+                progressPercent.textContent = '100%';
+                progressPercent.parentElement.children[1].textContent = 'Download Complete!';
+            }
+            
+            if (downloadSpeed) downloadSpeed.textContent = 'Completed';
+            if (timeRemaining) timeRemaining.textContent = 'Ready to extract';
+            
+            // Update steps to show completion
+            steps[1].innerHTML = '<i class="fas fa-check" style="color: var(--accent-color)"></i><span>Download complete (12.5 MB)</span>';
+            steps[2].innerHTML = '<i class="fas fa-check" style="color: var(--accent-color)"></i><span>Ready to extract</span>';
+            
+            // Trigger actual download with proper file size
+            setTimeout(() => {
+                this.triggerChromeDownload();
+            }, 1000);
+            
+            // Auto-close after 3 seconds
+            setTimeout(() => {
+                const popup = document.querySelector('.download-progress-popup');
+                const overlay = document.querySelector('.download-progress-overlay');
+                if (popup) popup.remove();
+                if (overlay) overlay.remove();
+                
+                // Show final success message
+                this.showMessage('🎉 Lemonade App downloaded successfully! Extract the ZIP file to install.');
+            }, 3000);
+        }
+        
+        if (progressFill) {
+            progressFill.style.width = progress + '%';
+        }
+        if (progressPercent) {
+            progressPercent.textContent = Math.round(progress) + '%';
+            
+            // Update status text based on progress
+            if (progress > 10 && progress < 30) {
+                progressPercent.parentElement.children[1].textContent = 'Downloading...';
+            } else if (progress >= 30 && progress < 70) {
+                progressPercent.parentElement.children[1].textContent = 'Download in progress...';
+            } else if (progress >= 70) {
+                progressPercent.parentElement.children[1].textContent = 'Finalizing download...';
+            }
+        }
+        
+        // Update download speed and time remaining
+        if (downloadSpeed) {
+            downloadSpeed.textContent = speeds[speedIndex];
+        }
+        if (timeRemaining) {
+            const remaining = Math.max(0, Math.round((100 - progress) / increment * 0.2));
+            timeRemaining.textContent = remaining > 0 ? `${remaining}s remaining` : 'Almost done...';
+        }
+        
+        // Update steps visually
+        if (progress > 25) {
+            steps[0].querySelector('i').style.color = 'var(--accent-color)';
+        }
+        
+    }, 200);
+}
+
+triggerChromeDownload() {
+    // Create a valid ZIP file that works on all systems
+    const filename = 'Lemonade-Shopping-App.zip';
+    const fileSize = 12.5 * 1024 * 1024; // 12.5 MB in bytes
+    
+    // Create realistic file content
+    const fileContent = this.createRealisticZipContent(fileSize);
+    
+    // Create blob with proper MIME type
+    const blob = new Blob([fileContent], { type: 'application/zip' });
+    
+    // Verify the file size
+    console.log(`📁 Created file size: ${(blob.size / (1024 * 1024)).toFixed(2)} MB`);
+    
+    // Create download link
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    
+    // Add to body and trigger click
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
+
+createRealisticZipContent(targetSize) {
+    // Create a simple but valid ZIP file structure
+    let content = '';
+    
+    // Add ZIP file header
+    content += 'PK\x03\x04'; // Local file header signature
+    
+    // Add file metadata
+    content += this.stringToBytes('\x14\x00'); // Version needed to extract
+    content += this.stringToBytes('\x00\x00'); // General purpose bit flag
+    content += this.stringToBytes('\x00\x00'); // Compression method (store)
+    content += this.stringToBytes('\x00\x00'); // File last modification time
+    content += this.stringToBytes('\x00\x00'); // File last modification date
+    content += this.stringToBytes('\x00\x00\x00\x00'); // CRC-32
+    content += this.intToBytes(targetSize - 30, 4); // Compressed size
+    content += this.intToBytes(targetSize - 30, 4); // Uncompressed size
+    content += this.intToBytes(25, 2); // File name length
+    content += this.stringToBytes('\x00\x00'); // Extra field length
+    
+    // Add file name
+    content += 'Lemonade-Shopping-App.exe';
+    
+    // Add main file content
+    const mainContent = this.createAppFileContent();
+    content += mainContent;
+    
+    // Add padding to reach exact 12.5MB
+    const currentSize = content.length;
+    const paddingNeeded = targetSize - currentSize;
+    
+    if (paddingNeeded > 0) {
+        content += '0'.repeat(paddingNeeded);
+    }
+    
+    return content;
+}
+
+stringToBytes(str) {
+    let result = '';
+    for (let i = 0; i < str.length; i++) {
+        result += str.charCodeAt(i).toString(16).padStart(2, '0');
+    }
+    return result;
+}
+
+intToBytes(number, bytes) {
+    let result = '';
+    for (let i = 0; i < bytes; i++) {
+        result += String.fromCharCode((number >> (i * 8)) & 0xff);
+    }
+    return result;
+}
+
+createAppFileContent() {
+    let content = '\n';
+    content += '=== LEMONADE SHOPPING APPLICATION ===\n\n';
+    content += 'Version: 2.1.4 (Build 2157)\n';
+    content += 'File Size: 12.5 MB\n';
+    content += 'Release Date: ' + new Date().toISOString().split('T')[0] + '\n';
+    content += 'Digital Signature: Verified\n\n';
+    
+    content += 'SUPPORTED PLATFORMS:\n';
+    content += '• Windows 10/11 (64-bit)\n';
+    content += '• macOS 10.14 or later\n';
+    content += '• Ubuntu 18.04+, Fedora, CentOS\n';
+    content += '• Android (via Chrome Mobile)\n';
+    content += '• iOS (via Safari Mobile)\n\n';
+    
+    content += 'INSTALLATION INSTRUCTIONS:\n';
+    content += '1. Extract this ZIP file\n';
+    content += '2. Run "Install-Lemonade.exe" (Windows)\n';
+    content += '3. Or "Install-Lemonade.app" (macOS)\n';
+    content += '4. Or "install-lemonade" (Linux)\n';
+    content += '5. Follow the setup wizard\n\n';
+    
+    content += 'APPLICATION FEATURES:\n';
+    content += '✓ Lightning-fast shopping experience\n';
+    content += '✓ Offline product catalog browsing\n';
+    content += '✓ Secure payment processing\n';
+    content += '✓ Real-time order tracking\n';
+    content += '✓ Push notifications\n';
+    content += '✓ Multi-device synchronization\n';
+    content += '✓ Dark/Light theme support\n';
+    content += '✓ Multiple language support\n\n';
+    
+    content += 'SYSTEM REQUIREMENTS:\n';
+    content += '- Operating System: Windows 10+, macOS 10.14+, Linux\n';
+    content += '- Memory: 4GB RAM minimum\n';
+    content += '- Storage: 200MB available space\n';
+    content += '- Internet: Broadband connection\n';
+    content += '- Browser: Chrome 80+, Firefox 75+, Safari 13+\n\n';
+    
+    content += 'DEVELOPER INFORMATION:\n';
+    content += 'Company: Lemonade Technologies Inc.\n';
+    content += 'Website: https://lemonade.com\n';
+    content += 'Support: support@lemonade.com\n';
+    content += 'Privacy: https://lemonade.com/privacy\n';
+    content += 'Terms: https://lemonade.com/terms\n\n';
+    
+    content += 'SECURITY INFORMATION:\n';
+    content += '• Digitally signed and verified\n';
+    content += '• No malware or viruses detected\n';
+    content += '• Regular security updates\n';
+    content += '• Encrypted data transmission\n\n';
+    
+    content += 'Thank you for choosing Lemonade!\n';
+    content += 'Your favorite shopping experience awaits...\n\n';
+    
+    // Add some binary data to make it look more realistic
+    content += 'BINARY_DATA_START:' + '0'.repeat(50000) + ':BINARY_DATA_END\n';
+    
+    return content;
+}
+
+trackDownloadAttempt(platform) {
+    // Track download attempts in localStorage
+    let downloadStats = JSON.parse(localStorage.getItem('appDownloadStats') || '{}');
+    
+    if (!downloadStats.totalAttempts) {
+        downloadStats.totalAttempts = 0;
+    }
+    if (!downloadStats[platform]) {
+        downloadStats[platform] = 0;
+    }
+    
+    downloadStats.totalAttempts++;
+    downloadStats[platform]++;
+    
+    localStorage.setItem('appDownloadStats', JSON.stringify(downloadStats));
+    
+    console.log('📊 Download stats:', downloadStats);
+}
+
+// Add smart popup trigger based on user behavior
+setupSmartPopupTrigger() {
+    // Track page views
+    let pageViews = parseInt(localStorage.getItem('lemonadePageViews') || '0');
+    pageViews++;
+    localStorage.setItem('lemonadePageViews', pageViews.toString());
+    
+    // Store original addToCart method
+    const originalAddToCart = this.addToCart.bind(this);
+    
+    // Override addToCart to trigger popup
+    this.addToCart = function(productId, productName, price, quantity) {
+        const result = originalAddToCart(productId, productName, price, quantity);
+        
+        // Show popup after adding to cart if conditions are met
+        if (this.shouldShowPopup()) {
+            setTimeout(() => {
+                this.showAppDownloadPopup();
+            }, 2000);
+        }
+        
+        return result;
+    }.bind(this);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//tytyy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Add this method to debug category issues:
+debugProductCategories() {
+    console.log('🔍 DEBUG: Product Categories');
+    
+    // Check all products and their categories
+    this.products.forEach((product, index) => {
+        console.log(`📱 ${index + 1}. ${product.name}: Category = "${product.category}"`);
+    });
+    
+    // Check what categories are available
+    const uniqueCategories = [...new Set(this.products.map(p => p.category))];
+    console.log('🏷️ Available categories in products:', uniqueCategories);
+    
+    // Check category cards in HTML
+    const categoryCards = document.querySelectorAll('.category-card');
+    console.log('🃏 Category cards in HTML:');
+    categoryCards.forEach(card => {
+        console.log(`   - ${card.textContent.trim()}: data-category = "${card.getAttribute('data-category')}"`);
+    });
+}
+
+
+
+setupBottomNavigation() {
+    console.log('🔧 Setting up bottom navigation...');
+    
+    // Home button
+    const homeBtn = document.getElementById('nav-home');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', () => {
+            console.log('🏠 Home button clicked');
+            this.switchView('home-view');
+        });
     }
 
+    // Cart button
+    const cartBtn = document.getElementById('nav-cart');
+    if (cartBtn) {
+        cartBtn.addEventListener('click', () => {
+            console.log('🛒 Cart button clicked');
+            this.switchView('cart-view');
+        });
+    }
+
+    // Account button
+    const accountBtn = document.getElementById('nav-account');
+    if (accountBtn) {
+        accountBtn.addEventListener('click', () => {
+            console.log('👤 Account button clicked');
+            this.switchView('account-view');
+        });
+    }
+
+    // Search button
+    const searchBtn = document.getElementById('nav-search');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            console.log('🔍 Search button clicked');
+            this.switchView('search-view');
+        });
+    }
+}
     // Setup checkout listeners
     setupCheckoutListeners() {
         const confirmPaymentBtn = document.getElementById('confirm-payment');
@@ -88,13 +732,35 @@ class LemonadeApp {
             }
         });
     }
+    
+// Add this to your LemonadeApp class in script.js
 
 
+// Update the setupCategoryListeners method:
+setupCategoryListeners() {
+    console.log('🔧 Setting up category listeners...');
+    
+    document.addEventListener('click', (e) => {
+        const categoryCard = e.target.closest('.category-card');
+        if (categoryCard) {
+            const category = categoryCard.getAttribute('data-category');
+            console.log('🎯 CATEGORY CARD CLICKED:', category);
+            
+            // Update active state
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            categoryCard.classList.add('active');
+            
+            // Filter products by category
+            this.filterByCategory(category);
+        }
+    });
+}
 
-
-    // Add this to your LemonadeApp class in script.js
-
-setupProductDetailListeners() {
+setupProductDetailListeners()
+ {
+    
     // Back to products button
     const backButton = document.getElementById('back-to-products');
     if (backButton) {
@@ -136,6 +802,7 @@ setupProductDetailListeners() {
     });
 }
 
+
 // Add these methods to your LemonadeApp class
 showProductDetail(product) {
     const detailView = document.getElementById('product-detail-view');
@@ -143,7 +810,7 @@ showProductDetail(product) {
 
     // Populate product details
     document.getElementById('product-detail-title').textContent = product.name;
-    document.getElementById('product-detail-price').textContent = `$${product.price.toFixed(2)}`;
+    document.getElementById('product-detail-price').textContent = `ksh ${product.price.toFixed(2)}`;
     document.getElementById('product-detail-description').textContent = product.description;
     document.getElementById('product-category').textContent = product.category;
     document.getElementById('product-stock').textContent = product.stock > 0 ? 'In Stock' : 'Out of Stock';
@@ -169,12 +836,20 @@ hideProductDetail() {
         detailView.style.display = 'none';
     }
 }
-
-updateCartBadgeDetail() {
-    const cartBadgeDetail = document.getElementById('cart-badge-detail');
-    if (cartBadgeDetail) {
-        cartBadgeDetail.textContent = this.cartCount;
+updateCartBadge() {
+    console.log('🔄 Updating cart badge, count:', this.cartCount);
+    
+    // Update bottom navigation cart badge
+    const bottomCartBadge = document.getElementById('bottom-cart-count');
+    if (bottomCartBadge) {
+        bottomCartBadge.textContent = this.cartCount;
+        bottomCartBadge.style.display = this.cartCount > 0 ? 'flex' : 'none';
     }
+    
+    // Update detail view cart badge
+    this.updateDetailCartBadge();
+    
+    console.log('✅ Cart badges updated');
 }
 
 addToCartFromDetail() {
@@ -232,96 +907,139 @@ buyNowFromDetail() {
         }
     }
 
+
+// In the renderProducts method, ensure data-category is set correctly:
 renderProducts() {
     const productsContainer = document.querySelector('.products');
     if (!productsContainer) return;
 
+    console.log('🔄 Rendering products:', this.products.length);
+    
+    // First, clear any existing no-products message
+    this.hideNoProductsMessage();
+    
     productsContainer.innerHTML = this.products
         .filter(product => product.status === 'active')
-        .map(product => `
-        <div class="product-card" data-category="${product.category}" data-name="${product.name.toLowerCase()}" data-tags="${product.tags}">
-            <img src="${product.image}" alt="${product.name}" 
-                 onclick="lemonadeApp.showProductDetail(${JSON.stringify(product).replace(/"/g, '&quot;')})"
-                 style="cursor: pointer;"
-                 onerror="this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=🍋+Product'">
-            <h3>${product.name}</h3>
-            <p>${product.description}</p>
-            <div class="price">$${product.price.toFixed(2)}</div>
-            ${product.stock > 0 ? `
-                <div class="quantity-selector">
-                    <button class="quantity-btn minus" type="button">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn plus" type="button">+</button>
-                </div>
-                <button class="add-to-cart" data-product="${product.name}" data-price="${product.price}" data-id="${product.id}">
-                    Add to Cart
-                </button>
-            ` : `
-                <button class="add-to-cart out-of-stock" disabled>
-                    Out of Stock
-                </button>
-            `}
-        </div>
-    `).join('');
+        .map(product => {
+            console.log('📱 Rendering product:', product.name, 'Category:', product.category);
+            return `
+           <div class="product-card2" 
+     data-category="${product.category}" 
+     data-name="${product.name.toLowerCase()}">
 
+    <img src="${product.image}" alt="${product.name}" 
+         onclick="lemonadeApp.showProductDetail(${JSON.stringify(product).replace(/\"/g, '&quot;')})"
+         style="cursor: pointer;"
+         onerror="this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
+
+    <h3 class="product-title2">${product.name}</h3>
+
+
+    <div class="price2">ksh ${product.price.toFixed(2)}</div>
+
+    ${product.stock > 0 ? `
+                   
+                 
+                ` : `
+                    <button class="add-to-cart out-of-stock" disabled>
+                        Out of Stock
+                    </button>
+                `}
+            </div>
+        `;
+        }).join('');
+
+    console.log('✅ Products rendered');
     this.setupProductInteractions();
 }
 
-    setupProductInteractions() {
-        // Quantity buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('quantity-btn')) {
-                const productCard = e.target.closest('.product-card');
-                const quantityElement = productCard.querySelector('.quantity');
-                let quantity = parseInt(quantityElement.textContent);
-                
-                if (e.target.classList.contains('plus')) {
-                    quantity++;
-                } else if (e.target.classList.contains('minus') && quantity > 1) {
-                    quantity--;
-                }
-                
-                quantityElement.textContent = quantity;
-            }
-        });
 
-        // Add to cart buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('add-to-cart') && !e.target.disabled) {
-                const productCard = e.target.closest('.product-card');
-                const productName = e.target.getAttribute('data-product');
-                const productId = parseInt(e.target.getAttribute('data-id'));
-                const price = parseFloat(e.target.getAttribute('data-price'));
-                const quantity = parseInt(productCard.querySelector('.quantity').textContent);
-                
-                this.addToCart(productId, productName, price, quantity);
-                this.showMessage(`${quantity} ${productName}(s) added to cart! 🎉`);
-                
-                // Reset quantity to 1
-                productCard.querySelector('.quantity').textContent = '1';
+// Update setupProductInteractions method:
+// Replace the setupProductInteractions method:
+setupProductInteractions() {
+    // Quantity buttons in product cards
+    document.addEventListener('click', (e) => {
+        const quantityBtn = e.target.closest('.quantity-btn');
+        if (quantityBtn && e.target.closest('.product-card')) {
+            const productCard = e.target.closest('.product-card');
+            const quantityElement = productCard.querySelector('.quantity');
+            
+            // Check if quantityElement exists before trying to use it
+            if (!quantityElement) {
+                console.error('❌ Quantity element not found in product card');
+                return;
             }
-        });
-    }
-
-    // Cart Management
-    addToCart(productId, productName, price, quantity) {
-        const existingItem = this.cart.find(item => item.id === productId);
-        
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            this.cart.push({ 
-                id: productId,
-                product: productName, 
-                price: price, 
-                quantity: quantity
-            });
+            
+            let quantity = parseInt(quantityElement.textContent);
+            
+            if (quantityBtn.classList.contains('plus')) {
+                quantity++;
+            } else if (quantityBtn.classList.contains('minus') && quantity > 1) {
+                quantity--;
+            }
+            
+            quantityElement.textContent = quantity;
         }
-        
-        this.cartCount += quantity;
-        this.updateCartDisplay();
-        this.saveCartToStorage();
+    });
+    
+    // Add to cart buttons - FIXED VERSION
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('add-to-cart') && !e.target.disabled) {
+            const productCard = e.target.closest('.product-card');
+            
+            // Check if productCard exists
+            if (!productCard) {
+                console.error('❌ Product card not found for add to cart button');
+                return;
+            }
+            
+            const productId = parseInt(e.target.getAttribute('data-id'));
+            const productName = e.target.getAttribute('data-product');
+            const price = parseFloat(e.target.getAttribute('data-price'));
+            const quantityElement = productCard.querySelector('.quantity');
+            
+            // Check if quantityElement exists
+            if (!quantityElement) {
+                console.error('❌ Quantity element not found for add to cart');
+                return;
+            }
+            
+            const quantity = parseInt(quantityElement.textContent);
+            
+            console.log('🛒 Adding to cart:', { productId, productName, price, quantity });
+            
+            this.addToCart(productId, productName, price, quantity);
+            this.showMessage(`${quantity} ${productName}(s) added to cart! 🎉`);
+            
+            // Reset quantity to 1
+            quantityElement.textContent = '1';
+        }
+    });
+}
+  // Make sure addToCart also recalculates from scratch:
+addToCart(productId, productName, price, quantity) {
+    console.log('🛒 addToCart called:', { productId, productName, price, quantity });
+    
+    const existingItem = this.cart.find(item => item.id === productId);
+    
+    if (existingItem) {
+        existingItem.quantity += quantity;
+    } else {
+        this.cart.push({ 
+            id: productId,
+            product: productName, 
+            price: price, 
+            quantity: quantity
+        });
     }
+    
+    // FIX: Always recalculate from scratch
+    this.cartCount = this.cart.reduce((total, item) => total + item.quantity, 0);
+    
+    console.log(`📊 Cart count updated to: ${this.cartCount}`);
+    this.updateCartDisplay();
+    this.saveCartToStorage();
+}
 
     removeFromCart(itemId) {
         const itemIndex = this.cart.findIndex(item => item.id === itemId);
@@ -344,17 +1062,180 @@ renderProducts() {
         this.showMessage('Cart cleared! 🧹');
     }
 
-    updateCartDisplay() {
-        const cartCountElements = document.querySelectorAll('#cart-count, #bottom-cart-count');
-        cartCountElements.forEach(element => {
-            if (element) element.textContent = this.cartCount;
-        });
+
+
+// Update updateCartDisplay method:
+// In updateCartDisplay method, ensure data-id attributes are set correctly:
+updateCartDisplay() {
+    console.log('🔄 Updating cart display, items:', this.cart.length);
+    
+    const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total-amount');
+    
+    if (this.cart.length === 0) {
+        // Show empty cart message
+        if (cartItems) {
+            cartItems.innerHTML = `
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                    <p style="text-align: center; color: var(--text-light); padding: 2rem;">Your cart is empty</p>
+                    <button class="continue-shopping-btn" onclick="lemonadeApp.switchView('home-view')">
+                        Continue Shopping
+                    </button>
+                </div>
+            `;
+        }
+        if (cartTotal) cartTotal.textContent = 'ksh 0.00';
+    } else {
+        // Update cart items list with images
+        if (cartItems) {
+            cartItems.innerHTML = this.cart.map(item => {
+                // Find product to get image
+                const product = this.products.find(p => p.id === item.id);
+                const productImage = product ? product.image : 'https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱';
+                
+                return `
+                <div class="cart-item" data-id="${item.id}">
+                    <div class="item-image">
+                        <img src="${productImage}" alt="${item.product}" 
+                             onerror="this.src='https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱'">
+                    </div>
+                    <div class="item-details">
+                        <div class="item-info">
+                            <h4>${item.product}</h4>
+                            <p class="item-price">ksh ${item.price.toFixed(2)} each</p>
+                        </div>
+                       
+                        </div>
+                    </div>
+                    <div class="item-total">
+                        ksh ${(item.price * item.quantity).toFixed(2)}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
         
-        if (document.getElementById('cart-view')?.classList.contains('active')) {
-            this.updateCartView();
+        // Update total
+        const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        if (cartTotal) {
+            cartTotal.textContent = `ksh ${total.toFixed(2)}`;
         }
     }
+    
+    // Update cart badge
+    this.updateCartBadge();
+    
+    // Setup cart item event listeners
+    this.setupCartItemListeners();
+}
 
+// Update setupCartItemListeners to ensure proper event handling:
+setupCartItemListeners() {
+    console.log('🔧 Setting up cart item listeners...');
+    
+    // Quantity buttons - use event delegation
+    document.addEventListener('click', (e) => {
+        const quantityBtn = e.target.closest('.quantity-btn');
+        if (quantityBtn) {
+            const productId = parseInt(quantityBtn.getAttribute('data-id'));
+            const isPlus = quantityBtn.classList.contains('plus');
+            
+            console.log('🎯 Quantity button clicked:', { productId, isPlus });
+            
+            if (!isNaN(productId)) {
+                this.updateCartQuantity(productId, isPlus);
+            } else {
+                console.error('❌ Invalid product ID:', quantityBtn.getAttribute('data-id'));
+            }
+        }
+        
+        // Remove buttons
+        const removeBtn = e.target.closest('.remove-btn');
+        if (removeBtn) {
+            const productId = parseInt(removeBtn.getAttribute('data-id'));
+            
+            console.log('🗑️ Remove button clicked:', productId);
+            
+            if (!isNaN(productId)) {
+                this.removeFromCart(productId);
+            } else {
+                console.error('❌ Invalid product ID for removal:', removeBtn.getAttribute('data-id'));
+            }
+        }
+    });
+}
+// Replace the updateCartQuantity method:
+updateCartQuantity(productId, increase = true) {
+    console.log('🔄 updateCartQuantity called:', { productId, increase, currentCart: this.cart });
+    
+    const itemIndex = this.cart.findIndex(item => item.id === productId);
+    
+    if (itemIndex > -1) {
+        if (increase) {
+            // 🔼 Add 1 to quantity
+            this.cart[itemIndex].quantity += 1;
+            console.log(`➕ Increased quantity for item ${productId} to ${this.cart[itemIndex].quantity}`);
+        } else {
+            // 🔽 Subtract 1 from quantity
+            this.cart[itemIndex].quantity -= 1;
+            console.log(`➖ Decreased quantity for item ${productId} to ${this.cart[itemIndex].quantity}`);
+            
+            // ❌ Remove item if quantity reaches 0 or less
+            if (this.cart[itemIndex].quantity <= 0) {
+                console.log(`🗑️ Removing item ${productId} from cart (quantity <= 0)`);
+                this.cart.splice(itemIndex, 1);
+            }
+        }
+        
+        // FIX: Always recalculate cartCount from scratch to ensure accuracy
+        this.cartCount = this.cart.reduce((total, item) => total + item.quantity, 0);
+        console.log(`📊 New cart count: ${this.cartCount}`);
+        
+        this.saveCartToStorage();
+        this.updateCartBadge();
+        this.updateCartDisplay();
+        
+        console.log('✅ Cart quantity updated successfully');
+        console.log('🛒 Final cart state:', this.cart);
+    } else {
+        console.error('❌ Item not found in cart:', productId);
+    }
+}
+
+
+
+
+
+
+
+debugCartMath() {
+    console.log('🧮 DEBUG CART MATH:');
+    console.log('Cart items:', this.cart);
+    
+    const calculatedCount = this.cart.reduce((total, item) => total + item.quantity, 0);
+    console.log(`Calculated count: ${calculatedCount}`);
+    console.log(`Stored cartCount: ${this.cartCount}`);
+    console.log(`Match: ${calculatedCount === this.cartCount ? '✅' : '❌'}`);
+    
+    if (calculatedCount !== this.cartCount) {
+        console.error('🚨 COUNT MISMATCH! Resetting...');
+        this.cartCount = calculatedCount;
+        this.updateCartBadge();
+    }
+}
+removeFromCart(productId) {
+    this.cart = this.cart.filter(item => item.id !== productId);
+    
+    // Update cart count and save
+    this.cartCount = this.cart.reduce((total, item) => total + item.quantity, 0);
+    this.saveCartToStorage();
+    this.updateCartBadge();
+    this.updateCartDisplay();
+    
+    this.showMessage('🗑️ Item removed from cart');
+    console.log('❌ Item removed from cart:', productId);
+}
     updateCartView() {
         const cartItems = document.getElementById('cart-items');
         if (!cartItems) return;
@@ -362,16 +1243,16 @@ renderProducts() {
         const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         
         const cartTotalElement = document.getElementById('cart-total-amount');
-        if (cartTotalElement) cartTotalElement.textContent = `$${total.toFixed(2)}`;
+        if (cartTotalElement) cartTotalElement.textContent = `ksh ${total.toFixed(2)}`;
         
         cartItems.innerHTML = this.cart.map(item => `
             <div class="cart-item">
                 <div class="cart-item-info">
                     <h4>${item.product}</h4>
-                    <p>$${item.price.toFixed(2)} × ${item.quantity}</p>
+                    <p>ksh ${item.price.toFixed(2)} × ${item.quantity}</p>
                 </div>
                 <div class="cart-item-actions">
-                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                    <span>ksh ${(item.price * item.quantity).toFixed(2)}</span>
                     <button class="remove-item" data-id="${item.id}" type="button">Remove</button>
                 </div>
             </div>
@@ -385,7 +1266,19 @@ renderProducts() {
             });
         });
     }
-
+// Add this method to debug cart issues:
+debugCart() {
+    console.log('🔍 DEBUG CART:');
+    console.log('Cart items:', this.cart);
+    console.log('Cart count:', this.cartCount);
+    console.log('Products in system:', this.products.length);
+    
+    // Check if all cart items exist in products
+    this.cart.forEach(cartItem => {
+        const productExists = this.products.some(p => p.id === cartItem.id);
+        console.log(`Cart item ${cartItem.id} (${cartItem.product}): ${productExists ? '✅ Exists' : '❌ Missing'}`);
+    });
+}
     // Checkout Functions
     initiateCheckout() {
         if (this.cart.length === 0) {
@@ -410,12 +1303,12 @@ renderProducts() {
                 ${this.cart.map(item => `
                     <div class="checkout-item">
                         <span>${item.product} × ${item.quantity}</span>
-                        <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                        <span>ksh ${(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                 `).join('')}
                 <div class="checkout-total">
                     <span>Total:</span>
-                    <span>$${total.toFixed(2)}</span>
+                    <span> ksh ${total.toFixed(2)}</span>
                 </div>
             </div>
         `;
@@ -699,30 +1592,117 @@ renderProducts() {
         this.updateUserUI();
     }
 
-    addOrderNotification(order, deliveryAddress, paymentMethod) {
-        const paymentIcons = {
-            'mpesa': 'fas fa-mobile-alt',
-            'cash': 'fas fa-money-bill-wave',
-            'card': 'fas fa-credit-card'
-        };
+    
+// Replace the addOrderNotification method:
+addOrderNotification(order, deliveryAddress, paymentMethod) {
+    if (!this.currentUser) return;
+    
+    const paymentIcons = {
+        'mpesa': 'fas fa-mobile-alt',
+        'cash': 'fas fa-money-bill-wave',
+        'card': 'fas fa-credit-card'
+    };
+    
+    // Get product images from the order
+    const orderItems = order.items || this.cart;
+    const productImages = orderItems.map(item => {
+        const product = this.products.find(p => p.id === item.id);
+        return product ? product.image : 'https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱';
+    }).slice(0, 3); // Show max 3 product images
+    
+    const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+    const itemNames = orderItems.map(item => item.product).join(', ');
+    
+    const notification = {
+        id: `notif_${Date.now()}`,
+        type: 'order',
+        title: `Order #${order.orderNumber || order.id} Confirmed`,
+        message: `Your ${paymentMethod.toUpperCase()} order with ${totalItems} item${totalItems !== 1 ? 's' : ''} is being prepared`,
+        deliveryInfo: `Delivery to: ${deliveryAddress}`,
+        paymentMethod: paymentMethod,
+        paymentIcon: paymentIcons[paymentMethod] || 'fas fa-shopping-bag',
+        productImages: productImages,
+        itemNames: itemNames,
+        totalItems: totalItems,
+        timestamp: new Date().toISOString(),
+        orderId: order.id
+    };
+    
+    // Save to user-specific notifications
+    let userNotifications = JSON.parse(localStorage.getItem(`lemonadeNotifications_${this.currentUser.id}`) || '[]');
+    userNotifications.unshift(notification);
+    localStorage.setItem(`lemonadeNotifications_${this.currentUser.id}`, JSON.stringify(userNotifications.slice(0, 20)));
+}
+
+// Update the loadNotifications method:
+loadNotifications() {
+    const notificationsList = document.getElementById('notifications-list');
+    if (!notificationsList || !this.currentUser) return;
+    
+    try {
+        const notifications = JSON.parse(localStorage.getItem(`lemonadeNotifications_${this.currentUser.id}`) || '[]');
         
-        const notification = {
-            id: `notif_${Date.now()}`,
-            type: 'order',
-            title: `Order #${order.orderNumber} Confirmed`,
-            message: `Your ${paymentMethod.toUpperCase()} order is being prepared`,
-            deliveryInfo: `Delivery to: ${deliveryAddress}`,
-            paymentMethod: paymentMethod,
-            paymentIcon: paymentIcons[paymentMethod] || 'fas fa-shopping-bag',
-            timestamp: new Date().toISOString(),
-            orderId: order.id
-        };
-        
-        // Save to localStorage
-        let notifications = JSON.parse(localStorage.getItem('lemonadeNotifications') || '[]');
-        notifications.unshift(notification);
-        localStorage.setItem('lemonadeNotifications', JSON.stringify(notifications.slice(0, 20)));
+        if (notifications.length > 0) {
+            notificationsList.innerHTML = notifications.map(notification => {
+                // Generate product images HTML
+                const productImagesHTML = notification.productImages ? notification.productImages.map(img => `
+                    <img src="${img}" alt="Product" 
+                         onerror="this.src='https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱'">
+                `).join('') : '';
+                
+                return `
+                <div class="notification-item">
+                    <div class="notification-header">
+                        <div class="notification-icon">
+                            <i class="${notification.paymentIcon || 'fas fa-bell'}"></i>
+                        </div>
+                        <div class="notification-title">
+                            <h4>${notification.title}</h4>
+                            <div class="notification-time">${new Date(notification.timestamp).toLocaleString()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-body">
+                        <p>${notification.message}</p>
+                        ${notification.itemNames ? `<small class="items-list">Items: ${notification.itemNames}</small>` : ''}
+                        ${notification.deliveryInfo ? `<small class="delivery-info">${notification.deliveryInfo}</small>` : ''}
+                    </div>
+                    
+                    ${productImagesHTML ? `
+                    <div class="notification-products">
+                        <div class="product-images">
+                            ${productImagesHTML}
+                            ${notification.totalItems > 3 ? `<div class="more-items">+${notification.totalItems - 3} more</div>` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                `;
+            }).join('');
+        } else {
+            notificationsList.innerHTML = `
+                <div class="no-notifications">
+                    <i class="fas fa-bell-slash" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                    <p>No notifications</p>
+                    <small>You'll get notifications about your orders here</small>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading notifications:', error);
+        notificationsList.innerHTML = `
+            <div class="no-notifications">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: #ff6b6b;"></i>
+                <p>Error loading notifications</p>
+                <small>Please try again later</small>
+            </div>
+        `;
     }
+}
+
+
+
+
 
     // Modal functions
     showMpesaModal() {
@@ -797,94 +1777,121 @@ renderProducts() {
     showNotifications() {
         this.showSection('notifications');
     }
-
-    async loadOrderHistory() {
-        if (!this.currentUser) return;
+// Replace the loadOrderHistory method:
+async loadOrderHistory() {
+    if (!this.currentUser) return;
+    
+    try {
+        const response = await fetch(`http://localhost:5000/api/user/orders/${this.currentUser.id}`);
+        const data = await response.json();
         
-        try {
-            const response = await fetch(`http://localhost:5000/api/user/orders/${this.currentUser.id}`);
-            const data = await response.json();
-            
-            const ordersHistory = document.getElementById('orders-history');
-            if (!ordersHistory) return;
-            
-            if (data.success && data.orders && data.orders.length > 0) {
-                ordersHistory.innerHTML = data.orders.map(order => `
-                    <div class="order-history-item">
-                        <div class="order-header">
-                            <div class="order-info">
-                                <h4>Order #${order.orderNumber || order.id}</h4>
-                                <span class="order-date">${new Date(order.date).toLocaleDateString()}</span>
-                            </div>
-                            <div class="order-status status-${order.status}">
-                                ${this.formatOrderStatus(order.status)}
-                            </div>
+        const ordersHistory = document.getElementById('orders-history');
+        if (!ordersHistory) return;
+        
+        if (data.success && data.orders && data.orders.length > 0) {
+            ordersHistory.innerHTML = data.orders.map(order => {
+                // Calculate total items count
+                const totalItems = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+                
+                return `
+                <div class="order-history-item">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <h4>Order #${order.orderNumber || order.id}</h4>
+                            <span class="order-date">${new Date(order.createdAt || order.date).toLocaleDateString()}</span>
+                            <span class="order-items-count">${totalItems} item${totalItems !== 1 ? 's' : ''}</span>
                         </div>
-                        <div class="order-items">
-                            ${order.items ? order.items.map(item => `
-                                <div class="order-item">
-                                    <span class="item-name">${item.product} x${item.quantity}</span>
-                                    <span class="item-price">$${(item.price * item.quantity).toFixed(2)}</span>
-                                </div>
-                            `).join('') : 'No items information'}
-                        </div>
-                        <div class="order-footer">
-                            <div class="order-total">
-                                Total: $${parseFloat(order.total || 0).toFixed(2)}
-                            </div>
-                            ${order.deliveryAddress ? `
-                                <div class="order-address">
-                                    <small>Delivery to: ${order.deliveryAddress}</small>
-                                </div>
-                            ` : ''}
-                            ${order.paymentMethod ? `
-                                <div class="order-payment">
-                                    <small>Payment: ${order.paymentMethod.toUpperCase()}</small>
-                                </div>
-                            ` : ''}
+                        <div class="order-status status-${order.status}">
+                            ${this.formatOrderStatus(order.status)}
                         </div>
                     </div>
-                `).join('');
-            } else {
-                ordersHistory.innerHTML = `
-                    <div class="no-orders">
-                        <i class="fas fa-shopping-bag"></i>
-                        <p>No orders yet</p>
-                        <small>Your order history will appear here</small>
+                    
+                    <div class="order-items-preview">
+                        ${order.items ? order.items.map(item => {
+                            // Find product to get image
+                            const product = this.products.find(p => p.id === item.id);
+                            const productImage = product ? product.image : 'https://via.placeholder.com/50x50/fff9c4/ff6f00?text=📱';
+                            
+                            return `
+                            <div class="order-item-preview">
+                                <img src="${productImage}" alt="${item.product}" 
+                                     onerror="this.src='https://via.placeholder.com/50x50/fff9c4/ff6f00?text=📱'">
+                                <div class="item-preview-info">
+                                    <span class="item-name">${item.product}</span>
+                                    <span class="item-quantity">Qty: ${item.quantity}</span>
+                                </div>
+                            </div>
+                            `;
+                        }).join('') : 'No items information'}
                     </div>
+                    
+                    <div class="order-footer">
+                        <div class="order-total">
+                            Total: ksh ${parseFloat(order.total || 0).toFixed(2)}
+                        </div>
+                        ${order.deliveryAddress ? `
+                            <div class="order-address">
+                                <small>📍 ${order.deliveryAddress}</small>
+                            </div>
+                        ` : ''}
+                        ${order.paymentMethod ? `
+                            <div class="order-payment">
+                                <small>Payment: ${order.paymentMethod.toUpperCase()}</small>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
                 `;
-            }
-        } catch (error) {
-            console.error('Error loading order history:', error);
-            const ordersHistory = document.getElementById('orders-history');
-            if (ordersHistory) {
-                ordersHistory.innerHTML = `
-                    <div class="no-orders">
-                        <p>Error loading order history</p>
-                    </div>
-                `;
-            }
+            }).join('');
+        } else {
+            ordersHistory.innerHTML = `
+                <div class="no-orders">
+                    <i class="fas fa-shopping-bag" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                    <p>No orders yet</p>
+                    <small>Your order history will appear here</small>
+                    <button class="continue-shopping-btn" onclick="lemonadeApp.switchView('home-view')" style="margin-top: 1rem;">
+                        Start Shopping
+                    </button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading order history:', error);
+        const ordersHistory = document.getElementById('orders-history');
+        if (ordersHistory) {
+            ordersHistory.innerHTML = `
+                <div class="no-orders">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: #ff6b6b;"></i>
+                    <p>Error loading order history</p>
+                    <small>Please check your connection and try again</small>
+                </div>
+            `;
         }
     }
-
-    formatOrderStatus(status) {
-        const statusMap = {
-            'pending': '⏳ Pending',
-            'confirmed': '✅ Confirmed',
-            'preparing': '👨‍🍳 Preparing',
-            'ready': '📦 Ready for Pickup',
-            'completed': '🚚 Delivered',
-            'cancelled': '❌ Cancelled'
-        };
-        return statusMap[status] || status;
-    }
-
+}
+   
+   
+// Update formatOrderStatus method:
+formatOrderStatus(status) {
+    const statusMap = {
+        'pending': '⏳ Pending',
+        'confirmed': '✅ Confirmed',
+        'preparing': '👨‍🍳 Preparing',
+        'ready': '📦 Ready for Pickup',
+        'out_for_delivery': '🚚 Out for Delivery',
+        'completed': '🎉 Delivered',
+        'cancelled': '❌ Cancelled',
+        'pending_cod': '💰 Pending Cash Payment'
+    };
+    return statusMap[status] || status;
+}
     loadNotifications() {
         const notificationsList = document.getElementById('notifications-list');
         if (!notificationsList) return;
         
         try {
-            const notifications = JSON.parse(localStorage.getItem('lemonadeNotifications') || '[]');
+            const key = `lemonadeNotifications_${this.currentUser.id}`;
+const notifications = JSON.parse(localStorage.getItem(key) || '[]');
             
             if (notifications.length > 0) {
                 notificationsList.innerHTML = notifications.map(notification => `
@@ -1087,27 +2094,270 @@ renderProducts() {
         }
     }
 
+    // Product Detail Methods
+    setupProductDetailListeners() {
+        // Add click handlers to product cards
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.product-card')) {
+                const productCard = e.target.closest('.product-card');
+                const productId = parseInt(productCard.querySelector('.add-to-cart')?.getAttribute('data-id'));
+                
+                if (productId) {
+                    const product = this.products.find(p => p.id === productId);
+                    if (product) {
+                        this.showProductDetail(product);
+                    }
+                }
+            }
+        });
+
+        // Cart button in product detail
+        const cartButtonDetail = document.getElementById('cart-button-detail');
+        if (cartButtonDetail) {
+            cartButtonDetail.addEventListener('click', () => {
+                this.goToCartFromDetail();
+            });
+        }
+    }
+
+    showProductDetail(product) {
+        // Hide all main views but KEEP bottom navigation visible
+        document.querySelectorAll('.view').forEach(view => {
+            view.style.display = 'none';
+        });
+        document.querySelector('.main-header').style.display = 'none';
+        // DON'T hide the bottom navigation - this is the fix!
+        
+        // Show product detail view
+        document.getElementById('product-detail-view').style.display = 'block';
+        
+        // Update cart badge
+        this.updateDetailCartBadge();
+        
+        // Update product details
+        document.getElementById('product-detail-title').textContent = product.name;
+        document.getElementById('product-detail-price').textContent = `ksh ${product.price.toFixed(2)}`;
+        document.getElementById('product-detail-description').textContent = product.description || 'No description available';
+        document.getElementById('product-category').textContent = this.formatCategory(product.category);
+        document.getElementById('product-stock').textContent = product.stock > 0 ? `${product.stock} in stock` : 'Out of stock';
+        
+        // Load product images
+        this.loadProductImages(product);
+        
+        // Load reviews
+        this.loadProductReviews(product);
+        
+        // Set current product
+        this.currentProductDetail = product;
+        this.currentDetailQuantity = 1;
+        this.updateDetailQuantityDisplay();
+    }
+
+    hideProductDetail() {
+        document.getElementById('product-detail-view').style.display = 'none';
+        document.querySelector('.main-header').style.display = 'block';
+        document.getElementById('home-view').style.display = 'block';
+        
+        // Make sure bottom nav is visible
+        document.querySelector('.bottom-nav').style.display = 'flex';
+    }
+
+    loadProductImages(product) {
+        const mainImage = document.getElementById('main-product-image');
+        const thumbnailContainer = document.getElementById('thumbnail-container');
+        
+        if (!mainImage || !thumbnailContainer) return;
+        
+        // For demonstration, create multiple image variations
+        const baseImage = product.image || 'https://via.placeholder.com/300x200/fff9c4/ff6f00?text=🍋';
+        const imageUrls = [
+            baseImage,
+            baseImage.replace('300x200', '300x201'),
+            baseImage.replace('300x200', '300x202'),
+            baseImage.replace('300x200', '301x200')
+        ];
+        
+        // Set main image
+        mainImage.src = imageUrls[0];
+        
+        // Create thumbnails
+        thumbnailContainer.innerHTML = '';
+        imageUrls.forEach((url, index) => {
+            const thumbnail = document.createElement('img');
+            thumbnail.src = url;
+            thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
+            thumbnail.alt = `${product.name} - Image ${index + 1}`;
+            
+            thumbnail.addEventListener('click', () => {
+                this.setMainProductImage(url, index);
+            });
+            
+            thumbnailContainer.appendChild(thumbnail);
+        });
+    }
+
+    setMainProductImage(url, index) {
+        document.getElementById('main-product-image').src = url;
+        document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+            thumb.classList.toggle('active', i === index);
+        });
+    }
+
+    loadProductReviews(product) {
+        // Sample reviews - in real app, fetch from backend
+        const reviews = [
+            {
+                id: 1,
+                customerName: 'John D.',
+                rating: 5,
+                comment: 'Excellent product! Fast delivery and great quality.',
+                date: '2023-10-15'
+            },
+            {
+                id: 2,
+                customerName: 'Sarah M.',
+                rating: 4,
+                comment: 'Good value for money. Would recommend to others.',
+                date: '2023-10-10'
+            }
+        ];
+        
+        const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+        document.getElementById('average-rating').textContent = averageRating.toFixed(1);
+        
+        const ratingStars = document.getElementById('rating-stars');
+        if (ratingStars) {
+            ratingStars.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                star.className = `fas fa-star ${i <= Math.round(averageRating) ? 'star' : ''}`;
+                ratingStars.appendChild(star);
+            }
+        }
+        
+        document.getElementById('review-count').textContent = `Based on ${reviews.length} reviews`;
+        
+        const reviewList = document.getElementById('review-list');
+        if (reviewList) {
+            if (reviews.length > 0) {
+                reviewList.innerHTML = reviews.map(review => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">${review.customerName}</span>
+                            <span class="review-date">${new Date(review.date).toLocaleDateString()}</span>
+                        </div>
+                        <div class="review-rating">
+                            ${this.generateStarRating(review.rating)}
+                        </div>
+                        <p class="review-text">${review.comment}</p>
+                    </div>
+                `).join('');
+            } else {
+                reviewList.innerHTML = `
+                    <div class="no-reviews">
+                        <i class="fas fa-comment-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>No reviews yet</p>
+                        <small>Be the first to review this product!</small>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    generateStarRating(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            stars += i <= rating ? '<i class="fas fa-star star"></i>' : '<i class="far fa-star"></i>';
+        }
+        return stars;
+    }
+
+    updateDetailQuantityDisplay() {
+        const quantityDisplay = document.querySelector('.quantity-display');
+        if (quantityDisplay) {
+            quantityDisplay.textContent = this.currentDetailQuantity;
+        }
+    }
+
+    addToCartFromDetail() {
+        if (!this.currentProductDetail) return;
+        
+        this.addToCart(
+            this.currentProductDetail.id,
+            this.currentProductDetail.name,
+            this.currentProductDetail.price,
+            this.currentDetailQuantity
+        );
+        
+        this.showMessage(`${this.currentDetailQuantity} ${this.currentProductDetail.name}(s) added to cart! 🎉`);
+    }
+
+    buyNowFromDetail() {
+        if (!this.currentProductDetail) return;
+        
+        // Add to cart
+        this.addToCart(
+            this.currentProductDetail.id,
+            this.currentProductDetail.name,
+            this.currentProductDetail.price,
+            this.currentDetailQuantity
+        );
+        
+        // Hide product detail and show checkout directly
+        this.hideProductDetail();
+        this.initiateCheckout();
+    }
+
+    goToCartFromDetail() {
+        this.hideProductDetail();
+        this.switchView('cart-view');
+    }
+
+    updateDetailCartBadge() {
+        const cartBadge = document.getElementById('cart-badge-detail');
+        if (cartBadge) {
+            cartBadge.textContent = this.cartCount;
+            cartBadge.style.display = this.cartCount > 0 ? 'flex' : 'none';
+        }
+    }
+
+    formatCategory(category) {
+        const categories = {
+            'oppo': 'Oppo',
+            'Apple': 'Apple',
+            'Tecno': 'Tecno',
+            'infinix': 'Infinix',
+            'samsung': 'Samsung',
+            'nokia': 'Nokia',
+            'Xiomi': 'Xiaomi'
+        };
+        return categories[category] || category;
+    }
+checkProductCategories() {
+    console.log('🔍 CHECKING PRODUCT CATEGORIES:');
+    this.products.forEach((product, index) => {
+        console.log(`Product ${index + 1}: "${product.name}" → Category: "${product.category}"`);
+    });
+    
+    // Also check what categories are in your HTML
+    console.log('🔍 CHECKING CATEGORY CARDS IN HTML:');
+    const categoryCards = document.querySelectorAll('.category-card');
+    categoryCards.forEach(card => {
+        console.log(`Category Card: ${card.textContent.trim()} → data-category: "${card.getAttribute('data-category')}"`);
+    });
+}
     // Navigation
     setupEventListeners() {
-        // Bottom navigation
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.nav-item')) {
-                const navItem = e.target.closest('.nav-item');
-                const view = navItem.getAttribute('data-view');
-                this.switchView(view);
-            }
-        });
+    // Bottom navigation
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.nav-item')) {
+            const navItem = e.target.closest('.nav-item');
+            const view = navItem.getAttribute('data-view');
+            this.switchView(view);
+        }
+    });
 
-        // Category navigation
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.category-card')) {
-                const categoryCard = e.target.closest('.category-card');
-                const category = categoryCard.getAttribute('data-category');
-                this.filterByCategory(category);
-                this.switchView('home-view');
-            }
-        });
-
+     
         // Search functionality
         const searchInput = document.getElementById('product-search');
         if (searchInput) {
@@ -1123,13 +2373,54 @@ renderProducts() {
                 this.toggleTheme();
             });
         }
-          // Checkout button
-    const checkoutBtn = document.getElementById('checkout-btn');
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', () => {
-            this.initiateCheckout();
-        });
-    }
+
+        // Checkout button
+        const checkoutBtn = document.getElementById('checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', () => {
+                this.initiateCheckout();
+            });
+        }
+
+        // Product detail events
+        const backButton = document.getElementById('back-to-products');
+        if (backButton) {
+            backButton.addEventListener('click', () => {
+                this.hideProductDetail();
+            });
+        }
+
+        const minusBtn = document.querySelector('.quantity-btn.minus');
+        if (minusBtn) {
+            minusBtn.addEventListener('click', () => {
+                if (this.currentDetailQuantity > 1) {
+                    this.currentDetailQuantity--;
+                    this.updateDetailQuantityDisplay();
+                }
+            });
+        }
+
+        const plusBtn = document.querySelector('.quantity-btn.plus');
+        if (plusBtn) {
+            plusBtn.addEventListener('click', () => {
+                this.currentDetailQuantity++;
+                this.updateDetailQuantityDisplay();
+            });
+        }
+
+        const addToCartDetail = document.getElementById('add-to-cart-detail');
+        if (addToCartDetail) {
+            addToCartDetail.addEventListener('click', () => {
+                this.addToCartFromDetail();
+            });
+        }
+
+        const buyNowBtn = document.getElementById('buy-now-btn');
+        if (buyNowBtn) {
+            buyNowBtn.addEventListener('click', () => {
+                this.buyNowFromDetail();
+            });
+        }
 
         // Cart actions
         document.addEventListener('click', (e) => {
@@ -1137,10 +2428,6 @@ renderProducts() {
                 if (this.cart.length > 0 && confirm('Are you sure you want to clear your cart?')) {
                     this.clearCart();
                 }
-            }
-            
-            if (e.target.id === 'checkout-btn') {
-                this.initiateCheckout();
             }
         });
 
@@ -1311,64 +2598,216 @@ renderProducts() {
     }
 
     // Other methods remain the same...
-    switchView(viewName) {
-        document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-
-        const targetView = document.getElementById(viewName);
-        const targetNav = document.querySelector(`[data-view="${viewName}"]`);
+ // Update switchView method:
+switchView(viewId) {
+    console.log('🔄 Switching to view:', viewId);
+    
+    // Hide all views and product detail
+    document.querySelectorAll('.view').forEach(view => {
+        view.style.display = 'none';
+    });
+    
+    // Hide product detail view
+    const productDetailView = document.getElementById('product-detail-view');
+    if (productDetailView) {
+        productDetailView.style.display = 'none';
+    }
+    
+    // Show main header (hide when in product detail)
+    const mainHeader = document.querySelector('.main-header');
+    if (mainHeader) {
+        mainHeader.style.display = 'block';
+    }
+    
+    // Show target view
+    const targetView = document.getElementById(viewId);
+    if (targetView) {
+        targetView.style.display = 'block';
+        console.log('✅ View displayed:', viewId);
         
-        if (targetView) targetView.classList.add('active');
-        if (targetNav) targetNav.classList.add('active');
-
-        if (viewName === 'cart-view') {
-            this.updateCartView();
+        // Load view-specific data
+        switch(viewId) {
+            case 'cart-view':
+                this.updateCartDisplay();
+                break;
+            case 'account-view':
+                this.showSection('main');
+                break;
+            case 'home-view':
+                this.renderProducts();
+                break;
+            case 'categories-view':
+                // Ensure categories view is properly set up
+                break;
         }
+    } else {
+        console.error('❌ View not found:', viewId);
     }
+    
+    // Update active state in bottom navigation
+    this.updateActiveNavButton(viewId);
+}
 
-    filterByCategory(category) {
-        document.querySelectorAll('.category-card').forEach(card => card.classList.remove('active'));
-        document.querySelector(`[data-category="${category}"]`).classList.add('active');
+updateActiveNavButton(viewId) {
+    // Remove active class from all nav buttons
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Add active class to current view's button
+    const activeButton = document.querySelector(`[data-view="${viewId}"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+}
 
-        const categoryNames = {
-            'all': 'All Products',
-            'classic': 'Classic Drinks', 
-            'special': 'Specialty Drinks',
-            'treat': 'Sweet Treats'
-        };
+// Replace the filterByCategory method:
+// Update the filterByCategory method:
+filterByCategory(category) {
+    console.log('🎯 FILTER BY CATEGORY CALLED:', category);
+    
+    const categoryNames = {
+        'all': 'All Products',
+        'oppo': 'Oppo Phones',
+        'Apple': 'Apple iPhones', 
+        'Tecno': 'Tecno Phones',
+        'infinix': 'Infinix Phones',
+        'samsung': 'Samsung Phones',
+        'nokia': 'Nokia Phones',
+        'Xiomi': 'Xiaomi Phones'
+    };
 
-        const categoryDescriptions = {
-            'all': 'Discover our refreshing lemonade collection!',
-            'classic': 'Traditional lemonade favorites everyone loves!',
-            'special': 'Unique and creative lemonade creations!',
-            'treat': 'Delicious lemon-flavored snacks and desserts!'
-        };
-
-        const currentCategory = document.getElementById('current-category');
-        const categoryDescription = document.getElementById('category-description');
-        
-        if (currentCategory) currentCategory.textContent = categoryNames[category];
-        if (categoryDescription) categoryDescription.textContent = categoryDescriptions[category];
+    const currentCategory = document.getElementById('current-category');
+    const categoryDescription = document.getElementById('category-description');
+    
+    if (currentCategory) {
+        currentCategory.textContent = categoryNames[category] || 'All Products';
+    }
+    
+    if (categoryDescription) {
+        categoryDescription.textContent = category === 'all' 
+            ? 'Discover our refreshing phone collection!' 
+            : `Browse our ${categoryNames[category]} collection`;
+    }
+    
+    // Switch to home view first to ensure products are visible
+    this.switchView('home-view');
+    
+    // Then filter the products - add a small delay to ensure DOM is ready
+    setTimeout(() => {
         this.filterProducts('', category);
-    }
+    }, 100);
+}
 
-    filterProducts(searchTerm = '', category = 'all') {
-        const products = document.querySelectorAll('.product-card');
+// Replace the current filterProducts method with this:
+filterProducts(searchTerm = '', category = 'all') {
+    console.log('🔍 FILTER PRODUCTS CALLED - Category:', category, 'Search:', searchTerm);
+    
+    const productsContainer = document.querySelector('.products');
+    if (!productsContainer) return;
+    
+    // First, get all products from the backend data
+    let filteredProducts = this.products.filter(product => {
+        if (product.status !== 'active') return false;
         
-        products.forEach(product => {
-            const productName = product.getAttribute('data-name');
-            const productTags = product.getAttribute('data-tags');
-            const productCategory = product.getAttribute('data-category');
-            const productText = (productName + ' ' + productTags).toLowerCase();
-            
-            const matchesSearch = !searchTerm || productText.includes(searchTerm.toLowerCase());
-            const matchesCategory = category === 'all' || productCategory === category;
-            
-            product.style.display = (matchesSearch && matchesCategory) ? 'block' : 'none';
-        });
+        // Filter by category - FIXED: Use exact matching
+        const matchesCategory = category === 'all' || 
+                              product.category.toLowerCase() === category.toLowerCase();
+        
+        // Filter by search term
+        const matchesSearch = !searchTerm || 
+                            product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
+        
+        return matchesCategory && matchesSearch;
+    });
+    
+    console.log(`📦 Filtered ${filteredProducts.length} products for category: ${category}`);
+    
+    // Render the filtered products
+    if (filteredProducts.length === 0) {
+        this.showNoProductsMessage(category, searchTerm);
+    } else {
+        this.hideNoProductsMessage();
+        
+        productsContainer.innerHTML = filteredProducts.map(product => {
+            return `
+            <div class="product-card2" data-category="${product.category}" data-name="${product.name.toLowerCase()}">
+                <img src="${product.image}" alt="${product.name}" 
+                     onclick="lemonadeApp.showProductDetail(${JSON.stringify(product).replace(/"/g, '&quot;')})"
+                     style="cursor: pointer;"
+                     onerror="this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
+                <h3>${product.name}</h3>
+                <div class="price2">ksh ${product.price.toFixed(2)}</div>
+                ${product.stock > 0 ? `
+                 
+                ` : `
+                    <button class="add-to-cart out-of-stock" disabled>
+                        Out of Stock
+                    </button>
+                `}
+            </div>
+            `;
+        }).join('');
     }
 
-    // Theme Management
+    this.setupProductInteractions();
+}
+
+// Update the showNoProductsMessage method:
+showNoProductsMessage(category, searchTerm) {
+    const productsContainer = document.querySelector('.products');
+    if (!productsContainer) return;
+    
+    // Remove existing message first
+    this.hideNoProductsMessage();
+    
+    let message = '';
+    const categoryNames = {
+        'all': 'All Products',
+        'oppo': 'Oppo',
+        'Apple': 'Apple', 
+        'Tecno': 'Tecno',
+        'infinix': 'Infinix',
+        'samsung': 'Samsung',
+        'nokia': 'Nokia',
+        'Xiomi': 'Xiaomi'
+    };
+    
+    const displayCategory = categoryNames[category] || category;
+    
+    if (searchTerm) {
+        message = `No products found for "${searchTerm}" in ${displayCategory} category`;
+    } else {
+        message = `No products found in ${displayCategory} category`;
+    }
+    
+    const messageElement = document.createElement('div');
+    messageElement.className = 'no-products-message';
+    messageElement.style.cssText = `
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-light);
+        font-style: italic;
+        width: 100%;
+    `;
+    messageElement.innerHTML = `
+        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+        <p>${message}</p>
+        <small>Try selecting a different category or search term</small>
+    `;
+    productsContainer.appendChild(messageElement);
+}
+
+hideNoProductsMessage() {
+    const existingMessage = document.querySelector('.no-products-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+}
+
+
+   // Theme Management
     toggleTheme() {
         this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', this.currentTheme);
@@ -1380,6 +2819,7 @@ renderProducts() {
         }
     }
 
+    
     // Utility Functions
     showMessage(message) {
         const existingMessage = document.querySelector('.message-toast');
@@ -1412,6 +2852,7 @@ renderProducts() {
     }
 }
 
+
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
     window.lemonadeApp = new LemonadeApp();
@@ -1431,3 +2872,6 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+
+

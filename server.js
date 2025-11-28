@@ -35,55 +35,7 @@ async function ensureDirectories() {
         console.error('Error creating directories:', error);
     }
 }
-// Add this after ensureDirectories() function in server.js
-async function initializeDefaultProducts() {
-    try {
-        const products = await readJSON('products.json');
-        
-        if (products.length === 0) {
-            const defaultProducts = [
-                {
-                    id: 1,
-                    name: "iPhone 14 Pro",
-                    price: 999.99,
-                    description: "Latest Apple smartphone with advanced camera",
-                    category: "Apple",
-                    stock: 50,
-                    status: "active",
-                    image: "https://via.placeholder.com/300x200/007AFF/FFFFFF?text=iPhone+14",
-                    tags: "apple, smartphone, premium"
-                },
-                {
-                    id: 2,
-                    name: "Samsung Galaxy S23",
-                    price: 899.99,
-                    description: "Premium Android phone with great display",
-                    category: "samsung",
-                    stock: 30,
-                    status: "active",
-                    image: "https://via.placeholder.com/300x200/1428A0/FFFFFF?text=Galaxy+S23",
-                    tags: "samsung, android, smartphone"
-                },
-                {
-                    id: 3,
-                    name: "Oppo Reno 8",
-                    price: 499.99,
-                    description: "Great camera phone for photography",
-                    category: "oppo",
-                    stock: 25,
-                    status: "active",
-                    image: "https://via.placeholder.com/300x200/46C1BE/FFFFFF?text=Oppo+Reno+8",
-                    tags: "oppo, camera, android"
-                }
-            ];
-            
-            await writeJSON('products.json', defaultProducts);
-            console.log('✅ Default products created');
-        }
-    } catch (error) {
-        console.error('Error creating default products:', error);
-    }
-}
+
 // Helper functions
 async function readJSON(filename) {
     try {
@@ -633,7 +585,7 @@ app.put('/api/user/address/:userId', async (req, res) => {
 
 async function startServer() {
     await ensureDirectories();
-      await initializeDefaultProducts(); // Add this line
+    
     
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`

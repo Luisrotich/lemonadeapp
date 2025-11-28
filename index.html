@@ -49,7 +49,8 @@
                  <div class="category-card" data-category="oppo">
                    <img src="uploads/oppo.jpg" alt=" " class="category-icon" />
                    <span>oppo</span>
-                   </div> <div class="category-card" data-category="Apple">
+                   </div>
+                    <div class="category-card" data-category="Apple">
                    <img src="uploads/apple.jpg" alt=" " class="category-icon" />
                    <span>Apple</span>
                 </div> <div class="category-card" data-category="Tecno">
@@ -69,14 +70,6 @@
                    <img src="uploads/xiomi.jpg" alt=" " class="category-icon" />
                    <span>Xiomi</span>
                 </div>
-               
-                
-
-               
-
-             
-                
-                </div>
             </div>
         </div>
 
@@ -95,7 +88,7 @@
                     <span id="cart-total-amount">$0.00</span>
                 </div>
                 <button class="checkout-btn" id="checkout-btn">
-                    <i class="fas fa-shopping-bag"></i> Checkout
+                    <i ></i> Checkout
                 </button>
             </div>
         </div>
@@ -274,6 +267,7 @@
 
       <!-- Product Detail View -->
     <div class="product-detail-container" id="product-detail-view" style="display: none;">
+        <p style="font-weight: bolder;font-size: x-large;">Product Details</p><Br>
         <!-- Add this header with both buttons -->
         <div class="detail-header">
             <button class="back-button" id="back-to-products">
@@ -285,6 +279,7 @@
                 <span class="cart-badge-detail" id="cart-badge-detail">0</span>
             </button>
         </div>
+
 
         <div class="product-gallery">
             <img id="main-product-image" class="main-image" src="" alt="Product Image">
@@ -328,12 +323,17 @@
             <h2 class="section-title">Customer Reviews</h2>
             
             <div class="rating-summary">
-                <div class="average-rating" id="average-rating">4.5</div>
+                <div class="average-rating" id="average-rating"><p style="font-weight:bold ;">4.5</p>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                </div>
                 <div>
                     <div class="rating-stars" id="rating-stars">
                         <!-- Stars will be generated here -->
                     </div>
-                    <div class="review-count" id="review-count">Based on 12 reviews</div>
+                    <div class="review-count" id="review-count"></div>
                 </div>
             </div>
             
@@ -343,12 +343,7 @@
         </div>
     </div>
 
-     
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <!-- Your existing bottom nav code -->
-    </nav>
-
+   
     
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
@@ -494,9 +489,78 @@
         </div>
     </div>
 
+
+
+
+
+
+
+    
     <!-- Modal Overlay -->
     <div class="modal-overlay" id="modal-overlay"></div>
 
+<!-- App Download Popup -->
+<div id="app-download-popup" class="app-download-popup" style="display: none;">
+    <div class="app-download-content">
+        <div class="app-download-header">
+            <button class="close-popup" id="close-popup">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="app-download-body">
+            <div class="app-icon">
+            </div>
+            
+            <h2>Get Lemonade for Chrome</h2>
+            <p>Download our Chrome extension for the best shopping experience across all your devices!</p>
+            
+            <div class="app-features">
+                <div class="feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Chrome Verified</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-sync"></i>
+                    <span>Auto Updates</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-cloud"></i>
+                    <span>Cross-Device Sync</span>
+                </div>
+            </div>
+            
+            <div class="download-buttons">
+                <button class="download-btn chrome-btn" id="download-chrome">
+                    <i class="fab fa-chrome"></i>
+                    <div>
+                        <span>Downloading app is</span>
+                        <strong style="font-size: larger;">Coming soon.....</strong>
+                    </div>
+                </button>
+            </div>
+            
+         
+            
+            
+        </div>
+    </div>
+</div>
+
+<div class="app-download-overlay" id="app-download-overlay" style="display: none;"></div>
+
+
+
+
+
+
+
+
+
+
+    
     <script src="script.js"></script>
+
+    
 </body>
 </html>
