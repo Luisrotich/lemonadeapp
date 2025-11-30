@@ -694,9 +694,13 @@ class AdminDashboard {
                     <thead>
                         <tr>
                             <th>Customer</th>
+
                             <th>Contact</th>
+
                             <th>Orders</th>
+
                             <th>Total Spent</th>
+                            
                             <th>Last Order</th>
                         </tr>
                     </thead>
