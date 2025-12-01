@@ -890,83 +890,121 @@ buyNowFromDetail() {
         this.fetchProductsFromBackend();
     }
 
-    async fetchProductsFromBackend() {
-        try {
-            const response = await fetch('/api/products');
-            const data = await response.json();
-            if (data.success) {
-                this.products = data.products;
-            } else {
-                this.products = [];
-            }
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            this.products = [];
-        } finally {
-            this.renderProducts();
+async fetchProductsFromBackend() {
+    try {
+        const response = await fetch('/api/products');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
+        const data = await response.json();
+        
+        // Handle different API response formats
+        if (data.products) {
+            this.products = data.products;
+        } else if (Array.isArray(data)) {
+            this.products = data;
+        } else if (data.success && data.products) {
+            this.products = data.products;
+        } else {
+            console.warn('⚠️ Unexpected API response format:', data);
+            this.products = [];
+        }
+        
+        console.log('📦 Products loaded:', this.products.length);
+        
+    } catch (error) {
+        console.error('❌ Error fetching products:', error);
+        this.products = [];
+    } finally {
+        // Always render (even with empty array)
+        this.renderProducts();
     }
-
+}
 
 // In the renderProducts method, ensure data-category is set correctly:
 renderProducts() {
     const productsContainer = document.querySelector('.products');
-    if (!productsContainer) return;
+    if (!productsContainer) {
+        console.error('❌ Products container (.products) not found');
+        return;
+    }
 
-    console.log('🔄 Rendering products:', this.products.length);
-    // In your script.js, after line 916 where it says "🔄 Rendering products: 0"
-if (products.length === 0) {
-    console.log('⚠️ No products received. Using fallback data.');
+    console.log('🔄 Rendering products:', this.products?.length || 0);
     
-    // Fallback products (remove after API works)
-    products = [
-        {
-            id: 1,
-            name: "Sample Product",
-            category: "oppo",
-            price: 299.99,
-            image: "/uploads/placeholder.jpg"
-        }
-    ];
-}
+    // Check if we have products - use this.products (class property)
+    if (!this.products || this.products.length === 0) {
+        console.log('⚠️ No products received. Using fallback data.');
+        
+        // Fallback products
+        this.products = [
+            {
+                id: 1,
+                name: "Sample Product",
+                category: "oppo",
+                price: 299.99,
+                image: "/uploads/placeholder.jpg",
+                status: 'active',
+                stock: 10
+            }
+        ];
+    }
+    
     // First, clear any existing no-products message
     this.hideNoProductsMessage();
     
-    productsContainer.innerHTML = this.products
-        .filter(product => product.status === 'active')
-        .map(product => {
-            console.log('📱 Rendering product:', product.name, 'Category:', product.category);
-            return `
-           <div class="product-card2" 
-     data-category="${product.category}" 
-     data-name="${product.name.toLowerCase()}">
-
-    <img src="${product.image}" alt="${product.name}" 
-         onclick="lemonadeApp.showProductDetail(${JSON.stringify(product).replace(/\"/g, '&quot;')})"
-         style="cursor: pointer;"
-         onerror="this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
-
-    <h3 class="product-title2">${product.name}</h3>
-
-
-    <div class="price2">ksh ${product.price.toFixed(2)}</div>
-
-    ${product.stock > 0 ? `
-                   
-                 
-                ` : `
-                    <button class="add-to-cart out-of-stock" disabled>
-                        Out of Stock
-                    </button>
-                `}
+    // Filter and render products
+    const activeProducts = this.products.filter(product => product.status === 'active');
+    
+    if (activeProducts.length === 0) {
+        productsContainer.innerHTML = `
+            <div class="no-products">
+                <p>No products available at the moment.</p>
             </div>
         `;
+        return;
+    }
+    
+    productsContainer.innerHTML = activeProducts
+        .map(product => {
+            console.log('📱 Rendering product:', product.name, 'Category:', product.category);
+            
+            // Make product safe for HTML attribute
+            const safeProduct = JSON.stringify(product)
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+            
+            return `
+                <div class="product-card2" 
+                     data-category="${product.category || 'all'}" 
+                     data-name="${product.name?.toLowerCase() || ''}">
+                    
+                    <img src="${product.image || '/uploads/placeholder.jpg'}" 
+                         alt="${product.name || 'Product'}" 
+                         onclick="lemonadeApp.showProductDetail(${safeProduct})"
+                         style="cursor: pointer;"
+                         onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
+                    
+                    <h3 class="product-title2">${product.name || 'Unnamed Product'}</h3>
+                    
+                    <div class="price2">Ksh ${product.price?.toFixed(2) || '0.00'}</div>
+                    
+                    ${product.stock > 0 ? `
+                        <button class="add-to-cart" onclick="lemonadeApp.addToCart(${product.id || 0})">
+                            Add to Cart
+                        </button>
+                    ` : `
+                        <button class="add-to-cart out-of-stock" disabled>
+                            Out of Stock
+                        </button>
+                    `}
+                </div>
+            `;
         }).join('');
 
-    console.log('✅ Products rendered');
+    console.log('✅ Products rendered:', activeProducts.length);
     this.setupProductInteractions();
 }
-
 
 // Update setupProductInteractions method:
 // Replace the setupProductInteractions method:
