@@ -1878,14 +1878,14 @@ async loadOrderHistory() {
 // Update formatOrderStatus method:
 formatOrderStatus(status) {
     const statusMap = {
-        'pending': '⏳ Pending',
-        'confirmed': '✅ Confirmed',
-        'preparing': '👨‍🍳 Preparing',
-        'ready': '📦 Ready for Pickup',
-        'out_for_delivery': '🚚 Out for Delivery',
-        'completed': '🎉 Delivered',
-        'cancelled': '❌ Cancelled',
-        'pending_cod': '💰 Pending Cash Payment'
+        'pending': 'Pending',
+        'confirmed': 'Confirmed',
+        'preparing': 'Preparing',
+        'ready': 'Ready for Pickup',
+        'out_for_delivery': 'Out for Delivery',
+        'completed': 'Delivered',
+        'cancelled': 'Cancelled',
+        'pending_cod': 'Pending Cash Payment'
     };
     return statusMap[status] || status;
 }
@@ -2627,7 +2627,7 @@ switchView(viewId) {
     const targetView = document.getElementById(viewId);
     if (targetView) {
         targetView.style.display = 'block';
-        console.log('✅ View displayed:', viewId);
+        console.log('View displayed:', viewId);
         
         // Load view-specific data
         switch(viewId) {
