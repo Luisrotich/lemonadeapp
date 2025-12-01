@@ -892,7 +892,7 @@ buyNowFromDetail() {
 
     async fetchProductsFromBackend() {
         try {
-            const response = await fetch('http://localhost:5000/api/products');
+            const response = await fetch('/api/products');
             const data = await response.json();
             if (data.success) {
                 this.products = data.products;
@@ -914,7 +914,21 @@ renderProducts() {
     if (!productsContainer) return;
 
     console.log('🔄 Rendering products:', this.products.length);
+    // In your script.js, after line 916 where it says "🔄 Rendering products: 0"
+if (products.length === 0) {
+    console.log('⚠️ No products received. Using fallback data.');
     
+    // Fallback products (remove after API works)
+    products = [
+        {
+            id: 1,
+            name: "Sample Product",
+            category: "oppo",
+            price: 299.99,
+            image: "/uploads/placeholder.jpg"
+        }
+    ];
+}
     // First, clear any existing no-products message
     this.hideNoProductsMessage();
     

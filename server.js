@@ -612,9 +612,9 @@ async function startServer() {
 - GET  /api/user/orders/:userId
 - PUT  /api/user/address/:userId
 
-🌍 Your app will be available at: https://your-app-name.onrender.com
-        `);
+     `);
     });
 }
 
 startServer().catch(console.error);
+

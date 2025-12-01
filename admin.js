@@ -332,7 +332,7 @@ class AdminDashboard {
                     <small class="text-muted">${itemsSummary}</small>
                 </td>
                 <td>${new Date(order.date).toLocaleDateString()}</td>
-                <td><strong>$${parseFloat(order.total || 0).toFixed(2)}</strong></td>
+                <td><strong>ksh ${parseFloat(order.total || 0).toFixed(2)}</strong></td>
                 <td>
                     <span class="status-badge status-${order.status}">
                         ${this.formatOrderStatus(order.status)}
@@ -475,7 +475,7 @@ class AdminDashboard {
                     <small>${product.description || 'No description'}</small>
                 </td>
                 <td>${this.formatCategory(product.category)}</td>
-                <td><strong>$${product.price.toFixed(2)}</strong></td>
+                <td><strong>ksh ${product.price.toFixed(2)}</strong></td>
                 <td>
                     <span class="stock-indicator stock-${this.getStockLevel(product.stock)}">
                         ${product.stock} units
@@ -716,7 +716,7 @@ class AdminDashboard {
                                     ${customer.phone ? `<div><i class="fas fa-phone"></i> ${customer.phone}</div>` : ''}
                                 </td>
                                 <td><span class="order-count">${customer.orderCount || 0}</span></td>
-                                <td><strong>$${(customer.totalSpent || 0).toFixed(2)}</strong></td>
+                                <td><strong>ksh ${(customer.totalSpent || 0).toFixed(2)}</strong></td>
                                 <td>${customer.lastOrder ? new Date(customer.lastOrder).toLocaleDateString() : 'Never'}</td>
                             </tr>
                         `).join('')}
@@ -734,7 +734,7 @@ class AdminDashboard {
         const totalCustomers = this.customers.length;
         const totalProducts = this.products.length;
 
-        document.getElementById('stat-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
+        document.getElementById('stat-revenue').textContent = `ksh${totalRevenue.toFixed(2)}`;
         document.getElementById('stat-orders').textContent = this.orders.length;
         document.getElementById('stat-customers').textContent = totalCustomers;
         document.getElementById('stat-products').textContent = totalProducts;
@@ -749,7 +749,7 @@ class AdminDashboard {
 
         const items = order.items || [];
         const itemsList = items.map(item => 
-            `${item.product} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`
+            `${item.product} x${item.quantity} - ksh ${(item.price * item.quantity).toFixed(2)}`
         ).join('\n');
 
         const details = `
@@ -767,7 +767,7 @@ Delivery: ${order.deliveryAddress || 'No address'}
 Items:
 ${itemsList || 'No items'}
 
-Total: $${order.total.toFixed(2)}
+Total: ksh ${order.total.toFixed(2)}
         `;
 
         alert(details);

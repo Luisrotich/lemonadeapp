@@ -31,9 +31,9 @@
     "category": "oppo",
     "stock": 1999,
     "status": "active",
-    "image": "/uploads/product_1764262938998.png",
+    "image": "/uploads/product_1764501380533.png",
     "createdAt": "2025-11-27T17:02:19.000Z",
-    "updatedAt": "2025-11-27T17:02:19.000Z"
+    "updatedAt": "2025-11-30T11:16:20.535Z"
   },
   {
     "id": 1764311440171,
@@ -60,27 +60,27 @@
     "updatedAt": "2025-11-28T06:33:03.528Z"
   },
   {
-    "id": 1764311651335,
-    "name": "sumsung A06",
-    "price": 14555,
-    "description": "sumsung A06",
-    "category": "samsung",
+    "id": 1764500198259,
+    "name": "iphone 17 pro max",
+    "price": 199000,
+    "description": "dfgkuvlwetgkg,jdSJk.d",
+    "category": "Apple",
     "stock": 1000,
     "status": "active",
-    "image": "/uploads/product_1764311651332.png",
-    "createdAt": "2025-11-28T06:34:11.335Z",
-    "updatedAt": "2025-11-28T06:34:11.335Z"
+    "image": "/uploads/product_1764500198257.png",
+    "createdAt": "2025-11-30T10:56:38.259Z",
+    "updatedAt": "2025-11-30T10:56:38.259Z"
   },
   {
-    "id": 1764311726859,
-    "name": "infinix 20",
-    "price": 12000,
-    "description": "infinix ghjkl;gjk",
-    "category": "infinix",
-    "stock": 12000,
+    "id": 1764500494039,
+    "name": "nknkn333",
+    "price": 1800,
+    "description": "sd;ml,'mljfg",
+    "category": "Hoodies",
+    "stock": 100,
     "status": "active",
-    "image": "/uploads/product_1764311726854.png",
-    "createdAt": "2025-11-28T06:35:26.859Z",
-    "updatedAt": "2025-11-28T06:35:26.859Z"
+    "image": "/uploads/product_1764500647464.png",
+    "createdAt": "2025-11-30T11:01:34.039Z",
+    "updatedAt": "2025-11-30T11:04:07.468Z"
   }
 ]
