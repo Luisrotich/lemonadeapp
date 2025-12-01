@@ -1,3 +1,4 @@
+
 // Mobile E-Commerce App - Complete Implementation
 class LemonadeApp {
     constructor() {
@@ -990,9 +991,7 @@ renderProducts() {
                     <div class="price2">Ksh ${product.price?.toFixed(2) || '0.00'}</div>
                     
                     ${product.stock > 0 ? `
-                        <button class="add-to-cart" onclick="lemonadeApp.addToCart(${product.id || 0})">
-                            Add to Cart
-                        </button>
+                      
                     ` : `
                         <button class="add-to-cart out-of-stock" disabled>
                             Out of Stock
@@ -2924,6 +2923,3 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-
-
-

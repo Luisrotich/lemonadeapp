@@ -27,5 +27,16 @@
     "orders": 0,
     "totalSpent": 0,
     "lastOrder": null
+  },
+  {
+    "id": 1764582983471,
+    "name": "Luis rotich",
+    "email": "l.rspacekuuenya@gmail.com",
+    "phone": "0740972350",
+    "password": "default-password",
+    "createdAt": "2025-12-01T09:56:23.471Z",
+    "orders": 0,
+    "totalSpent": 0,
+    "lastOrder": null
   }
 ]
