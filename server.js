@@ -10,7 +10,11 @@ const DATA_DIR = path.join(__dirname, 'data');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Or specify frontend domain
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static('.'));
 app.use('/uploads', express.static('uploads'));
