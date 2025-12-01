@@ -2873,9 +2873,10 @@ if ('serviceWorker' in navigator) {
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('🍋 PWA: beforeinstallprompt event fired!');
     // Prevent Chrome from showing the default prompt
     e.preventDefault();
-    
+
     // Save the event to trigger later
     deferredPrompt = e;
 
@@ -2883,23 +2884,73 @@ window.addEventListener('beforeinstallprompt', (e) => {
     const installBtn = document.getElementById('install-btn');
     if (installBtn) {
         installBtn.style.display = 'block'; // Show the button
+        console.log('🍋 PWA: Install button shown');
+
         installBtn.addEventListener('click', async () => {
+            console.log('🍋 PWA: Install button clicked');
             // Show the prompt
             deferredPrompt.prompt();
 
             // Wait for the user to respond
             const choiceResult = await deferredPrompt.userChoice;
             if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the install prompt');
+                console.log('🍋 PWA: User accepted the install prompt');
+                // Hide button after successful installation
+                installBtn.style.display = 'none';
             } else {
-                console.log('User dismissed the install prompt');
+                console.log('🍋 PWA: User dismissed the install prompt');
+                // Keep button visible for future attempts
             }
 
             // Reset the deferred prompt
             deferredPrompt = null;
-            installBtn.style.display = 'none';
         });
     }
+});
+
+// Check if app is already installed
+window.addEventListener('appinstalled', (e) => {
+    console.log('🍋 PWA: App was installed successfully!');
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn) {
+        installBtn.style.display = 'none';
+    }
+});
+
+// Debug PWA readiness
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        console.log('🍋 PWA Debug Info:');
+        console.log('- Service Worker support:', 'serviceWorker' in navigator);
+        console.log('- Manifest link exists:', !!document.querySelector('link[rel="manifest"]'));
+        console.log('- Is HTTPS or localhost:', location.protocol === 'https:' || location.hostname === 'localhost');
+        console.log('- BeforeInstallPrompt support:', 'onbeforeinstallprompt' in window);
+
+        // Check if manifest is accessible
+        fetch('/manifest.json')
+            .then(response => {
+                console.log('- Manifest fetch status:', response.status);
+                return response.json();
+            })
+            .then(manifest => {
+                console.log('- Manifest loaded successfully:', manifest.name);
+                console.log('- Manifest icons:', manifest.icons);
+            })
+            .catch(error => {
+                console.error('- Manifest fetch failed:', error);
+            });
+
+        // Check service worker status
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                console.log('- Service Worker registrations:', registrations.length);
+                registrations.forEach(reg => {
+                    console.log('  - SW scope:', reg.scope);
+                    console.log('  - SW state:', reg.active?.state);
+                });
+            });
+        }
+    }, 2000);
 });
 
 
