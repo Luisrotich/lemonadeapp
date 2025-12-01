@@ -11,7 +11,7 @@ const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // Middleware
 app.use(cors({
-  origin: 'https://lemonadeapp-production-611f.up.railway.com', // Or specify frontend domain
+  origin: 'https://lemonadeapp-production-611f.up.railway.app', // Or specify frontend domain
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));

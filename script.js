@@ -1,6 +1,6 @@
 
 // Mobile E-Commerce App - Complete Implementation
-const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://lemonadeapp-production-611f.up.railway.com';
+const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://lemonadeapp-production-611f.up.railway.app';
 class LemonadeApp {
     constructor() {
         this.cart = [];
@@ -8,7 +8,7 @@ class LemonadeApp {
         this.currentUser = null;
         this.currentTheme = 'light';
         this.products = [];
-        this.baseURL = 'https://lemonadeapp-production-611f.up.railway.com';
+        this.baseURL = 'https://lemonadeapp-production-611f.up.railway.app';
         this.currentProductDetail = null;
         this.currentDetailQuantity = 1;
         this.deferredPrompt = null; // For PWA install prompt
