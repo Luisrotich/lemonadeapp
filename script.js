@@ -2908,6 +2908,38 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
+// Fallback: Show install button if PWA criteria are met but beforeinstallprompt didn't fire
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        // Check if we're in a PWA-capable environment
+        const isPWAReady = (
+            'serviceWorker' in navigator &&
+            window.matchMedia('(display-mode: standalone)').matches === false &&
+            (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        );
+
+        // If PWA is ready but no beforeinstallprompt event fired, show the button anyway
+        if (isPWAReady && !deferredPrompt) {
+            console.log('🍋 PWA: Showing install button as fallback');
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn) {
+                installBtn.style.display = 'block';
+                installBtn.textContent = '📱 Install Lemonade App';
+
+                installBtn.addEventListener('click', () => {
+                    // Since we don't have the deferred prompt, try to trigger installation manually
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                    } else {
+                        // Fallback: Show instructions
+                        alert('To install this app:\n1. Click the menu (⋮) in your browser\n2. Select "Add to Home screen"\n3. Follow the prompts');
+                    }
+                });
+            }
+        }
+    }, 3000); // Wait 3 seconds for beforeinstallprompt to potentially fire
+});
+
 // Check if app is already installed
 window.addEventListener('appinstalled', (e) => {
     console.log('🍋 PWA: App was installed successfully!');
@@ -2923,8 +2955,10 @@ window.addEventListener('load', () => {
         console.log('🍋 PWA Debug Info:');
         console.log('- Service Worker support:', 'serviceWorker' in navigator);
         console.log('- Manifest link exists:', !!document.querySelector('link[rel="manifest"]'));
-        console.log('- Is HTTPS or localhost:', location.protocol === 'https:' || location.hostname === 'localhost');
+        console.log('- Is HTTPS or localhost:', location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
         console.log('- BeforeInstallPrompt support:', 'onbeforeinstallprompt' in window);
+        console.log('- Current URL:', window.location.href);
+        console.log('- Display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
 
         // Check if manifest is accessible
         fetch('/manifest.json')
@@ -2935,6 +2969,8 @@ window.addEventListener('load', () => {
             .then(manifest => {
                 console.log('- Manifest loaded successfully:', manifest.name);
                 console.log('- Manifest icons:', manifest.icons);
+                console.log('- Manifest start_url:', manifest.start_url);
+                console.log('- Manifest scope:', manifest.scope);
             })
             .catch(error => {
                 console.error('- Manifest fetch failed:', error);
