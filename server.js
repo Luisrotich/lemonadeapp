@@ -111,7 +111,7 @@ app.get('/admin', (req, res) => {
 
 // ====== AUTHENTICATION ======
 app.post('/api/auth/signup', async (req, res) => {
-    console.log("Received signup request body:", req.body);
+    // console.log("Received signup request body:", req.body);
 
     try {
         const { name, email, phone, password } = req.body;
