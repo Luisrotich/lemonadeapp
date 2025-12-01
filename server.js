@@ -19,6 +19,13 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.static('.'));
 app.use('/uploads', express.static('uploads'));
 
+// Serve manifest.json with correct MIME type
+app.get('/manifest.json', (req, res) => {
+  res.type('application/manifest+json');
+  res.sendFile(path.join(__dirname, 'manifest.json'));
+});
+
+
 // Ensure data and uploads directories exist
 async function ensureDirectories() {
     try {

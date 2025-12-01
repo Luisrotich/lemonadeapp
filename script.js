@@ -2870,6 +2870,39 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome from showing the default prompt
+    e.preventDefault();
+    
+    // Save the event to trigger later
+    deferredPrompt = e;
+
+    // Show your custom install button
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn) {
+        installBtn.style.display = 'block'; // Show the button
+        installBtn.addEventListener('click', async () => {
+            // Show the prompt
+            deferredPrompt.prompt();
+
+            // Wait for the user to respond
+            const choiceResult = await deferredPrompt.userChoice;
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            } else {
+                console.log('User dismissed the install prompt');
+            }
+
+            // Reset the deferred prompt
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        });
+    }
+});
+
+
 // Add CSS animations
 const style = document.createElement('style');
 style.textContent = `

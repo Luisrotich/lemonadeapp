@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lemonade</title>
-<link rel="icon" type="image/png" sizes="32x32" href="uploads/appicon.jpg">
-
+    <link rel="icon" type="image/png" sizes="32x32" href="uploads/appicon.jpg">
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -500,8 +500,9 @@
 
     <div class="app-download-overlay" id="app-download-overlay" style="display: none;"></div>
 
-    <script src="script.js"></script>
+    <button id="install-btn" style="display:none; position:fixed; bottom:20px; right:20px; padding:1rem; background:#ff6f00; color:#fff; border:none; border-radius:10px; cursor:pointer;">Install Lemonade 🍋</button>
 
-    
+
+    <script src="script.js"></script>
 </body>
 </html>
