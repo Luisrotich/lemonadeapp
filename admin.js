@@ -5,7 +5,7 @@ class AdminDashboard {
         this.products = [];
         this.customers = [];
         this.currentUser = null;
-        this.baseURL = 'http://localhost:5000';
+        this.baseURL = 'https://lemonadeapp-production-611f.up.railway.com';
         this.currentProductImage = null;
         
         this.init();

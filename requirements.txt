@@ -1,0 +1,38 @@
+# Lemonade Store Requirements
+# ===========================
+
+# Core Dependencies
+express==4.21.2
+cors==2.8.5
+
+# Additional Dependencies (if needed for future features)
+# bcrypt==5.1.0          # For password hashing
+# jsonwebtoken==9.0.2    # For JWT authentication
+# multer==1.4.5-lts.1    # For file uploads
+# nodemailer==6.9.7      # For email notifications
+# stripe==13.17.0        # For payment processing
+# mongoose==8.0.3        # For MongoDB (if switching from file-based storage)
+# socket.io==4.7.4       # For real-time features
+
+# Development Dependencies
+# nodemon==3.0.2         # For development server auto-restart
+# dotenv==16.3.1         # For environment variables
+
+# Testing Dependencies (if implementing tests)
+# jest==29.7.0           # For unit testing
+# supertest==6.3.3       # For API testing
+
+# Python Dependencies (if adding Python components)
+# flask==3.0.0           # Alternative backend
+# requests==2.31.0       # For API calls
+# pillow==10.1.0         # For image processing
+# python-dotenv==1.0.0   # For environment variables
+
+# Database Dependencies (future use)
+# sqlite3==5.1.0         # For SQLite database
+# psycopg2==2.9.9        # For PostgreSQL
+# pymongo==4.6.0         # For MongoDB
+
+# Deployment Dependencies
+# gunicorn==21.2.0       # For production server
+# waitress==3.0.0        # Alternative production server

@@ -1,5 +1,6 @@
 
 // Mobile E-Commerce App - Complete Implementation
+const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://lemonadeapp-production-611f.up.railway.com';
 class LemonadeApp {
     constructor() {
         this.cart = [];
@@ -7,41 +8,32 @@ class LemonadeApp {
         this.currentUser = null;
         this.currentTheme = 'light';
         this.products = [];
-        this.baseURL = 'http://localhost:5000';
+        this.baseURL = 'https://lemonadeapp-production-611f.up.railway.com';
         this.currentProductDetail = null;
         this.currentDetailQuantity = 1;
-        
+        this.deferredPrompt = null; // For PWA install prompt
+
         this.initializeApp();
     }
 
     initializeApp() {
-    this.loadCartFromStorage();
-    this.loadUserPreferences();
-    this.loadProducts();
-    this.setupEventListeners();
-    this.setupCheckoutListeners();
-    this.setupAccountNavigation();
-     this.setupCategoryListeners(); // Add this line
-    this.setupProductDetailListeners(); // ADD THIS LINE
-     this.setupProductDetailListeners();
-    this.setupAppDownloadPopup(); // Add this line
-    this.updateUI();
+        this.loadCartFromStorage();
+        this.loadUserPreferences();
+        this.loadProducts();
+        this.setupEventListeners();
+        this.setupCheckoutListeners();
+        this.setupAccountNavigation();
+        this.setupCategoryListeners();
+        this.setupProductDetailListeners();
+        this.setupAppDownloadPopup();
+        this.updateUI();
 
- setTimeout(() => {
-        this.debugProductCategories();
-         this.debugCart(); // Add cart debug
-          this.debugCartMath(); // Add this line
-    }, 2000);
-    
-
-}
-
-
-//kkkkkkkkk
-
-
-
-
+        setTimeout(() => {
+            this.debugProductCategories();
+            this.debugCart();
+            this.debugCartMath();
+        }, 2000);
+    }
 
 // Add these methods to your LemonadeApp class:
 
@@ -565,45 +557,6 @@ setupSmartPopupTrigger() {
         return result;
     }.bind(this);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//tytyy
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Add this method to debug category issues:
 debugProductCategories() {
@@ -1528,7 +1481,7 @@ debugCart() {
             
             console.log('Sending order to backend:', orderData);
             
-            const response = await fetch('http://localhost:5000/api/orders', {
+            const response = await fetch(`${this.baseURL}/api/orders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1609,7 +1562,7 @@ debugCart() {
 
     async saveUserAddress(address) {
         try {
-            const response = await fetch(`http://localhost:5000/api/user/address/${this.currentUser.id}`, {
+            const response = await fetch(`${this.baseURL}/api/user/address/${this.currentUser.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ address: address })
@@ -1831,9 +1784,9 @@ loadNotifications() {
 // Replace the loadOrderHistory method:
 async loadOrderHistory() {
     if (!this.currentUser) return;
-    
+
     try {
-        const response = await fetch(`http://localhost:5000/api/user/orders/${this.currentUser.id}`);
+        const response = await fetch(`${this.baseURL}/api/user/orders/${this.currentUser.id}`);
         const data = await response.json();
         
         const ordersHistory = document.getElementById('orders-history');
@@ -2089,7 +2042,7 @@ const notifications = JSON.parse(localStorage.getItem(key) || '[]');
         
         try {
             // Try to save to backend first
-            const response = await fetch(`http://localhost:5000/api/user/address/${this.currentUser.id}`, {
+            const response = await fetch(`${BASE_URL}/api/user/address/${this.currentUser.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ address: address })
@@ -2540,7 +2493,7 @@ checkProductCategories() {
 
         try {
             // Call backend login API
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2586,7 +2539,7 @@ checkProductCategories() {
 
         try {
             // Call backend signup API
-            const response = await fetch('http://localhost:5000/api/auth/signup', {
+            const response = await fetch(`${BASE_URL}/api/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
