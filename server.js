@@ -5,7 +5,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 5000; // Render provides PORT
+const PORT = process.env.PORT || 5000;
 const DATA_DIR = path.join(__dirname, 'data');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
@@ -43,9 +43,16 @@ async function ensureDirectories() {
 // Helper functions
 async function readJSON(filename) {
     try {
-        const data = await fs.readFile(path.join(DATA_DIR, filename), 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
+        const filePath = path.join(DATA_DIR, filename);
+
+        if (!fs.stat(filePath)) {
+            await fs.writeFile(filePath, '[]');  // create new file
+        }
+
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data || '[]');
+    } catch (err) {
+        console.error("readJSON error:", err);
         return [];
     }
 }
@@ -97,6 +104,8 @@ app.get('/admin', (req, res) => {
 
 // ====== AUTHENTICATION ======
 app.post('/api/auth/signup', async (req, res) => {
+    console.log("Received signup request body:", req.body);
+
     try {
         const { name, email, phone, password } = req.body;
 
