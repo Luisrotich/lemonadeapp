@@ -1283,6 +1283,12 @@ input:checked + .slider:before {
     }
 }
 
+@media screen and (max-width: 768px) {
+    .account-actions {
+        margin-left: 0;
+    }
+}
+
 @media (min-width: 1024px) {
     .products {
         grid-template-columns: repeat(3, 1fr);
