@@ -2862,6 +2862,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.lemonadeApp = new LemonadeApp();
 });
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then(reg => console.log('Service Worker registered with scope:', reg.scope))
+      .catch(err => console.error('SW registration failed:', err));
+  });
+}
+
 // Add CSS animations
 const style = document.createElement('style');
 style.textContent = `
