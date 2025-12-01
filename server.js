@@ -11,7 +11,7 @@ const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // Middleware
 app.use(cors({
-  origin: '*', // Or specify frontend domain
+  origin: 'https://lemonadeapp-production-611f.up.railway.com', // Or specify frontend domain
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
@@ -95,33 +95,32 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
-// ============ AUTHENTICATION ============
-
+// ====== AUTHENTICATION ======
 app.post('/api/auth/signup', async (req, res) => {
     try {
         const { name, email, phone, password } = req.body;
-        
+
         if (!name || (!email && !phone)) {
             return res.status(400).json({
                 success: false,
                 message: 'Name and either email or phone required'
             });
         }
-        
+
         const users = await readJSON('users.json');
-        
+
         // Check if user exists
-        const existingUser = users.find(u => 
+        const existingUser = users.find(u =>
             (email && u.email === email) || (phone && u.phone === phone)
         );
-        
+
         if (existingUser) {
             return res.status(400).json({
                 success: false,
                 message: 'User already exists'
             });
         }
-        
+
         const newUser = {
             id: Date.now(),
             name,
@@ -133,18 +132,19 @@ app.post('/api/auth/signup', async (req, res) => {
             totalSpent: 0,
             lastOrder: null
         };
-        
+
         users.push(newUser);
         await writeJSON('users.json', users);
-        
-        // Remove password from response
+
+        // Remove password before sending response
         const { password: _, ...userWithoutPassword } = newUser;
-        
+
         res.json({
             success: true,
             user: userWithoutPassword,
             message: 'Signup successful'
         });
+
     } catch (error) {
         console.error('Signup error:', error);
         res.status(500).json({
@@ -157,28 +157,36 @@ app.post('/api/auth/signup', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, phone, password } = req.body;
-        
+
         const users = await readJSON('users.json');
-        
-        const user = users.find(u => 
+
+        const user = users.find(u =>
             (email && u.email === email) || (phone && u.phone === phone)
         );
-        
+
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: 'User not found'
             });
         }
-        
-        // Remove password from response
+
+        // 🔴 PASSWORD CHECK (YOU MISSED THIS)
+        if (user.password !== password) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid password'
+            });
+        }
+
         const { password: _, ...userWithoutPassword } = user;
-        
+
         res.json({
             success: true,
             user: userWithoutPassword,
             message: 'Login successful'
         });
+
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({
