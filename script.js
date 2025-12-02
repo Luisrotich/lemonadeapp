@@ -892,10 +892,16 @@ renderProducts() {
         
         // Fallback products
         this.products = [
-        
-           
+            {
+                id: 1,
+                name: "Sample Product",
+                category: "oppo",
+                price: 299.99,
+                image: "/uploads/placeholder.jpg",
+                status: 'active',
+                stock: 10
+            }
         ];
-        
     }
     
     // First, clear any existing no-products message
@@ -2321,13 +2327,13 @@ const notifications = JSON.parse(localStorage.getItem(key) || '[]');
 
     formatCategory(category) {
         const categories = {
-            'Electonics': 'Electronics',
-            'Home & Kitchen': 'Home & Kitchen',
-            'Fashion & Clothing': 'Fashion & Clothing',
-            'Home Tools': 'Home Tools',
-            'Automotives': 'Automotives',
-            'Shoes': 'Shoes',
-          
+            'oppo': 'Oppo',
+            'Apple': 'Apple',
+            'Tecno': 'Tecno',
+            'infinix': 'Infinix',
+            'samsung': 'Samsung',
+            'nokia': 'Nokia',
+            'Xiomi': 'Xiaomi'
         };
         return categories[category] || category;
     }
@@ -2666,12 +2672,13 @@ filterByCategory(category) {
     
     const categoryNames = {
         'all': 'All Products',
-        'Electonics': 'Electronics',
-            'Home & Kitchen': 'Home & Kitchen',
-            'Fashion & Clothing': 'Fashion & Clothing',
-            'Home Tools': 'Home Tools',
-            'Automotives': 'Automotives',
-            'Shoes': 'Shoes',
+        'oppo': 'Oppo Phones',
+        'Apple': 'Apple iPhones', 
+        'Tecno': 'Tecno Phones',
+        'infinix': 'Infinix Phones',
+        'samsung': 'Samsung Phones',
+        'nokia': 'Nokia Phones',
+        'Xiomi': 'Xiaomi Phones'
     };
 
     const currentCategory = document.getElementById('current-category');
@@ -2762,12 +2769,13 @@ showNoProductsMessage(category, searchTerm) {
     let message = '';
     const categoryNames = {
         'all': 'All Products',
-        'Electonics': 'Electronics',
-            'Home & Kitchen': 'Home & Kitchen',
-            'Fashion & Clothing': 'Fashion & Clothing',
-            'Home Tools': 'Home Tools',
-            'Automotives': 'Automotives',
-            'Shoes': 'Shoes',
+        'oppo': 'Oppo',
+        'Apple': 'Apple', 
+        'Tecno': 'Tecno',
+        'infinix': 'Infinix',
+        'samsung': 'Samsung',
+        'nokia': 'Nokia',
+        'Xiomi': 'Xiaomi'
     };
     
     const displayCategory = categoryNames[category] || category;
@@ -2811,7 +2819,7 @@ hideNoProductsMessage() {
         
         const themeIcon = document.querySelector('#theme-toggle i');
         if (themeIcon) {
-            themeIcon.className = this.currentTheme === 'light' ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off';
+            themeIcon.className = this.currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
         }
     }
 
