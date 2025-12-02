@@ -1475,8 +1475,245 @@ body {
     .tab-header h2 {
         font-size: 24px;
     }
-<<<<<<< HEAD
+/* 4-Image Upload Grid Styles */
+.image-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: 15px 0;
 }
-=======
+
+@media (max-width: 768px) {
+    .image-upload-grid {
+        grid-template-columns: 1fr;
+    }
 }
->>>>>>> 95d3fa545ef5672d931f11ec991839f40cb80a78
+
+.image-upload-item {
+    background: var(--card-bg);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.image-upload-item:hover {
+    border-color: var(--primary-color);
+    background: rgba(var(--primary-rgb), 0.05);
+}
+
+.image-label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.image-number {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    margin-right: 8px;
+    font-size: 12px;
+}
+
+.image-type {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.image-upload-item small {
+    display: block;
+    color: var(--text-light);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.image-upload-box {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-color);
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.upload-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+}
+
+.upload-placeholder i {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: var(--border-color);
+}
+
+.image-upload-box input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.image-upload-box .image-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.image-upload-item input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.image-upload-item input[type="text"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Image preview styles */
+.image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Remove button for images */
+.remove-image-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-upload-box:hover .remove-image-btn {
+    opacity: 1;
+}
+
+.remove-image-btn:hover {
+    background: rgba(255, 0, 0, 1);
+}
+
+/* Image status indicators */
+.image-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.image-status.uploaded {
+    color: var(--success-color);
+}
+
+.image-status.required {
+    color: var(--error-color);
+}
+
+/* Progress bar for uploads */
+.upload-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--border-color);
+    overflow: hidden;
+}
+
+.upload-progress-bar {
+    height: 100%;
+    background: var(--primary-color);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Bulk upload button */
+.bulk-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin: 20px auto;
+    transition: all 0.3s ease;
+}
+
+.bulk-upload-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Instructions */
+.image-upload-instructions {
+    background: var(--info-bg);
+    border-left: 4px solid var(--info-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.image-upload-instructions h4 {
+    margin-top: 0;
+    color: var(--info-color);
+}
+
+.image-upload-instructions ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.image-upload-instructions li {
+    margin: 5px 0;
+    color: var(--text-color);
+}
