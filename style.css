@@ -1228,7 +1228,7 @@ input:checked + .slider:before {
 }
 
 #install-btn {
-  position: fixed;
+  position: sticky;
   bottom: 20px;
   right: 20px;
   z-index: 9999; /* make sure it's on top */
