@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lemonade</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="uploads/icon.jpg">
+    <link rel="icon" type="image/png" sizes="32x32" href="uploads/appicon.jpg">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -14,7 +14,9 @@
     <header class="main-header">
         <div class="header-content">
             <h1>🍋 Lemonade</h1>
-           
+            <button class="theme-toggle" id="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
         
         <!-- Search Bar -->
@@ -41,46 +43,38 @@
         <!-- Categories View -->
         <div class="view" id="categories-view">
             <div class="categories-grid">
-                 
                 <div class="category-card active" data-category="all">
                     <i class="fas fa-star"></i>
                     <span>All Products</span>
                 </div>
-
-                 <div class="category-card" data-category="Electronics">
-                   <img src="uploads/electronics.jpg" alt=" " class="category-icon" />
-                   <span>Electronics</span>
+                 <div class="category-card" data-category="oppo">
+                   <img src="uploads/oppo.jpg" alt=" " class="category-icon" />
+                   <span>oppo</span>
                    </div>
-                <div class="category-card" data-category="Home & Kitchen">
-                   <img src="uploads/home and kitchen.jpg" alt=" " class="category-icon" />
-                   <span>Home & Kitchen</span>
-                </div> 
-
-                <div class="category-card" data-category="Fashion & Clothing">
-                   <img src="uploads/clothings.jpg" alt=" " class="category-icon" />
-                   <span>Fashion & Clothing</span>
-                </div> 
-   
-                <div class="category-card" data-category="Home Tools">
-                   <img src="uploads/home and tools.jpg" alt=" " class="category-icon" />
-                   <span>Home Tools</span>
+                    <div class="category-card" data-category="Apple">
+                   <img src="uploads/apple.jpg" alt=" " class="category-icon" />
+                   <span>Apple</span>
+                </div> <div class="category-card" data-category="Tecno">
+                   <img src="uploads/tecno.jpg" alt=" " class="category-icon" />
+                   <span>Tecno</span>
+                   </div> <div class="category-card" data-category="infinix">
+                   <img src="uploads/infinix.jpg" alt=" " class="category-icon" />
+                   <span>infinix</span>
               
+                </div> <div class="category-card" data-category="samsung">
+                   <img src="uploads/samsung.jpg" alt=" " class="category-icon" />
+                   <span>samsung</span>
+                </div> <div class="category-card" data-category="nokia">
+                   <img src="uploads/nokia.jpg" alt=" " class="category-icon" />
+                   <span>Nokia</span>
+                </div> <div class="category-card" data-category="Xiomi">
+                   <img src="uploads/xiomi.jpg" alt=" " class="category-icon" />
+                   <span>Xiomi</span>
                 </div>
-
-                <div class="category-card" data-category="Automotives">
-                   <img src="uploads/automotives.jpg" alt=" " class="category-icon" />
-                   <span>Automotives</span>
-              
+                 </div> <div class="category-card" data-category="Hoodies">
+                   <img src="uploads/hood.jpg" alt=" " class="category-icon" />
+                   <span>Hoodies</span>
                 </div>
-                <div class="category-card" data-category="Shoes">
-                   <img src="uploads/shoes.jpg" alt=" " class="category-icon" />
-                   <span>Shoes</span>
-              
-                </div>
-                
-
-              
-                 </div> 
             </div>
         </div>
 

@@ -81,7 +81,6 @@ html, body {
 .search-container {
     position: relative;
     width: 100%;
-   
     max-width: 400px;
     margin: 0.5rem auto 0;
     display: flex;
@@ -419,7 +418,7 @@ html, body {
 
 .category-card.active {
     background: var(--primary-color);
-    color: rgb(8, 8, 8);
+    color: white;
     border-color: var(--primary-color);
 }
 
@@ -431,7 +430,7 @@ html, body {
 .category-icon {
   width: 158px;   /* adjust as needed */
   height: 158px;
-  border-radius: 5px;
+      border-radius: 15px;
 
   object-fit: contain;
 }
@@ -529,7 +528,7 @@ html, body {
     text-align: center;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: linear-gradient( var(--secondary-color) 0%, var(--primary-color) 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
     border-radius: 20px;
     color: white;
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
@@ -914,7 +913,7 @@ textarea:focus {
 }
 
 .auth-btn {
-    background: linear-gradient( var(--secondary-color) 0%, var(--primary-color) 110%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
     color: white;
     border: none;
     padding: 1rem 1.5rem;
@@ -2237,8 +2236,8 @@ input:checked + .slider:before {
 
 .category-card.active {
     border-color: var(--accent-color);
-    background: linear-gradient(var(--accent-color) 0%, orangered 100%);
-    color: rgb(8, 7, 7);
+    background: linear-gradient(135deg, var(--accent-color) 0%, #ff9a3d 100%);
+    color: white;
 }
 
 .category-card.active .category-icon {
@@ -2246,9 +2245,9 @@ input:checked + .slider:before {
 }
 
 .category-icon {
-    width: 70px;
-    height: 90px;
-    border-radius: 15px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
     object-fit: cover;
     margin-bottom: 0.75rem;
     transition: all 0.3s ease;

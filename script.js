@@ -2327,12 +2327,13 @@ const notifications = JSON.parse(localStorage.getItem(key) || '[]');
 
     formatCategory(category) {
         const categories = {
-             'Electonics': 'Electronics',
-            'Home & Kitchen': 'Home & Kitchen',
-            'Fashion & Clothing': 'Fashion & Clothing',
-            'Home Tools': 'Home Tools',
-            'Automotives': 'Automotives',
-            'Shoes': 'Shoes',
+            'oppo': 'Oppo',
+            'Apple': 'Apple',
+            'Tecno': 'Tecno',
+            'infinix': 'Infinix',
+            'samsung': 'Samsung',
+            'nokia': 'Nokia',
+            'Xiomi': 'Xiaomi'
         };
         return categories[category] || category;
     }
@@ -2671,12 +2672,13 @@ filterByCategory(category) {
     
     const categoryNames = {
         'all': 'All Products',
-         'Electonics': 'Electronics',
-            'Home & Kitchen': 'Home & Kitchen',
-            'Fashion & Clothing': 'Fashion & Clothing',
-            'Home Tools': 'Home Tools',
-            'Automotives': 'Automotives',
-            'Shoes': 'Shoes',
+        'oppo': 'Oppo Phones',
+        'Apple': 'Apple iPhones', 
+        'Tecno': 'Tecno Phones',
+        'infinix': 'Infinix Phones',
+        'samsung': 'Samsung Phones',
+        'nokia': 'Nokia Phones',
+        'Xiomi': 'Xiaomi Phones'
     };
 
     const currentCategory = document.getElementById('current-category');
@@ -2767,12 +2769,13 @@ showNoProductsMessage(category, searchTerm) {
     let message = '';
     const categoryNames = {
         'all': 'All Products',
-        'Electonics': 'Electronics',
-            'Home & Kitchen': 'Home & Kitchen',
-            'Fashion & Clothing': 'Fashion & Clothing',
-            'Home Tools': 'Home Tools',
-            'Automotives': 'Automotives',
-            'Shoes': 'Shoes',
+        'oppo': 'Oppo',
+        'Apple': 'Apple', 
+        'Tecno': 'Tecno',
+        'infinix': 'Infinix',
+        'samsung': 'Samsung',
+        'nokia': 'Nokia',
+        'Xiomi': 'Xiaomi'
     };
     
     const displayCategory = categoryNames[category] || category;
