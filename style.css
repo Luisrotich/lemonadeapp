@@ -43,6 +43,11 @@ body {
     padding-bottom: 80px; /* Space for bottom nav */
 }
 
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
 /* Header Styles */
 .main-header {
     background: var(--secondary-color);
@@ -1222,6 +1227,13 @@ input:checked + .slider:before {
     color: white;
 }
 
+#install-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999; /* make sure it's on top */
+}
+
 /* Responsive Design */
 @media (min-width: 768px) {
     .products {
@@ -1514,16 +1526,6 @@ input:checked + .slider:before {
         font-size: 0.8rem;
     }
 }
-
-
-
-
-
-
-
-
-
-
 
 /* Product Detail Styles */
 .product-detail-container {
