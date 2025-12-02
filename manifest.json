@@ -1,0 +1,29 @@
+{
+  "id": "/",
+  "name": "Lemonade Shopping App",
+  "short_name": "Lemonade",
+  "description": "Your favorite mobile e-commerce shopping experience",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FF6F00",
+  "theme_color": "#FF6F00",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/uploads/icon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/uploads/appicon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"],
+  "lang": "en-US",
+  "dir": "ltr"
+}
