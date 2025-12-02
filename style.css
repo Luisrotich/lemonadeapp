@@ -1229,9 +1229,10 @@ input:checked + .slider:before {
 
 #install-btn {
   position: sticky;
-  bottom: 20px;
+  bottom: 60px;
   right: 20px;
   z-index: 9999; /* make sure it's on top */
+  padding: 1rem;
 }
 
 /* Responsive Design */
