@@ -1,17 +1,19 @@
 // server.js - Production Ready for Railway with PostgreSQL
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs').promises;
-const path = require('path');
 const { query } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
+app.use(cors());
+app.use(express.json());
+
 // Initialize database tables
 async function initDatabase() {
   try {
-    // Create users table
+    // Users table
     await query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -27,20 +29,21 @@ async function initDatabase() {
       )
     `);
 
-    //Create Customers table
+    // Customers table (fixed syntax)
     await query(`
       CREATE TABLE IF NOT EXISTS customers (
-      name VARCHAR(255), 
-      email VARCHAR(255), 
-      phone VARCHAR(20), 
-      address TEXT),
-      id SERIAL PRIMARY KEY,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(email, phone),
-      `);
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        email VARCHAR(255),
+        phone VARCHAR(20),
+        address TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(email, phone)
+      )
+    `);
 
-    // Create products table
+    // Products table
     await query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
@@ -55,7 +58,7 @@ async function initDatabase() {
       )
     `);
 
-    // Create orders table
+    // Orders table
     await query(`
       CREATE TABLE IF NOT EXISTS orders (
         id VARCHAR(50) PRIMARY KEY,
@@ -80,15 +83,55 @@ async function initDatabase() {
   }
 }
 
-// ✅ Call initDatabase before starting the server
+// Routes
+app.get('/', (req, res) => {
+  res.send('Server running with PostgreSQL');
+});
+
+// Signup route
+app.post('/api/auth/signup', async (req, res) => {
+  const { name, email, phone, password } = req.body;
+
+  try {
+    const result = await query(
+      `INSERT INTO users (name, email, phone, password)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, email, phone`,
+      [name, email, phone, password]
+    );
+
+    res.json({ success: true, user: result.rows[0] });
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(500).json({ success: false, error: 'Signup failed' });
+  }
+});
+
+// Login route
+app.post('/api/auth/login', async (req, res) => {
+  const { email, phone, password } = req.body;
+
+  try {
+    const result = await query(
+      `SELECT id, name, email, phone
+       FROM users
+       WHERE (email = $1 OR phone = $2) AND password = $3`,
+      [email, phone, password]
+    );
+
+    if (result.rows.length > 0) {
+      res.json({ success: true, user: result.rows[0] });
+    } else {
+      res.json({ success: false, error: 'Invalid credentials' });
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ success: false, error: 'Login failed' });
+  }
+});
+
+// Start server after DB init
 initDatabase().then(() => {
-  app.use(cors());
-  app.use(express.json());
-
-  app.get('/', (req, res) => {
-    res.send('Server running with PostgreSQL');
-  });
-
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
