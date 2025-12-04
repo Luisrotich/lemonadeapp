@@ -1,3 +1,5 @@
+require('dotenv').config(); // load .env
+
 const { Pool } = require('pg');
 
 // Create a pool instance
