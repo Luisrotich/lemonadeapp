@@ -5,6 +5,9 @@ const fs = require('fs').promises;
 const path = require('path');
 const { query } = require('./db');
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 // Initialize database tables
 async function initDatabase() {
   try {
@@ -23,6 +26,19 @@ async function initDatabase() {
         address TEXT
       )
     `);
+
+    //Create Customers table
+    await query(`
+      CREATE TABLE IF NOT EXISTS customers (
+      name VARCHAR(255), 
+      email VARCHAR(255), 
+      phone VARCHAR(20), 
+      address TEXT),
+      id SERIAL PRIMARY KEY,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(email, phone),
+      `);
 
     // Create products table
     await query(`
@@ -63,3 +79,17 @@ async function initDatabase() {
     console.error('Error initializing database:', error);
   }
 }
+
+// ✅ Call initDatabase before starting the server
+initDatabase().then(() => {
+  app.use(cors());
+  app.use(express.json());
+
+  app.get('/', (req, res) => {
+    res.send('Server running with PostgreSQL');
+  });
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+});
