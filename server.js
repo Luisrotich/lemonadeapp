@@ -92,6 +92,139 @@ async function initDatabase() {
       console.error('Error updating existing products:', updateError);
     }
 
+    // Migrate data from JSON files to PostgreSQL
+    try {
+      const fs = require('fs');
+      const path = require('path');
+
+      // Migrate products
+      const productsPath = path.join(__dirname, 'data', 'products.json');
+      if (fs.existsSync(productsPath)) {
+        const productsData = JSON.parse(fs.readFileSync(productsPath, 'utf8'));
+        console.log(`Found ${productsData.length} products in JSON file`);
+
+        for (const product of productsData) {
+          try {
+            await query(`
+              INSERT INTO products (id, name, description, price, image, category, stock, status, created_at, updated_at)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+              ON CONFLICT (id) DO NOTHING
+            `, [
+              product.id,
+              product.name,
+              product.description,
+              product.price,
+              product.image,
+              product.category,
+              product.stock,
+              product.status || 'active',
+              product.createdAt ? new Date(product.createdAt) : new Date(),
+              product.updatedAt ? new Date(product.updatedAt) : new Date()
+            ]);
+          } catch (insertError) {
+            console.error('Error inserting product:', product.name, insertError);
+          }
+        }
+        console.log('Products migration completed');
+      }
+
+      // Migrate customers
+      const customersPath = path.join(__dirname, 'data', 'customers.json');
+      if (fs.existsSync(customersPath)) {
+        const customersData = JSON.parse(fs.readFileSync(customersPath, 'utf8'));
+        console.log(`Found ${customersData.length} customers in JSON file`);
+
+        for (const customer of customersData) {
+          try {
+            await query(`
+              INSERT INTO customers (id, name, email, phone, address, created_at, updated_at)
+              VALUES ($1, $2, $3, $4, $5, $6, $7)
+              ON CONFLICT (id) DO NOTHING
+            `, [
+              customer.id,
+              customer.name,
+              customer.email,
+              customer.phone,
+              customer.address,
+              customer.createdAt ? new Date(customer.createdAt) : new Date(),
+              customer.updatedAt ? new Date(customer.updatedAt) : new Date()
+            ]);
+          } catch (insertError) {
+            console.error('Error inserting customer:', customer.name, insertError);
+          }
+        }
+        console.log('Customers migration completed');
+      }
+
+      // Migrate users
+      const usersPath = path.join(__dirname, 'data', 'users.json');
+      if (fs.existsSync(usersPath)) {
+        const usersData = JSON.parse(fs.readFileSync(usersPath, 'utf8'));
+        console.log(`Found ${usersData.length} users in JSON file`);
+
+        for (const user of usersData) {
+          try {
+            await query(`
+              INSERT INTO users (id, name, email, phone, password, created_at, orders, total_spent, last_order, address)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+              ON CONFLICT (id) DO NOTHING
+            `, [
+              user.id,
+              user.name,
+              user.email,
+              user.phone,
+              user.password,
+              user.createdAt ? new Date(user.createdAt) : new Date(),
+              user.orders || 0,
+              user.totalSpent || 0,
+              user.lastOrder ? new Date(user.lastOrder) : null,
+              user.address
+            ]);
+          } catch (insertError) {
+            console.error('Error inserting user:', user.name, insertError);
+          }
+        }
+        console.log('Users migration completed');
+      }
+
+      // Migrate orders
+      const ordersPath = path.join(__dirname, 'data', 'orders.json');
+      if (fs.existsSync(ordersPath)) {
+        const ordersData = JSON.parse(fs.readFileSync(ordersPath, 'utf8'));
+        console.log(`Found ${ordersData.length} orders in JSON file`);
+
+        for (const order of ordersData) {
+          try {
+            await query(`
+              INSERT INTO orders (id, order_number, customer_id, customer_name, customer_email, customer_phone, items, total, status, payment_method, payment_status, date, completed_at)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+              ON CONFLICT (id) DO NOTHING
+            `, [
+              order.id,
+              order.orderNumber || order.id,
+              order.customerId,
+              order.customerName,
+              order.customerEmail,
+              order.customerPhone,
+              JSON.stringify(order.items || []),
+              order.total,
+              order.status || 'pending',
+              order.paymentMethod,
+              order.paymentStatus || 'pending',
+              order.date ? new Date(order.date) : new Date(),
+              order.completedAt ? new Date(order.completedAt) : null
+            ]);
+          } catch (insertError) {
+            console.error('Error inserting order:', order.id, insertError);
+          }
+        }
+        console.log('Orders migration completed');
+      }
+
+    } catch (migrationError) {
+      console.error('Error during data migration:', migrationError);
+    }
+
     console.log('Database tables initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
