@@ -1,5 +1,5 @@
 // Service Worker for Lemonade PWA
-const CACHE_NAME = 'lemonade-v1';
+const CACHE_NAME = 'lemonade-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -43,16 +43,23 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache or network
+// ✅ Fetch event - DO NOT intercept API calls
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // ✅ Skip all backend API calls
+  if (url.pathname.startsWith('/api/')) {
+    return; // Let the network handle it normally
+  }
+
+  // ✅ Normal caching for static files
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Return cached version or fetch from network
         return response || fetch(event.request);
       })
       .catch(() => {
-        // Offline fallback - could return a custom offline page
+        // Offline fallback for pages
         if (event.request.destination === 'document') {
           return caches.match('/index.html');
         }
@@ -60,7 +67,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Background sync for offline orders (if needed)
+// Background sync for offline orders (optional)
 self.addEventListener('sync', event => {
   if (event.tag === 'background-sync-orders') {
     event.waitUntil(syncOrders());
@@ -68,6 +75,5 @@ self.addEventListener('sync', event => {
 });
 
 async function syncOrders() {
-  // Implement order sync logic here
   console.log('Service Worker: Syncing orders in background');
 }

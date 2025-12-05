@@ -231,163 +231,114 @@ async function initDatabase() {
   }
 }
 
-// Routes
-app.get('/', (req, res) => {
-  res.send('Server running with PostgreSQL');
-});
-
-// Signup route
-app.post('/api/auth/signup', async (req, res) => {
-  const { name, email, phone, password } = req.body;
-
-  try {
-    const result = await query(
-      `INSERT INTO users (name, email, phone, password)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, name, email, phone`,
-      [name, email, phone, password]
-    );
-
-    res.json({ success: true, user: result.rows[0] });
-  } catch (err) {
-    console.error('Signup error:', err);
-    res.status(500).json({ success: false, error: 'Signup failed' });
-  }
-});
-
-// Login route
-app.post('/api/auth/login', async (req, res) => {
-  const { email, phone, password } = req.body;
-
-  try {
-    const result = await query(
-      `SELECT id, name, email, phone
-       FROM users
-       WHERE (email = $1 OR phone = $2) AND password = $3`,
-      [email, phone, password]
-    );
-
-    if (result.rows.length > 0) {
-      res.json({ success: true, user: result.rows[0] });
-    } else {
-      res.json({ success: false, error: 'Invalid credentials' });
-    }
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ success: false, error: 'Login failed' });
-  }
-});
-
-// Get all products
+// ✅ Get all products (homepage + admin)
 app.get('/api/products', async (req, res) => {
   try {
     const result = await query('SELECT * FROM products ORDER BY created_at DESC');
-    res.json(result.rows);
+
+    // ✅ Convert DECIMAL price → number
+    const products = result.rows.map(p => ({
+      ...p,
+      price: Number(p.price)
+    }));
+
+    res.json({ success: true, products });
   } catch (error) {
     console.error('Error fetching products:', error);
-    res.status(500).json({ error: 'Failed to fetch products' });
+    res.status(500).json({ success: false, error: 'Failed to fetch products' });
   }
 });
 
-// Get all customers
+// ✅ Get all customers
 app.get('/api/admin/customers', async (req, res) => {
   try {
     const result = await query('SELECT * FROM customers ORDER BY created_at DESC');
-    res.json(result.rows);
+    res.json({ success: true, customers: result.rows });
   } catch (error) {
     console.error('Error fetching customers:', error);
-    res.status(500).json({ error: 'Failed to fetch customers' });
+    res.status(500).json({ success: false, error: 'Failed to fetch customers' });
   }
 });
 
-// Get all orders
+// ✅ Get all orders
 app.get('/api/admin/orders', async (req, res) => {
   try {
     const result = await query('SELECT * FROM orders ORDER BY date DESC');
-    res.json(result.rows);
+    res.json({ success: true, orders: result.rows });
   } catch (error) {
     console.error('Error fetching orders:', error);
-    res.status(500).json({ error: 'Failed to fetch orders' });
+    res.status(500).json({ success: false, error: 'Failed to fetch orders' });
   }
 });
 
-// Create product
+// ✅ Create product
 app.post('/api/products', async (req, res) => {
-  const { name, description, price, image, category, stock, status } = req.body;
+  const { name, description, price, image, category, stock } = req.body;
+
   try {
     const result = await query(
-      'INSERT INTO products (name, description, price, image, category, stock, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [name, description, price, image, category, stock, status || 'active']
+      `INSERT INTO products (name, description, price, image, category, stock)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [name, description, price, image, category, stock]
     );
-    res.json({ success: true, product: result.rows[0] });
+
+    const product = {
+      ...result.rows[0],
+      price: Number(result.rows[0].price)
+    };
+
+    res.json({ success: true, product });
   } catch (error) {
     console.error('Error creating product:', error);
-    res.status(500).json({ error: 'Failed to create product' });
+    res.status(500).json({ success: false, error: 'Failed to create product' });
   }
 });
 
-// Update product
+// ✅ Update product
 app.put('/api/products/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, description, price, image, category, stock, status } = req.body;
+  const { name, description, price, image, category, stock } = req.body;
+
   try {
     const result = await query(
-      'UPDATE products SET name = $1, description = $2, price = $3, image = $4, category = $5, stock = $6, status = $7, updated_at = CURRENT_TIMESTAMP WHERE id = $8 RETURNING *',
-      [name, description, price, image, category, stock, status, id]
+      `UPDATE products
+       SET name=$1, description=$2, price=$3, image=$4, category=$5, stock=$6, updated_at=CURRENT_TIMESTAMP
+       WHERE id=$7
+       RETURNING *`,
+      [name, description, price, image, category, stock, id]
     );
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ success: false, error: 'Product not found' });
     }
-    res.json({ success: true, product: result.rows[0] });
+
+    const product = {
+      ...result.rows[0],
+      price: Number(result.rows[0].price)
+    };
+
+    res.json({ success: true, product });
   } catch (error) {
     console.error('Error updating product:', error);
-    res.status(500).json({ error: 'Failed to update product' });
+    res.status(500).json({ success: false, error: 'Failed to update product' });
   }
 });
 
-// Delete product
+// ✅ Delete product
 app.delete('/api/products/:id', async (req, res) => {
   const { id } = req.params;
+
   try {
-    const result = await query('DELETE FROM products WHERE id = $1 RETURNING *', [id]);
+    const result = await query('DELETE FROM products WHERE id=$1 RETURNING *', [id]);
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ success: false, error: 'Product not found' });
     }
+
     res.json({ success: true, message: 'Product deleted successfully' });
   } catch (error) {
     console.error('Error deleting product:', error);
-    res.status(500).json({ error: 'Failed to delete product' });
+    res.status(500).json({ success: false, error: 'Failed to delete product' });
   }
-});
-
-// Update order status
-app.put('/api/admin/orders/:id', async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  try {
-    const result = await query(
-      'UPDATE orders SET status = $1, completed_at = CASE WHEN $1 = \'completed\' THEN CURRENT_TIMESTAMP ELSE NULL END WHERE id = $2 RETURNING *',
-      [status, id]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
-    res.json({ success: true, order: result.rows[0] });
-  } catch (error) {
-    console.error('Error updating order:', error);
-    res.status(500).json({ error: 'Failed to update order' });
-  }
-});
-
-// Start server after DB init
-initDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}).catch((error) => {
-  console.error('Failed to initialize database:', error);
-  // Start server anyway to allow API endpoints to respond with errors
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT} (database initialization failed)`);
-  });
 });
