@@ -95,7 +95,6 @@ async function initDatabase() {
     // Migrate data from JSON files to PostgreSQL
     try {
       const fs = require('fs');
-      const path = require('path');
 
       // Migrate products
       const productsPath = path.join(__dirname, 'data', 'products.json');
@@ -228,6 +227,7 @@ async function initDatabase() {
     console.log('Database tables initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
+    throw error;
   }
 }
 
