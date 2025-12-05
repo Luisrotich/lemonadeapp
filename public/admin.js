@@ -5,7 +5,7 @@ class AdminDashboard {
         this.products = [];
         this.customers = [];
         this.currentUser = null;
-        this.baseURL = 'https://lemonadeapp-production-611f.up.railway.app';
+        this.baseURL = 'https://lemonadeapp-production-611f.up.railway.app/admin';
         this.currentProductImage = null;
         
         this.init();
@@ -270,22 +270,19 @@ class AdminDashboard {
         try {
             console.log('📦 Loading orders from backend...');
             const response = await fetch(`${this.baseURL}/api/admin/orders`);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const data = await response.json();
             console.log('📦 Orders response:', data);
-            
-            if (data.success) {
-                this.orders = data.orders || [];
-                this.displayOrders();
-                this.updateOrderStats();
-                this.updatePendingBadge();
-            } else {
-                throw new Error(data.message || 'Failed to load orders');
-            }
+
+            // Server returns array directly, not wrapped in success object
+            this.orders = Array.isArray(data) ? data : [];
+            this.displayOrders();
+            this.updateOrderStats();
+            this.updatePendingBadge();
         } catch (error) {
             console.error('❌ Error loading orders:', error);
             this.showNotification('Failed to load orders. Check if server is running.', 'error');
@@ -424,20 +421,17 @@ class AdminDashboard {
         try {
             console.log('📦 Loading products from backend...');
             const response = await fetch(`${this.baseURL}/api/products`);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const data = await response.json();
             console.log('📦 Products response:', data);
-            
-            if (data.success) {
-                this.products = data.products || [];
-                this.displayProducts();
-            } else {
-                throw new Error(data.message || 'Failed to load products');
-            }
+
+            // Server returns array directly, not wrapped in success object
+            this.products = Array.isArray(data) ? data : [];
+            this.displayProducts();
         } catch (error) {
             console.error('❌ Error loading products:', error);
             this.showNotification('Failed to load products', 'error');
@@ -653,20 +647,17 @@ class AdminDashboard {
         try {
             console.log('📦 Loading customers from backend...');
             const response = await fetch(`${this.baseURL}/api/admin/customers`);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const data = await response.json();
             console.log('📦 Customers response:', data);
-            
-            if (data.success) {
-                this.customers = data.customers || [];
-                this.displayCustomers();
-            } else {
-                throw new Error(data.message || 'Failed to load customers');
-            }
+
+            // Server returns array directly, not wrapped in success object
+            this.customers = Array.isArray(data) ? data : [];
+            this.displayCustomers();
         } catch (error) {
             console.error('❌ Error loading customers:', error);
             this.showNotification('Failed to load customers', 'error');

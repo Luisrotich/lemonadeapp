@@ -238,4 +238,10 @@ initDatabase().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+}).catch((error) => {
+  console.error('Failed to initialize database:', error);
+  // Start server anyway to allow API endpoints to respond with errors
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT} (database initialization failed)`);
+  });
 });
