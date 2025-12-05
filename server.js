@@ -62,6 +62,17 @@ async function initDatabase() {
       )
     `);
 
+    // Add status column if it doesn't exist (for existing tables)
+    try {
+      await query(`
+        ALTER TABLE products
+        ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active'
+      `);
+      console.log('Status column added to products table');
+    } catch (alterError) {
+      console.error('Error adding status column:', alterError);
+    }
+
     // Orders table
     await query(`
       CREATE TABLE IF NOT EXISTS orders (
