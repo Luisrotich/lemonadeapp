@@ -1,15 +1,14 @@
-# PostgreSQL Migration Plan
+# Product Visibility Fix - TODO List
 
-## Steps to Complete Migration
+## Completed Tasks
+- [x] Added `status` column to products table with default 'active'
+- [x] Updated POST /api/products endpoint to include status field
+- [x] Updated PUT /api/products/:id endpoint to include status field
+- [x] Added migration to set existing products to 'active' status
+- [x] Committed changes to Git repository
 
-- [ ] Install PostgreSQL dependencies (pg package)
-- [ ] Create database connection module (db.js)
-- [ ] Create database schema (init.sql or migration script)
-- [ ] Update server.js to use PostgreSQL instead of JSON files
-- [ ] Update package.json with new dependencies
-- [ ] Provide environment variables needed for Railway PostgreSQL connection
-- [ ] Test the migration (optional, if user requests)
-
-## Environment Variables Needed
-- DATABASE_URL: PostgreSQL connection string from Railway
-- NODE_ENV: Set to 'production' for Railway deployment
+## Remaining Tasks
+- [ ] Push changes to GitHub repository
+- [ ] Redeploy Railway application to apply database schema changes
+- [ ] Test that products are now visible in admin panel and homepage
+- [ ] Verify that new products are created with 'active' status
