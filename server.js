@@ -144,6 +144,53 @@ async function initDatabase() {
   }
 }
 
+// Routes
+app.get('/', (req, res) => {
+  res.send('Server running with PostgreSQL');
+});
+
+// Signup route
+app.post('/api/auth/signup', async (req, res) => {
+  const { name, email, phone, password } = req.body;
+
+  try {
+    const result = await query(
+      `INSERT INTO users (name, email, phone, password)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, email, phone`,
+      [name, email, phone, password]
+    );
+
+    res.json({ success: true, user: result.rows[0] });
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(500).json({ success: false, error: 'Signup failed' });
+  }
+});
+
+// Login route
+app.post('/api/auth/login', async (req, res) => {
+  const { email, phone, password } = req.body;
+
+  try {
+    const result = await query(
+      `SELECT id, name, email, phone
+       FROM users
+       WHERE (email = $1 OR phone = $2) AND password = $3`,
+      [email, phone, password]
+    );
+
+    if (result.rows.length > 0) {
+      res.json({ success: true, user: result.rows[0] });
+    } else {
+      res.json({ success: false, error: 'Invalid credentials' });
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ success: false, error: 'Login failed' });
+  }
+});
+
 // ✅ Get all products (homepage + admin)
 app.get('/api/products', async (req, res) => {
   try {

@@ -10,8 +10,9 @@
 - [x] Pushed changes to GitHub repository
 
 ## Remaining Tasks
-- [ ] Redeploy Railway application to fix 502 errors (server startup code added)
-- [ ] Verify that all 7 products from products.json are now in PostgreSQL
+- [x] Redeploy Railway application to fix 502 errors (server startup code added)
+- [x] Verify that all 7 products from products.json are now in PostgreSQL
+- [x] Add homepage login endpoint (POST /api/auth/login)
 - [ ] Test that products are visible in admin panel and homepage
 - [ ] Verify that new products are created with 'active' status
 
