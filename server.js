@@ -5,6 +5,7 @@ const { query } = require('./db');
 const path = require('path');
 
 const app = express();
+app.use(express.static('public'));
 const PORT = process.env.PORT || 3000;
 
 // Middleware
@@ -83,11 +84,6 @@ async function initDatabase() {
     console.error('Error initializing database:', error);
   }
 }
-
-app.get('/admin.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin.html'));
-});
-
 
 // Routes
 app.get('/', (req, res) => {
