@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const { query } = require('./db');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -82,6 +83,11 @@ async function initDatabase() {
     console.error('Error initializing database:', error);
   }
 }
+
+app.get('/admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 
 // Routes
 app.get('/', (req, res) => {
