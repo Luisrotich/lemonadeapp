@@ -255,3 +255,16 @@ app.delete('/api/products/:id', async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to delete product' });
   }
 });
+
+// Start server after DB init
+initDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch((error) => {
+  console.error('Failed to initialize database:', error);
+  // Start server anyway to allow API endpoints to respond with errors
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT} (database initialization failed)`);
+  });
+});
