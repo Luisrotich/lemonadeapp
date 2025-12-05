@@ -5,10 +5,24 @@ class AdminDashboard {
         this.products = [];
         this.customers = [];
         this.currentUser = null;
-        this.baseURL = 'https://lemonadeapp-production-611f.up.railway.app';
+        this.baseURL = this.detectBaseURL();
         this.currentProductImage = null;
-        
+
         this.init();
+    }
+
+    detectBaseURL() {
+        // Try Railway URL first, fallback to localhost for development
+        const railwayURL = 'https://lemonadeapp-production-611f.up.railway.app';
+        const localhostURL = 'http://localhost:3000';
+
+        // Check if we're running on localhost (development)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return localhostURL;
+        }
+
+        // For production, use Railway URL
+        return railwayURL;
     }
 
     init() {

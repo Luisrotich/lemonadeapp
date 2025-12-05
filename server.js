@@ -6,6 +6,7 @@ const path = require('path');
 
 const app = express();
 app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
 const PORT = process.env.PORT || 3000;
 
 // Middleware
