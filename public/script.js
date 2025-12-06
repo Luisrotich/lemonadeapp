@@ -16,6 +16,32 @@ class LemonadeApp {
         this.initializeApp();
     }
 
+    async fetchWithFallback(url, options = {}) {
+        const urls = [
+            `${this.baseURL}${url}`,
+            `http://localhost:3000${url}`
+        ];
+
+        for (const fullUrl of urls) {
+            try {
+                console.log(`🔄 Trying to fetch: ${fullUrl}`);
+                const response = await fetch(fullUrl, options);
+
+                if (response.ok) {
+                    console.log(`✅ Successfully fetched from: ${fullUrl}`);
+                    return response;
+                } else {
+                    console.warn(`⚠️ Response not OK from ${fullUrl}: ${response.status}`);
+                }
+            } catch (error) {
+                console.warn(`❌ Failed to fetch from ${fullUrl}:`, error.message);
+                // Continue to next URL
+            }
+        }
+
+        throw new Error(`Failed to fetch ${url} from all available endpoints`);
+    }
+
     initializeApp() {
         this.loadCartFromStorage();
         this.loadUserPreferences();
@@ -846,13 +872,13 @@ buyNowFromDetail() {
 
 async fetchProductsFromBackend() {
     try {
-        const response = await fetch('/api/products');
+        const response = await this.fetchWithFallback('/api/products');
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
-        
+
         // Handle different API response formats
         if (data.products) {
             this.products = data.products;
@@ -864,9 +890,9 @@ async fetchProductsFromBackend() {
             console.warn('⚠️ Unexpected API response format:', data);
             this.products = [];
         }
-        
+
         console.log('📦 Products loaded:', this.products.length);
-        
+
     } catch (error) {
         console.error('❌ Error fetching products:', error);
         this.products = [];
@@ -944,7 +970,12 @@ renderProducts() {
                     <div class="price2">Ksh ${product.price?.toFixed(2) || '0.00'}</div>
                     
                     ${product.stock > 0 ? `
-                      
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus">-</button>
+                            <span class="quantity">1</span>
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                        <button class="add-to-cart" data-id="${product.id}" data-product="${product.name}" data-price="${product.price}">Add to Cart</button>
                     ` : `
                         <button class="add-to-cart out-of-stock" disabled>
                             Out of Stock
@@ -1101,7 +1132,7 @@ updateCartDisplay() {
                 return `
                 <div class="cart-item" data-id="${item.id}">
                     <div class="item-image">
-                        <img src="${productImage}" alt="${item.product}" 
+                        <img src="${productImage}" alt="${item.product}"
                              onerror="this.src='https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱'">
                     </div>
                     <div class="item-details">
@@ -1109,7 +1140,15 @@ updateCartDisplay() {
                             <h4>${item.product}</h4>
                             <p class="item-price">ksh ${item.price.toFixed(2)} each</p>
                         </div>
-                       
+                        <div class="item-actions">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                                <span class="quantity">${item.quantity}</span>
+                                <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                            </div>
+                            <button class="remove-btn" data-id="${item.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="item-total">

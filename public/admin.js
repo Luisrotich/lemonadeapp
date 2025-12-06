@@ -25,6 +25,32 @@ class AdminDashboard {
         return railwayURL;
     }
 
+    async fetchWithFallback(url, options = {}) {
+        const urls = [
+            `${this.baseURL}${url}`,
+            `http://localhost:3000${url}`
+        ];
+
+        for (const fullUrl of urls) {
+            try {
+                console.log(`🔄 Trying to fetch: ${fullUrl}`);
+                const response = await fetch(fullUrl, options);
+
+                if (response.ok) {
+                    console.log(`✅ Successfully fetched from: ${fullUrl}`);
+                    return response;
+                } else {
+                    console.warn(`⚠️ Response not OK from ${fullUrl}: ${response.status}`);
+                }
+            } catch (error) {
+                console.warn(`❌ Failed to fetch from ${fullUrl}:`, error.message);
+                // Continue to next URL
+            }
+        }
+
+        throw new Error(`Failed to fetch ${url} from all available endpoints`);
+    }
+
     init() {
         console.log('🚀 Initializing Admin Dashboard...');
         this.setupEventListeners();
@@ -283,11 +309,7 @@ class AdminDashboard {
     async loadOrders() {
         try {
             console.log('📦 Loading orders from backend...');
-            const response = await fetch(`${this.baseURL}/api/admin/orders`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            const response = await this.fetchWithFallback('/api/admin/orders');
 
             const data = await response.json();
             console.log('📦 Orders response:', data);
@@ -377,21 +399,21 @@ class AdminDashboard {
     async updateOrderStatus(orderId, newStatus) {
         const statusMessages = {
             'preparing': 'Mark as Preparing',
-            'ready': 'Mark as Ready for Pickup', 
+            'ready': 'Mark as Ready for Pickup',
             'completed': 'Mark as Completed'
         };
 
         if (!confirm(`${statusMessages[newStatus]}?`)) return;
-        
+
         try {
-            const response = await fetch(`${this.baseURL}/api/orders/${orderId}`, {
+            const response = await this.fetchWithFallback(`/api/orders/${orderId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 this.showNotification(`Order ${newStatus === 'completed' ? 'completed' : 'updated'} successfully!`, 'success');
                 await this.loadOrders();
@@ -434,11 +456,7 @@ class AdminDashboard {
     async loadProducts() {
         try {
             console.log('📦 Loading products from backend...');
-            const response = await fetch(`${this.baseURL}/api/products`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            const response = await this.fetchWithFallback('/api/products');
 
             const data = await response.json();
             console.log('📦 Products response:', data);
@@ -596,19 +614,19 @@ class AdminDashboard {
         this.showLoading();
         
         try {
-            const url = productId 
-                ? `${this.baseURL}/api/products/${productId}` 
-                : `${this.baseURL}/api/products`;
+            const url = productId
+                ? `/api/products/${productId}`
+                : `/api/products`;
             const method = productId ? 'PUT' : 'POST';
-            
-            const response = await fetch(url, {
+
+            const response = await this.fetchWithFallback(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(productData)
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 this.showNotification(`Product ${productId ? 'updated' : 'created'} successfully!`, 'success');
                 await this.loadProducts();
@@ -633,16 +651,16 @@ class AdminDashboard {
 
     async deleteProduct(productId) {
         if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
-        
+
         this.showLoading();
-        
+
         try {
-            const response = await fetch(`${this.baseURL}/api/products/${productId}`, {
+            const response = await this.fetchWithFallback(`/api/products/${productId}`, {
                 method: 'DELETE'
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 this.showNotification('Product deleted successfully!', 'success');
                 await this.loadProducts();
@@ -660,11 +678,7 @@ class AdminDashboard {
     async loadCustomers() {
         try {
             console.log('📦 Loading customers from backend...');
-            const response = await fetch(`${this.baseURL}/api/admin/customers`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            const response = await this.fetchWithFallback('/api/admin/customers');
 
             const data = await response.json();
             console.log('📦 Customers response:', data);
