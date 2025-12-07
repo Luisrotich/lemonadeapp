@@ -315,6 +315,135 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
+// ✅ Checkout Routes
+
+// Create new order
+app.post('/api/orders', async (req, res) => {
+  const { customerId, customerName, customerEmail, customerPhone, items, total, paymentMethod } = req.body;
+
+  try {
+    // Generate unique order ID and order number
+    const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const orderNumber = `ORD-${Date.now()}`;
+
+    // Set payment_status and status based on payment method
+    let paymentStatus = 'pending';
+    let status = 'pending';
+
+    if (paymentMethod === 'cash_on_delivery') {
+      paymentStatus = 'cash_on_delivery';
+      status = 'confirmed';
+    }
+
+    const result = await query(
+      `INSERT INTO orders (id, order_number, customer_id, customer_name, customer_email, customer_phone, items, total, status, payment_method, payment_status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       RETURNING *`,
+      [orderId, orderNumber, customerId, customerName, customerEmail, customerPhone, JSON.stringify(items), total, status, paymentMethod, paymentStatus]
+    );
+
+    res.json({ success: true, order: result.rows[0] });
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ success: false, error: 'Failed to create order' });
+  }
+});
+
+// Get specific order details
+app.get('/api/orders/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await query('SELECT * FROM orders WHERE id = $1', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    res.json({ success: true, order: result.rows[0] });
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch order' });
+  }
+});
+
+// Update order status (for admin or payment processing)
+app.put('/api/orders/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status, paymentStatus } = req.body;
+
+  try {
+    const result = await query(
+      `UPDATE orders
+       SET status = $1, payment_status = $2, completed_at = CASE WHEN $1 = 'completed' THEN CURRENT_TIMESTAMP ELSE completed_at END
+       WHERE id = $3
+       RETURNING *`,
+      [status, paymentStatus, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    res.json({ success: true, order: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ success: false, error: 'Failed to update order status' });
+  }
+});
+
+// M-Pesa payment callback handler
+app.post('/api/orders/:id/payment/callback', async (req, res) => {
+  const { id } = req.params;
+  const { ResultCode, ResultDesc, CallbackMetadata } = req.body.Body?.stkCallback || {};
+
+  try {
+    let paymentStatus = 'failed';
+    let orderStatus = 'pending';
+
+    if (ResultCode === 0) {
+      paymentStatus = 'completed';
+      orderStatus = 'confirmed';
+    }
+
+    const result = await query(
+      `UPDATE orders
+       SET payment_status = $1, status = $2, completed_at = CASE WHEN $2 = 'confirmed' THEN CURRENT_TIMESTAMP ELSE completed_at END
+       WHERE id = $3
+       RETURNING *`,
+      [paymentStatus, orderStatus, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    console.log(`Payment callback processed for order ${id}: ${ResultDesc}`);
+
+    res.json({ success: true, message: 'Payment callback processed' });
+  } catch (error) {
+    console.error('Error processing payment callback:', error);
+    res.status(500).json({ success: false, error: 'Failed to process payment callback' });
+  }
+});
+
+// Get user orders (already exists, but ensuring it's properly placed)
+app.get('/api/user/orders/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await query(
+      'SELECT * FROM orders WHERE customer_id = $1 ORDER BY date DESC',
+      [userId]
+    );
+
+    res.json({ success: true, orders: result.rows });
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch user orders' });
+  }
+});
+
 // Start server after DB init
 initDatabase().then(() => {
   app.listen(PORT, () => {

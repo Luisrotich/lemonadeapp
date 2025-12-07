@@ -13,7 +13,7 @@ class AdminDashboard {
 
     detectBaseURL() {
         // Try Railway URL first, fallback to localhost for development
-        const railwayURL = 'https://lemonadeapp-production-611f.up.railway.app';
+        const railwayURL = 'https://lemonadekenya.up.railway.app';
         const localhostURL = 'http://localhost:3000';
 
         // Check if we're running on localhost (development)
