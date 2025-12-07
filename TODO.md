@@ -13,6 +13,7 @@
 - [x] Redeploy Railway application to fix 502 errors (server startup code added)
 - [x] Verify that all 7 products from products.json are now in PostgreSQL
 - [x] Add homepage login endpoint (POST /api/auth/login)
+- [x] Add checkout routes
 - [ ] Test that products are visible in admin panel and homepage
 - [ ] Verify that new products are created with 'active' status
 
