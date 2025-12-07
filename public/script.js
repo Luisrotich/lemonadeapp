@@ -43,6 +43,8 @@ class LemonadeApp {
     }
 
     initializeApp() {
+        this.currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
         this.loadCartFromStorage();
         this.loadUserPreferences();
         this.loadProducts();
