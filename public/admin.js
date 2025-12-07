@@ -772,21 +772,21 @@ class AdminDashboard {
         ).join('\n');
 
         const details = `
-Order Details:
+            Order Details:
 
-Order: ${order.orderNumber || order.id}
-Customer: ${order.customerName || 'Unknown'}
-Phone: ${order.customerPhone || 'No phone'}
-Email: ${order.customerEmail || 'No email'}
-Date: ${new Date(order.date).toLocaleString()}
-Status: ${this.formatOrderStatus(order.status)}
-Payment: ${order.paymentMethod || 'Unknown'}
-Delivery: ${order.deliveryAddress || 'No address'}
+            Order: ${order.orderNumber || order.id}
+            Customer: ${order.customerName || 'Unknown'}
+            Phone: ${order.customerPhone || 'No phone'}
+            Email: ${order.customerEmail || 'No email'}
+            Date: ${new Date(order.date).toLocaleString()}
+            Status: ${this.formatOrderStatus(order.status)}
+            Payment: ${order.paymentMethod || 'Unknown'}
+            Delivery: ${order.deliveryAddress || 'No address'}
 
-Items:
-${itemsList || 'No items'}
+            Items:
+            ${itemsList || 'No items'}
 
-Total: ksh ${order.total.toFixed(2)}
+            Total: ksh ${Number(order.total).toFixed(2)}
         `;
 
         alert(details);
