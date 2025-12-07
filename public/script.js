@@ -1241,12 +1241,6 @@ updateCartQuantity(productId, increase = true) {
     }
 }
 
-
-
-
-
-
-
 debugCartMath() {
     console.log('🧮 DEBUG CART MATH:');
     console.log('Cart items:', this.cart);
@@ -1523,6 +1517,7 @@ debugCart() {
                 body: JSON.stringify(orderData)
             });
             
+            console.log("Current User:", this.currentUser);
             const data = await response.json();
             console.log('Backend response:', data);
             
