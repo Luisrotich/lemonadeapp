@@ -315,7 +315,7 @@ class AdminDashboard {
             console.log('📦 Orders response:', data);
 
             // Server returns array directly, not wrapped in success object
-            this.orders = Array.isArray(data) ? data : [];
+            this.orders = Array.isArray(data.orders) ? data.orders : [];
             this.displayOrders();
             this.updateOrderStats();
             this.updatePendingBadge();
@@ -462,7 +462,7 @@ class AdminDashboard {
             console.log('📦 Products response:', data);
 
             // Server returns array directly, not wrapped in success object
-            this.products = Array.isArray(data) ? data : [];
+            this.products = Array.isArray(data.products) ? data.products : [];
             this.displayProducts();
         } catch (error) {
             console.error('❌ Error loading products:', error);
@@ -684,7 +684,7 @@ class AdminDashboard {
             console.log('📦 Customers response:', data);
 
             // Server returns array directly, not wrapped in success object
-            this.customers = Array.isArray(data) ? data : [];
+            this.customers = Array.isArray(data.customers) ? data.customers : [];
             this.displayCustomers();
         } catch (error) {
             console.error('❌ Error loading customers:', error);
