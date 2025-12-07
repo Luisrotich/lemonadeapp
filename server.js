@@ -392,7 +392,9 @@ app.put('/api/orders/:id', async (req, res) => {
   try {
     const result = await query(
       `UPDATE orders
-       SET status = $1, payment_status = $2, completed_at = CASE WHEN $1 = 'completed' THEN CURRENT_TIMESTAMP ELSE completed_at END
+       SET status = $1::varchar,
+           payment_status = COALESCE($2::varchar, payment_status),
+           completed_at = CASE WHEN $1::varchar = 'completed' THEN CURRENT_TIMESTAMP ELSE completed_at END
        WHERE id = $3
        RETURNING *`,
       [status, paymentStatus, id]
