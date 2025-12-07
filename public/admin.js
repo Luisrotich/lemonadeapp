@@ -387,9 +387,6 @@ class AdminDashboard {
                                 <button class="status-btn completed" onclick="admin.updateOrderStatus('${order.id}', 'completed')" title="Mark as Completed">
                                     <i class="fas fa-check"></i>
                                 </button>
-                                <button class="status-btn delivered" onclick="admin.updateOrderStatus('${order.id}', 'delivered')" title="Mark as Delivered">
-                                    <i class="fas fa-truck"></i>
-                                </button>
                             </div>
                         ` : ''}
                     </div>
