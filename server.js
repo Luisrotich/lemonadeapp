@@ -385,7 +385,7 @@ app.get('/api/orders/:id', async (req, res) => {
 });
 
 // Update order status (for admin or payment processing)
-app.put('/api/orders/:id/status', async (req, res) => {
+app.put('/api/orders/:id', async (req, res) => {
   const { id } = req.params;
   const { status, paymentStatus } = req.body;
 
