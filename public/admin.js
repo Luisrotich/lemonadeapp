@@ -724,11 +724,16 @@ class AdminDashboard {
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.customers.map(customer => `
+                        ${this.customers.map(customer => {
+                            const joinedDate = new Date(customer.createdAt);
+                            const joinedText = joinedDate instanceof Date && !isNaN(joinedDate) 
+                                ? joinedDate.toLocaleDateString() 
+                                : 'Unknown';
+                            return `
                             <tr>
                                 <td>
                                     <strong>${customer.name}</strong><br>
-                                    <small>Joined: ${new Date(customer.createdAt).toLocaleDateString()}</small>
+                                    <small>Joined: ${joinedText}</small>
                                 </td>
                                 <td>
                                     ${customer.email ? `<div><i class="fas fa-envelope"></i> ${customer.email}</div>` : ''}
@@ -738,7 +743,7 @@ class AdminDashboard {
                                 <td><strong>ksh ${(customer.totalSpent || 0).toFixed(2)}</strong></td>
                                 <td>${customer.lastOrder ? new Date(customer.lastOrder).toLocaleDateString() : 'Never'}</td>
                             </tr>
-                        `).join('')}
+                        `;}).join('')}
                     </tbody>
                 </table>
             </div>
