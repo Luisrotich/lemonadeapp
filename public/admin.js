@@ -772,21 +772,21 @@ class AdminDashboard {
         }
 
         const items = order.items || [];
-        const itemsList = items.map(item => 
+        const itemsList = items.map(item =>
             `${item.product} x${item.quantity} - ksh ${(item.price * item.quantity).toFixed(2)}`
         ).join('\n');
 
         const details = `
             Order Details:
 
-            Order: ${order.orderNumber || order.id}
-            Customer: ${order.customerName || 'Unknown'}
-            Phone: ${order.customerPhone || 'No phone'}
-            Email: ${order.customerEmail || 'No email'}
+            Order: ${order.order_number || order.id}
+            Customer: ${order.customer_name || 'Unknown'}
+            Phone: ${order.customer_phone || 'No phone'}
+            Email: ${order.customer_email || 'No email'}
             Date: ${new Date(order.date).toLocaleString()}
             Status: ${this.formatOrderStatus(order.status)}
-            Payment: ${order.paymentMethod || 'Unknown'}
-            Delivery: ${order.deliveryAddress || 'No address'}
+            Payment: ${order.payment_method || 'Unknown'}
+            Delivery: ${order.delivery_address || 'No address'}
 
             Items:
             ${itemsList || 'No items'}
