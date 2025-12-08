@@ -104,10 +104,22 @@ async function initDatabase() {
         status VARCHAR(50) DEFAULT 'pending',
         payment_method VARCHAR(50),
         payment_status VARCHAR(50) DEFAULT 'pending',
+        delivery_address TEXT,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         completed_at TIMESTAMP NULL
       )
     `);
+
+    // Add delivery_address column if it doesn't exist (for existing tables)
+    try {
+      await query(`
+        ALTER TABLE orders
+        ADD COLUMN IF NOT EXISTS delivery_address TEXT
+      `);
+      console.log('Delivery address column added to orders table');
+    } catch (alterError) {
+      console.error('Error adding delivery_address column:', alterError);
+    }
 
     // Update existing products to have 'active' status if they don't have one
     try {
@@ -358,7 +370,7 @@ app.delete('/api/products/:id', async (req, res) => {
 
 // Create new order
 app.post('/api/orders', async (req, res) => {
-  const { customerId, customerName, customerEmail, customerPhone, items, total, paymentMethod } = req.body;
+  const { customerId, customerName, customerEmail, customerPhone, items, total, paymentMethod, deliveryAddress } = req.body;
 
   try {
     // Generate unique order ID and order number
@@ -395,10 +407,10 @@ app.post('/api/orders', async (req, res) => {
     }
 
     const result = await query(
-      `INSERT INTO orders (id, order_number, customer_id, customer_name, customer_email, customer_phone, items, total, status, payment_method, payment_status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `INSERT INTO orders (id, order_number, customer_id, customer_name, customer_email, customer_phone, items, total, status, payment_method, payment_status, delivery_address)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING *`,
-      [orderId, orderNumber, customerId, customerName, customerEmail, customerPhone, JSON.stringify(items), total, status, paymentMethod, paymentStatus]
+      [orderId, orderNumber, customerId, customerName, customerEmail, customerPhone, JSON.stringify(items), total, status, paymentMethod, paymentStatus, deliveryAddress]
     );
 
     res.json({ success: true, order: result.rows[0] });
