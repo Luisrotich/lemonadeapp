@@ -360,8 +360,8 @@ class AdminDashboard {
             <tr>
                 <td><strong>${order.orderNumber || order.id}</strong></td>
                 <td>
-                    <strong>${order.customerName || 'Unknown Customer'}</strong><br>
-                    <small>${order.customerPhone || 'No phone'}</small><br>
+                    <strong>${order.customer_name || 'Unknown Customer'}</strong><br>
+                    <small>${order.customer_phone || 'No phone'}</small><br>
                     <small class="text-muted">${itemsSummary}</small>
                 </td>
                 <td>${new Date(order.date).toLocaleDateString()}</td>

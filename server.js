@@ -238,11 +238,33 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// ✅ Get all customers
+// ✅ Get all customers (users who have completed orders)
 app.get('/api/admin/customers', async (req, res) => {
   try {
-    const result = await query('SELECT * FROM customers ORDER BY created_at DESC');
-    res.json({ success: true, customers: result.rows });
+    const result = await query(`
+      SELECT
+        customer_id as id,
+        customer_name as name,
+        customer_email as email,
+        customer_phone as phone,
+        COUNT(*) as orderCount,
+        SUM(total) as totalSpent,
+        MAX(date) as lastOrder,
+        MIN(date) as createdAt
+      FROM orders
+      WHERE customer_id IS NOT NULL
+      GROUP BY customer_id, customer_name, customer_email, customer_phone
+      ORDER BY lastOrder DESC
+    `);
+
+    // Convert totalSpent to number and format the response
+    const customers = result.rows.map(customer => ({
+      ...customer,
+      totalSpent: Number(customer.totalspent),
+      orderCount: Number(customer.ordercount)
+    }));
+
+    res.json({ success: true, customers });
   } catch (error) {
     console.error('Error fetching customers:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch customers' });
