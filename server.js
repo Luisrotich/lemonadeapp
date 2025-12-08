@@ -374,6 +374,26 @@ app.post('/api/orders', async (req, res) => {
       status = 'confirmed';
     }
 
+    // First, ensure customer exists in customers table
+    if (customerId && customerName) {
+      try {
+        await query(
+          `INSERT INTO customers (id, name, email, phone, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+           ON CONFLICT (id) DO UPDATE SET
+             name = EXCLUDED.name,
+             email = EXCLUDED.email,
+             phone = EXCLUDED.phone,
+             updated_at = CURRENT_TIMESTAMP`,
+          [customerId, customerName, customerEmail, customerPhone]
+        );
+        console.log(`Customer ${customerId} upserted to customers table`);
+      } catch (customerError) {
+        console.error('Error upserting customer:', customerError);
+        // Continue with order creation even if customer upsert fails
+      }
+    }
+
     const result = await query(
       `INSERT INTO orders (id, order_number, customer_id, customer_name, customer_email, customer_phone, items, total, status, payment_method, payment_status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
