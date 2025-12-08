@@ -1235,6 +1235,13 @@ input:checked + .slider:before {
   padding: 1rem;
 }
 
+/* Mobile responsive install button */
+@media (max-width: 768px) {
+  #install-btn {
+    bottom: 90px; /* Position above bottom navigation on mobile */
+  }
+}
+
 /* Responsive Design */
 @media (min-width: 768px) {
     .products {
