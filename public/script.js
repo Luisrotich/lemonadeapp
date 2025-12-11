@@ -168,7 +168,7 @@ class LemonadeApp {
                         color: white;
                         position: relative;
                     ">
-                        <button class="close-modal" onclick="lemonadeApp.hideMpesaConfirmation()" style="
+                        <button class="close-modal" style="
                             position: absolute;
                             top: 10px;
                             right: 10px;
@@ -219,7 +219,7 @@ class LemonadeApp {
                         </div>
                         
                         <div class="modal-actions" style="display: flex; gap: 10px;">
-                            <button class="btn-cancel" onclick="lemonadeApp.cancelMpesaPayment()" style="
+                            <button class="btn-cancel" style="
                                 flex: 1;
                                 padding: 15px;
                                 background: #f8f9fa;
@@ -231,7 +231,7 @@ class LemonadeApp {
                             ">
                                 Cancel
                             </button>
-                            <button class="btn-confirm" onclick="lemonadeApp.confirmMpesaPayment(${amount}, '${phoneNumber}')" style="
+                            <button class="btn-confirm" style="
                                 flex: 1;
                                 padding: 15px;
                                 background: #4CAF50;
@@ -266,6 +266,38 @@ class LemonadeApp {
             
             // Store promise resolve function
             this.mpesaConfirmationResolve = resolve;
+            
+            // Handle modal close via X button
+            const closeModal = modal.querySelector('.close-modal');
+            if (closeModal) {
+                closeModal.onclick = () => {
+                    this.hideMpesaConfirmation();
+                };
+            }
+
+            // Handle confirm button
+            const confirmBtn = modal.querySelector('.btn-confirm');
+            if (confirmBtn) {
+                confirmBtn.onclick = () => {
+                    if (this.mpesaConfirmationResolve) {
+                        this.mpesaConfirmationResolve(true);
+                        this.mpesaConfirmationResolve = null;
+                    }
+                    // The actual payment processing will be done by confirmMpesaPayment()
+                    // which is already bound to the button's onclick event
+                };
+            }
+
+            // Handle cancel button
+            const cancelBtn = modal.querySelector('.btn-cancel');
+            if (cancelBtn) {
+                cancelBtn.onclick = () => {
+                    if (this.mpesaConfirmationResolve) {
+                        this.mpesaConfirmationResolve(false);
+                        this.mpesaConfirmationResolve = null;
+                    }
+                };
+            }
         });
     }
 
@@ -279,6 +311,7 @@ class LemonadeApp {
             document.head.removeChild(this.mpesaConfirmationStyle);
             this.mpesaConfirmationStyle = null;
         }
+        // Resolve the promise with false if it's still pending
         if (this.mpesaConfirmationResolve) {
             this.mpesaConfirmationResolve(false);
             this.mpesaConfirmationResolve = null;
@@ -514,12 +547,18 @@ class LemonadeApp {
                 return;
             }
             
-            // Show M-Pesa confirmation modal instead of immediate processing
+            // Show M-Pesa confirmation modal
             const amount = Math.round(total);
-            await this.showMpesaPaymentConfirmation(amount, phone);
+            const userConfirmed = await this.showMpesaPaymentConfirmation(amount, phone);
             
-            // Note: The actual payment processing continues in confirmMpesaPayment()
-            // after user confirms in the modal
+            // If user confirmed in the modal, proceed with payment
+            if (userConfirmed) {
+                // The actual payment will be handled by confirmMpesaPayment()
+                // which is called when user clicks "Proceed" in the modal
+            } else {
+                // User cancelled from the modal
+                this.showMessage('Payment cancelled');
+            }
             
         } else if (selectedPayment === 'cash') {
             // Handle cash on delivery
