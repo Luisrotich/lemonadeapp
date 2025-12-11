@@ -15,13 +15,13 @@ class LemonadeApp {
 
         // M-Pesa Configuration
         this.mpesaConfig = {
-            consumerKey: 'YOUR_MPESA_CONSUMER_KEY', // Get from Daraja portal
-            consumerSecret: 'YOUR_MPESA_CONSUMER_SECRET', // Get from Daraja portal
-            shortCode: 'YOUR_TILL_NUMBER', // Your Till Number for Buy Goods
+            consumerKey: 'sJWMb8e5xwZ9APh9d8RAWt1VUjBEnmrM50bA8cBE4vwXxXwT', // Get from Daraja portal
+            consumerSecret: 'AecUYi2w8e1Mrjd0tHFAK7Z9WQxKkBN09pXEGs3JM83EGp7ofCJs5PlCI7Jq3KUQ', // Get from Daraja portal
+            shortCode: '3060826', // Your Till Number for Buy Goods
             passkey: 'YOUR_MPESA_PASSKEY', // From Daraja portal
             callbackURL: `${BASE_URL}/api/mpesa-callback`,
             transactionType: 'CustomerBuyGoodsOnline',
-            env: 'sandbox' // Change to 'production' when live
+            env: 'live' // Change to 'production' when live
         };
 
         this.initializeApp();
