@@ -3027,7 +3027,128 @@ window.addEventListener('load', () => {
         }
     }, 2000);
 });
+// M-Pesa configuration (You should get these from Daraja portal)
+const mpesaConfig = {
+    consumerKey: 'UiP9Ahb0IpkKG29m08eQihoMXOQfkGtIhl6cAcZex215Z43S',
+    consumerSecret: 'j0nmAm184YbYtz5zsx7AwH6kxlvEpf8qutDDfRIYBg723uh77sBPzRAn7iFPgABg',
+    shortCode: 'YOUR_SHORTCODE',
+    passkey: 'YOUR_PASSKEY',
+    callbackURL: 'https://yourdomain.com/callback', // Your callback URL
+    transactionType: 'CustomerPayBillOnline'
+};
 
+// Function to get access token
+async function getMpesaAccessToken() {
+    try {
+        const response = await fetch('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Basic ' + btoa(mpesaConfig.consumerKey + ':' + mpesaConfig.consumerSecret)
+            }
+        });
+        
+        const data = await response.json();
+        return data.access_token;
+    } catch (error) {
+        console.error('Error getting access token:', error);
+        throw error;
+    }
+}
+
+// Function to initiate STK Push
+async function initiateSTKPush(phoneNumber, amount, accountReference, transactionDesc) {
+    try {
+        const accessToken = await getMpesaAccessToken();
+        
+        // Generate timestamp
+        const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3);
+        
+        // Generate password
+        const password = btoa(mpesaConfig.shortCode + mpesaConfig.passkey + timestamp);
+        
+        // STK Push request
+        const response = await fetch('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                BusinessShortCode: mpesaConfig.shortCode,
+                Password: password,
+                Timestamp: timestamp,
+                TransactionType: mpesaConfig.transactionType,
+                Amount: amount,
+                PartyA: phoneNumber,
+                PartyB: mpesaConfig.shortCode,
+                PhoneNumber: phoneNumber,
+                CallBackURL: mpesaConfig.callbackURL,
+                AccountReference: accountReference,
+                TransactionDesc: transactionDesc
+            })
+        });
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error initiating STK Push:', error);
+        throw error;
+    }
+}
+
+// Main function to handle payment
+async function initiateMpesaPayment() {
+    // Show loading state
+    document.getElementById('mpesa-loading').style.display = 'block';
+    document.getElementById('confirm-payment').disabled = true;
+    
+    try {
+        // Collect payment details (you can get these from a form)
+        const phoneNumber = prompt('Enter M-Pesa phone number (e.g., 07XXXXXXXX):');
+        
+        if (!phoneNumber || phoneNumber.length < 12) {
+            alert('Please enter a valid phone number');
+            return;
+        }
+        
+        // Get order details (you can customize these)
+        const amount = 1; // Amount in KSH (use actual order amount)
+        const accountReference = 'ORDER123'; // Your order reference
+        const transactionDesc = 'Product purchase';
+        
+        // Initiate STK Push
+        const result = await initiateSTKPush(phoneNumber, amount, accountReference, transactionDesc);
+        
+        if (result.ResponseCode === '0') {
+            // STK Push sent successfully
+            alert('M-Pesa prompt sent to your phone! Please enter your PIN to complete payment.');
+            
+            // Poll for payment confirmation (simplified version)
+            checkPaymentStatus(result.CheckoutRequestID);
+        } else {
+            alert('Failed to initiate payment: ' + result.ResponseDescription);
+        }
+        
+    } catch (error) {
+        console.error('Payment error:', error);
+        alert('An error occurred while processing payment. Please try again.');
+    } finally {
+        // Hide loading state
+        document.getElementById('mpesa-loading').style.display = 'none';
+        document.getElementById('confirm-payment').disabled = false;
+    }
+}
+
+// Function to check payment status (simplified)
+async function checkPaymentStatus(checkoutRequestID) {
+    // In a real implementation, you would:
+    // 1. Use the M-Pesa query API
+    // 2. Or rely on the callback URL webhook
+    // 3. Poll your backend for payment confirmation
+    
+    console.log('Payment initiated with CheckoutRequestID:', checkoutRequestID);
+    alert('Payment processing... We\'ll notify you once confirmed.');
+}
 
 // Add CSS animations
 const style = document.createElement('style');

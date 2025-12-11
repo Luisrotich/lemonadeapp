@@ -486,12 +486,18 @@
             
             <!-- Action Buttons -->
             <div class="modal-actions">
-                <button type="button" id="cancel-checkout" class="btn-cancel">Cancel Order</button>
-                <button type="button" id="confirm-payment" class="btn-confirm">
-                    <i class="fas fa-lock"></i>
-                    Complete Order
-                </button>
-            </div>
+    <button type="button" id="cancel-checkout" class="btn-cancel">Cancel Order</button>
+    <button type="button" id="confirm-payment" class="btn-confirm" onclick="initiateMpesaPayment()">
+        <i class="fas fa-lock"></i>
+        Complete Order
+    </button>
+</div>
+
+<!-- Loading indicator (optional) -->
+<div id="mpesa-loading" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p>Processing M-Pesa payment...</p>
+</div>
         </div>
     </div>
     
