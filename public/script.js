@@ -3019,128 +3019,6 @@ window.addEventListener('load', () => {
         }
     }, 2000);
 });
-// M-Pesa configuration (You should get these from Daraja portal)
-const mpesaConfig = {
-    consumerKey: 'UiP9Ahb0IpkKG29m08eQihoMXOQfkGtIhl6cAcZex215Z43S',
-    consumerSecret: 'j0nmAm184YbYtz5zsx7AwH6kxlvEpf8qutDDfRIYBg723uh77sBPzRAn7iFPgABg',
-    shortCode: '600977',
-    passkey: 'YOUR_PASSKEY',
-    callbackURL: 'https://yourdomain.com/callback', // Your callback URL
-    transactionType: 'CustomerPayBillOnline'
-};
-
-// Function to get access token
-async function getMpesaAccessToken() {
-    try {
-        const response = await fetch('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Basic ' + btoa(mpesaConfig.consumerKey + ':' + mpesaConfig.consumerSecret)
-            }
-        });
-        
-        const data = await response.json();
-        return data.access_token;
-    } catch (error) {
-        console.error('Error getting access token:', error);
-        throw error;
-    }
-}
-
-// Function to initiate STK Push
-async function initiateSTKPush(phoneNumber, amount, accountReference, transactionDesc) {
-    try {
-        const accessToken = await getMpesaAccessToken();
-        
-        // Generate timestamp
-        const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3);
-        
-        // Generate password
-        const password = btoa(mpesaConfig.shortCode + mpesaConfig.passkey + timestamp);
-        
-        // STK Push request
-        const response = await fetch('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + accessToken,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                BusinessShortCode: mpesaConfig.shortCode,
-                Password: password,
-                Timestamp: timestamp,
-                TransactionType: mpesaConfig.transactionType,
-                Amount: amount,
-                PartyA: phoneNumber,
-                PartyB: mpesaConfig.shortCode,
-                PhoneNumber: phoneNumber,
-                CallBackURL: mpesaConfig.callbackURL,
-                AccountReference: accountReference,
-                TransactionDesc: transactionDesc
-            })
-        });
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error initiating STK Push:', error);
-        throw error;
-    }
-}
-
-// Main function to handle payment
-async function initiateMpesaPayment() {
-    // Show loading state
-    document.getElementById('mpesa-loading').style.display = 'block';
-    document.getElementById('confirm-payment').disabled = true;
-    
-    try {
-        // Collect payment details (you can get these from a form)
-        const phoneNumber = prompt('Enter M-Pesa phone number (e.g., 2547XXXXXXXX):');
-        
-        if (!phoneNumber || phoneNumber.length < 12) {
-            alert('Please enter a valid phone number');
-            return;
-        }
-        
-        // Get order details (you can customize these)
-        const amount = 1; // Amount in KSH (use actual order amount)
-        const accountReference = 'ORDER123'; // Your order reference
-        const transactionDesc = 'Product purchase';
-        
-        // Initiate STK Push
-        const result = await initiateSTKPush(phoneNumber, amount, accountReference, transactionDesc);
-        
-        if (result.ResponseCode === '0') {
-            // STK Push sent successfully
-            alert('M-Pesa prompt sent to your phone! Please enter your PIN to complete payment.');
-            
-            // Poll for payment confirmation (simplified version)
-            checkPaymentStatus(result.CheckoutRequestID);
-        } else {
-            alert('Failed to initiate payment: ' + result.ResponseDescription);
-        }
-        
-    } catch (error) {
-        console.error('Payment error:', error);
-        alert('An error occurred while processing payment. Please try again.');
-    } finally {
-        // Hide loading state
-        document.getElementById('mpesa-loading').style.display = 'none';
-        document.getElementById('confirm-payment').disabled = false;
-    }
-}
-
-// Function to check payment status (simplified)
-async function checkPaymentStatus(checkoutRequestID) {
-    // In a real implementation, you would:
-    // 1. Use the M-Pesa query API
-    // 2. Or rely on the callback URL webhook
-    // 3. Poll your backend for payment confirmation
-    
-    console.log('Payment initiated with CheckoutRequestID:', checkoutRequestID);
-    alert('Payment processing... We\'ll notify you once confirmed.');
-}
 
 // Add CSS animations
 const style = document.createElement('style');
@@ -3156,3 +3034,317 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+
+
+
+
+
+
+
+
+
+// M-Pesa configuration for Buy Goods and Services
+const mpesaConfig = {
+    consumerKey: 'sJWMb8e5xwZ9APh9d8RAWt1VUjBEnmrM50bA8cBE4vwXxXwT',
+    consumerSecret: 'AecUYi2w8e1Mrjd0tHFAK7Z9WQxKkBN09pXEGs3JM83EGp7ofCJs5PlCI7Jq3KUQ',
+    shortCode: '174379', // Till Number for Buy Goods and Services
+    passkey: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+    callbackURL: 'https://yourdomain.com/mpesa-callback',
+    transactionType: 'CustomerBuyGoodsOnline', // Changed from CustomerPayBillOnline
+    env: 'sandbox'
+};
+
+// Get the order amount from your checkout (update this based on your actual implementation)
+function getOrderAmount() {
+    // Example 1: If you have a cart total element
+    const cartTotal = document.querySelector('.cart-total')?.textContent;
+    if (cartTotal) {
+        const amount = parseFloat(cartTotal.replace(/[^0-9.]/g, ''));
+        return Math.round(amount); // M-Pesa requires whole numbers
+    }
+    
+    // Example 2: If you have a hidden input with amount
+    const amountInput = document.getElementById('order-amount');
+    if (amountInput?.value) {
+        return Math.round(parseFloat(amountInput.value));
+    }
+    
+    // Example 3: Calculate from order items
+    const orderItems = document.querySelectorAll('.order-item-price');
+    if (orderItems.length > 0) {
+        let total = 0;
+        orderItems.forEach(item => {
+            const price = parseFloat(item.textContent.replace(/[^0-9.]/g, ''));
+            total += price;
+        });
+        return Math.round(total);
+    }
+    
+    // Default fallback
+    return 100;
+}
+
+// Get order reference
+function getOrderReference() {
+    return `ORDER${Date.now()}`; // Generate unique reference
+}
+
+// Initiate STK Push for Buy Goods and Services
+async function initiateSTKPush(phoneNumber, amount, accountReference, transactionDesc) {
+    try {
+        const accessToken = await getMpesaAccessToken();
+        
+        // Generate timestamp (format: YYYYMMDDHHmmss)
+        const now = new Date();
+        const timestamp = now.getFullYear().toString() + 
+                         String(now.getMonth() + 1).padStart(2, '0') + 
+                         String(now.getDate()).padStart(2, '0') + 
+                         String(now.getHours()).padStart(2, '0') + 
+                         String(now.getMinutes()).padStart(2, '0') + 
+                         String(now.getSeconds()).padStart(2, '0');
+        
+        // Generate password for Buy Goods and Services
+        const password = btoa(mpesaConfig.shortCode + mpesaConfig.passkey + timestamp);
+        
+        const baseUrl = mpesaConfig.env === 'sandbox' 
+            ? 'https://sandbox.safaricom.co.ke' 
+            : 'https://api.safaricom.co.ke';
+        
+        // STK Push request for Buy Goods and Services
+        const response = await fetch(`${baseUrl}/mpesa/stkpush/v1/processrequest`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                BusinessShortCode: parseInt(mpesaConfig.shortCode), // Till Number
+                Password: password,
+                Timestamp: timestamp,
+                TransactionType: mpesaConfig.transactionType, // CustomerBuyGoodsOnline
+                Amount: amount,
+                PartyA: phoneNumber, // Customer phone number
+                PartyB: parseInt(mpesaConfig.shortCode), // Till Number
+                PhoneNumber: phoneNumber, // Customer phone number
+                CallBackURL: mpesaConfig.callbackURL,
+                AccountReference: accountReference,
+                TransactionDesc: transactionDesc
+            })
+        });
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error initiating STK Push:', error);
+        throw error;
+    }
+}
+
+// Main M-Pesa payment function
+async function initiateMpesaPayment() {
+    // Check if terms are agreed
+    if (!termsCheckbox.checked) {
+        alert('Please agree to the terms and conditions to proceed.');
+        return;
+    }
+    
+    // Get and validate phone number
+    const phoneNumber = phoneInput.value.trim();
+    if (!phoneNumber) {
+        alert('Please enter your M-Pesa phone number');
+        phoneInput.focus();
+        return;
+    }
+    
+    if (!validatePhoneNumber(phoneNumber)) {
+        alert('Please enter a valid Kenyan phone number (e.g., 07XXXXXXXX or 2547XXXXXXXX)');
+        phoneInput.focus();
+        return;
+    }
+    
+    // Format phone number
+    let formattedPhone;
+    try {
+        formattedPhone = formatPhoneNumber(phoneNumber);
+    } catch (error) {
+        alert(error.message);
+        phoneInput.focus();
+        return;
+    }
+    
+    // Get order details
+    const amount = getOrderAmount();
+    if (amount < 1) {
+        alert('Invalid order amount');
+        return;
+    }
+    
+    const accountReference = getOrderReference();
+    const transactionDesc = 'Online Purchase';
+    
+    // Show loading state
+    showLoading(true);
+    
+    try {
+        // Initiate STK Push
+        const result = await initiateSTKPush(formattedPhone, amount, accountReference, transactionDesc);
+        
+        if (result.ResponseCode === '0') {
+            // Success - STK Push initiated
+            alert('✅ M-Pesa prompt sent to your phone!\n\nPlease check your phone and enter your M-Pesa PIN to complete the payment.');
+            
+            // Store checkout request ID for later verification
+            localStorage.setItem('mpesa_checkout_id', result.CheckoutRequestID);
+            localStorage.setItem('order_reference', accountReference);
+            
+            // Start polling for payment confirmation (simplified)
+            setTimeout(() => {
+                checkPaymentStatus(result.CheckoutRequestID);
+            }, 20000); // Check after 20 seconds
+            
+        } else {
+            // Error from M-Pesa
+            showError('Failed to initiate payment: ' + (result.errorMessage || result.ResponseDescription || 'Unknown error'));
+        }
+        
+    } catch (error) {
+        console.error('Payment processing error:', error);
+        showError('An error occurred while processing payment. Please try again.');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Cash on Delivery function
+function placeCashOrder() {
+    if (!termsCheckbox.checked) {
+        alert('Please agree to the terms and conditions to proceed.');
+        return;
+    }
+    
+    const confirmCash = confirm('Are you sure you want to place this order with Cash on Delivery?\n\nYou will pay when you receive the delivery.');
+    
+    if (confirmCash) {
+        showLoading(true);
+        
+        // Simulate order processing
+        setTimeout(() => {
+            showLoading(false);
+            alert('✅ Order placed successfully!\n\nYour order will be delivered soon. Please have the exact amount ready.');
+            
+            // Redirect to order confirmation page or close modal
+            // window.location.href = '/order-confirmation';
+        }, 2000);
+    }
+}
+
+// Check payment status (This should ideally be done on your backend)
+async function checkPaymentStatus(checkoutRequestID) {
+    try {
+        const accessToken = await getMpesaAccessToken();
+        const baseUrl = mpesaConfig.env === 'sandbox' 
+            ? 'https://sandbox.safaricom.co.ke' 
+            : 'https://api.safaricom.co.ke';
+        
+        const response = await fetch(`${baseUrl}/mpesa/stkpushquery/v1/query`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                BusinessShortCode: parseInt(mpesaConfig.shortCode),
+                Password: btoa(mpesaConfig.shortCode + mpesaConfig.passkey + new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3)),
+                Timestamp: new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3),
+                CheckoutRequestID: checkoutRequestID
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.ResultCode === '0') {
+            // Payment successful
+            alert('✅ Payment confirmed! Your order is now being processed.');
+            // Redirect to success page or update UI
+        } else {
+            // Payment failed or cancelled
+            console.log('Payment status:', data);
+        }
+    } catch (error) {
+        console.error('Error checking payment status:', error);
+    }
+}
+
+// UI Helper Functions
+function showLoading(show) {
+    if (mpesaLoading) {
+        mpesaLoading.style.display = show ? 'block' : 'none';
+    }
+    confirmPaymentBtn.disabled = show;
+    cancelCheckoutBtn.disabled = show;
+}
+
+function showError(message) {
+    alert('❌ ' + message);
+}
+
+function showSuccess(message) {
+    alert('✅ ' + message);
+}
+
+// Cancel button handler
+cancelCheckoutBtn.addEventListener('click', function() {
+    if (confirm('Are you sure you want to cancel this order?')) {
+        // Close modal or redirect
+        window.location.href = '/cart'; // Or close modal
+    }
+});
+
+// Input validation for phone number
+phoneInput.addEventListener('input', function(e) {
+    // Auto-format phone number as user types
+    let value = e.target.value.replace(/\D/g, '');
+    
+    if (value.startsWith('254')) {
+        if (value.length > 12) value = value.substring(0, 12);
+    } else if (value.startsWith('7') || value.startsWith('1')) {
+        if (value.length > 9) value = value.substring(0, 9);
+        value = '0' + value;
+    } else if (value.startsWith('0')) {
+        if (value.length > 10) value = value.substring(0, 10);
+    }
+    
+    e.target.value = value;
+});
+
+// Form validation before submission
+phoneInput.addEventListener('blur', function() {
+    if (this.value && !validatePhoneNumber(this.value)) {
+        this.style.borderColor = '#ff0000';
+    } else {
+        this.style.borderColor = '';
+    }
+});
+
+// Initialize the form based on selected payment method
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial state
+    if (document.getElementById('payment-mpesa').checked) {
+        mpesaFields.style.display = 'block';
+        cashFields.style.display = 'none';
+        confirmPaymentBtn.onclick = initiateMpesaPayment;
+    } else {
+        mpesaFields.style.display = 'none';
+        cashFields.style.display = 'block';
+        confirmPaymentBtn.onclick = placeCashOrder;
+    }
+    
+    // Prevent form submission on enter in phone field
+    phoneInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmPaymentBtn.click();
+        }
+    });
+});
