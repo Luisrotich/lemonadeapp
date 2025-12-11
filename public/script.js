@@ -3023,7 +3023,7 @@ window.addEventListener('load', () => {
 const mpesaConfig = {
     consumerKey: 'UiP9Ahb0IpkKG29m08eQihoMXOQfkGtIhl6cAcZex215Z43S',
     consumerSecret: 'j0nmAm184YbYtz5zsx7AwH6kxlvEpf8qutDDfRIYBg723uh77sBPzRAn7iFPgABg',
-    shortCode: 'YOUR_SHORTCODE',
+    shortCode: '600977',
     passkey: 'YOUR_PASSKEY',
     callbackURL: 'https://yourdomain.com/callback', // Your callback URL
     transactionType: 'CustomerPayBillOnline'
@@ -3096,7 +3096,7 @@ async function initiateMpesaPayment() {
     
     try {
         // Collect payment details (you can get these from a form)
-        const phoneNumber = prompt('Enter M-Pesa phone number (e.g., 07XXXXXXXX):');
+        const phoneNumber = prompt('Enter M-Pesa phone number (e.g., 2547XXXXXXXX):');
         
         if (!phoneNumber || phoneNumber.length < 12) {
             alert('Please enter a valid phone number');
