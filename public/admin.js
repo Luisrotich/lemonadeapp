@@ -13,7 +13,7 @@ class AdminDashboard {
 
     detectBaseURL() {
         // Try Railway URL first, fallback to localhost for development
-        const railwayURL = 'https://lemonadeapp-production-611f.up.railway.app';
+        const railwayURL = 'https://lemonadekenya.up.railway.app';
         const localhostURL = 'http://localhost:3000';
 
         // Check if we're running on localhost (development)
@@ -315,7 +315,7 @@ class AdminDashboard {
             console.log('📦 Orders response:', data);
 
             // Server returns array directly, not wrapped in success object
-            this.orders = Array.isArray(data) ? data : [];
+            this.orders = Array.isArray(data.orders) ? data.orders : [];
             this.displayOrders();
             this.updateOrderStats();
             this.updatePendingBadge();
@@ -360,8 +360,8 @@ class AdminDashboard {
             <tr>
                 <td><strong>${order.orderNumber || order.id}</strong></td>
                 <td>
-                    <strong>${order.customerName || 'Unknown Customer'}</strong><br>
-                    <small>${order.customerPhone || 'No phone'}</small><br>
+                    <strong>${order.customer_name || 'Unknown Customer'}</strong><br>
+                    <small>${order.customer_phone || 'No phone'}</small><br>
                     <small class="text-muted">${itemsSummary}</small>
                 </td>
                 <td>${new Date(order.date).toLocaleDateString()}</td>
@@ -462,7 +462,7 @@ class AdminDashboard {
             console.log('📦 Products response:', data);
 
             // Server returns array directly, not wrapped in success object
-            this.products = Array.isArray(data) ? data : [];
+            this.products = Array.isArray(data.products) ? data.products : [];
             this.displayProducts();
         } catch (error) {
             console.error('❌ Error loading products:', error);
@@ -684,7 +684,7 @@ class AdminDashboard {
             console.log('📦 Customers response:', data);
 
             // Server returns array directly, not wrapped in success object
-            this.customers = Array.isArray(data) ? data : [];
+            this.customers = Array.isArray(data.customers) ? data.customers : [];
             this.displayCustomers();
         } catch (error) {
             console.error('❌ Error loading customers:', error);
@@ -724,11 +724,16 @@ class AdminDashboard {
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.customers.map(customer => `
+                        ${this.customers.map(customer => {
+                            const joinedDate = new Date(customer.createdAt);
+                            const joinedText = joinedDate instanceof Date && !isNaN(joinedDate) 
+                                ? joinedDate.toLocaleDateString() 
+                                : 'Unknown';
+                            return `
                             <tr>
                                 <td>
                                     <strong>${customer.name}</strong><br>
-                                    <small>Joined: ${new Date(customer.createdAt).toLocaleDateString()}</small>
+                                    <small>Joined: ${joinedText}</small>
                                 </td>
                                 <td>
                                     ${customer.email ? `<div><i class="fas fa-envelope"></i> ${customer.email}</div>` : ''}
@@ -738,7 +743,7 @@ class AdminDashboard {
                                 <td><strong>ksh ${(customer.totalSpent || 0).toFixed(2)}</strong></td>
                                 <td>${customer.lastOrder ? new Date(customer.lastOrder).toLocaleDateString() : 'Never'}</td>
                             </tr>
-                        `).join('')}
+                        `;}).join('')}
                     </tbody>
                 </table>
             </div>
@@ -767,26 +772,26 @@ class AdminDashboard {
         }
 
         const items = order.items || [];
-        const itemsList = items.map(item => 
+        const itemsList = items.map(item =>
             `${item.product} x${item.quantity} - ksh ${(item.price * item.quantity).toFixed(2)}`
         ).join('\n');
 
         const details = `
-Order Details:
+            Order Details:
 
-Order: ${order.orderNumber || order.id}
-Customer: ${order.customerName || 'Unknown'}
-Phone: ${order.customerPhone || 'No phone'}
-Email: ${order.customerEmail || 'No email'}
-Date: ${new Date(order.date).toLocaleString()}
-Status: ${this.formatOrderStatus(order.status)}
-Payment: ${order.paymentMethod || 'Unknown'}
-Delivery: ${order.deliveryAddress || 'No address'}
+            Order: ${order.order_number || order.id}
+            Customer: ${order.customer_name || 'Unknown'}
+            Phone: ${order.customer_phone || 'No phone'}
+            Email: ${order.customer_email || 'No email'}
+            Date: ${new Date(order.date).toLocaleString()}
+            Status: ${this.formatOrderStatus(order.status)}
+            Payment: ${order.payment_method || 'Unknown'}
+            Delivery: ${order.delivery_address || 'No address'}
 
-Items:
-${itemsList || 'No items'}
+            Items:
+            ${itemsList || 'No items'}
 
-Total: ksh ${order.total.toFixed(2)}
+            Total: ksh ${Number(order.total).toFixed(2)}
         `;
 
         alert(details);

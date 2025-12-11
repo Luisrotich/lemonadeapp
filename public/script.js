@@ -1,6 +1,6 @@
 
 // Mobile E-Commerce App - Complete Implementation
-const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://lemonadeapp-production-611f.up.railway.app';
+const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://lemonadekenya.up.railway.app';
 class LemonadeApp {
     constructor() {
         this.cart = [];
@@ -8,7 +8,7 @@ class LemonadeApp {
         this.currentUser = null;
         this.currentTheme = 'light';
         this.products = [];
-        this.baseURL = 'https://lemonadeapp-production-611f.up.railway.app';
+        this.baseURL = 'https://lemonadekenya.up.railway.app';
         this.currentProductDetail = null;
         this.currentDetailQuantity = 1;
         this.deferredPrompt = null; // For PWA install prompt
@@ -43,6 +43,8 @@ class LemonadeApp {
     }
 
     initializeApp() {
+        this.currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
         this.loadCartFromStorage();
         this.loadUserPreferences();
         this.loadProducts();
@@ -970,12 +972,7 @@ renderProducts() {
                     <div class="price2">Ksh ${product.price?.toFixed(2) || '0.00'}</div>
                     
                     ${product.stock > 0 ? `
-                        <div class="quantity-controls">
-                            <button class="quantity-btn minus">-</button>
-                            <span class="quantity">1</span>
-                            <button class="quantity-btn plus">+</button>
-                        </div>
-                        <button class="add-to-cart" data-id="${product.id}" data-product="${product.name}" data-price="${product.price}">Add to Cart</button>
+                        
                     ` : `
                         <button class="add-to-cart out-of-stock" disabled>
                             Out of Stock
@@ -1245,12 +1242,6 @@ updateCartQuantity(productId, increase = true) {
         console.error('❌ Item not found in cart:', productId);
     }
 }
-
-
-
-
-
-
 
 debugCartMath() {
     console.log('🧮 DEBUG CART MATH:');
@@ -1528,6 +1519,7 @@ debugCart() {
                 body: JSON.stringify(orderData)
             });
             
+            console.log("Current User:", this.currentUser);
             const data = await response.json();
             console.log('Backend response:', data);
             

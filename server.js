@@ -5,13 +5,30 @@ const { query } = require('./db');
 const path = require('path');
 
 const app = express();
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+const allowedOrigins = [
+  'https://lemonadekenya.up.railway.app',
+  'http://localhost:5000',
+  'http://localhost:3000'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS blocked'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Initialize database tables
 async function initDatabase() {
@@ -87,10 +104,22 @@ async function initDatabase() {
         status VARCHAR(50) DEFAULT 'pending',
         payment_method VARCHAR(50),
         payment_status VARCHAR(50) DEFAULT 'pending',
+        delivery_address TEXT,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         completed_at TIMESTAMP NULL
       )
     `);
+
+    // Add delivery_address column if it doesn't exist (for existing tables)
+    try {
+      await query(`
+        ALTER TABLE orders
+        ADD COLUMN IF NOT EXISTS delivery_address TEXT
+      `);
+      console.log('Delivery address column added to orders table');
+    } catch (alterError) {
+      console.error('Error adding delivery_address column:', alterError);
+    }
 
     // Update existing products to have 'active' status if they don't have one
     try {
@@ -221,11 +250,33 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// ✅ Get all customers
+// ✅ Get all customers (users who have completed orders)
 app.get('/api/admin/customers', async (req, res) => {
   try {
-    const result = await query('SELECT * FROM customers ORDER BY created_at DESC');
-    res.json({ success: true, customers: result.rows });
+    const result = await query(`
+      SELECT
+        customer_id as id,
+        customer_name as name,
+        customer_email as email,
+        customer_phone as phone,
+        COUNT(*) as orderCount,
+        SUM(total) as totalSpent,
+        MAX(date) as lastOrder,
+        MIN(date) as createdAt
+      FROM orders
+      WHERE customer_id IS NOT NULL
+      GROUP BY customer_id, customer_name, customer_email, customer_phone
+      ORDER BY lastOrder DESC
+    `);
+
+    // Convert totalSpent to number and format the response
+    const customers = result.rows.map(customer => ({
+      ...customer,
+      totalSpent: Number(customer.totalspent),
+      orderCount: Number(customer.ordercount)
+    }));
+
+    res.json({ success: true, customers });
   } catch (error) {
     console.error('Error fetching customers:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch customers' });
@@ -312,6 +363,157 @@ app.delete('/api/products/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting product:', error);
     res.status(500).json({ success: false, error: 'Failed to delete product' });
+  }
+});
+
+// ✅ Checkout Routes
+
+// Create new order
+app.post('/api/orders', async (req, res) => {
+  const { customerId, customerName, customerEmail, customerPhone, items, total, paymentMethod, deliveryAddress } = req.body;
+
+  try {
+    // Generate unique order ID and order number
+    const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const orderNumber = `ORD-${Date.now()}`;
+
+    // Set payment_status and status based on payment method
+    let paymentStatus = 'pending';
+    let status = 'pending';
+
+    if (paymentMethod === 'cash_on_delivery') {
+      paymentStatus = 'cash_on_delivery';
+      status = 'confirmed';
+    }
+
+    // First, ensure customer exists in customers table
+    if (customerId && customerName) {
+      try {
+        await query(
+          `INSERT INTO customers (id, name, email, phone, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+           ON CONFLICT (id) DO UPDATE SET
+             name = EXCLUDED.name,
+             email = EXCLUDED.email,
+             phone = EXCLUDED.phone,
+             updated_at = CURRENT_TIMESTAMP`,
+          [customerId, customerName, customerEmail, customerPhone]
+        );
+        console.log(`Customer ${customerId} upserted to customers table`);
+      } catch (customerError) {
+        console.error('Error upserting customer:', customerError);
+        // Continue with order creation even if customer upsert fails
+      }
+    }
+
+    const result = await query(
+      `INSERT INTO orders (id, order_number, customer_id, customer_name, customer_email, customer_phone, items, total, status, payment_method, payment_status, delivery_address)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       RETURNING *`,
+      [orderId, orderNumber, customerId, customerName, customerEmail, customerPhone, JSON.stringify(items), total, status, paymentMethod, paymentStatus, deliveryAddress]
+    );
+
+    res.json({ success: true, order: result.rows[0] });
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ success: false, error: 'Failed to create order' });
+  }
+});
+
+// Get specific order details
+app.get('/api/orders/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await query('SELECT * FROM orders WHERE id = $1', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    res.json({ success: true, order: result.rows[0] });
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch order' });
+  }
+});
+
+// Update order status (for admin or payment processing)
+app.put('/api/orders/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status, paymentStatus } = req.body;
+
+  try {
+    const result = await query(
+      `UPDATE orders
+       SET status = $1::varchar,
+           payment_status = COALESCE($2::varchar, payment_status),
+           completed_at = CASE WHEN $1::varchar = 'completed' THEN CURRENT_TIMESTAMP ELSE completed_at END
+       WHERE id = $3
+       RETURNING *`,
+      [status, paymentStatus, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    res.json({ success: true, order: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ success: false, error: 'Failed to update order status' });
+  }
+});
+
+// M-Pesa payment callback handler
+app.post('/api/orders/:id/payment/callback', async (req, res) => {
+  const { id } = req.params;
+  const { ResultCode, ResultDesc, CallbackMetadata } = req.body.Body?.stkCallback || {};
+
+  try {
+    let paymentStatus = 'failed';
+    let orderStatus = 'pending';
+
+    if (ResultCode === 0) {
+      paymentStatus = 'completed';
+      orderStatus = 'confirmed';
+    }
+
+    const result = await query(
+      `UPDATE orders
+       SET payment_status = $1, status = $2, completed_at = CASE WHEN $2 = 'confirmed' THEN CURRENT_TIMESTAMP ELSE completed_at END
+       WHERE id = $3
+       RETURNING *`,
+      [paymentStatus, orderStatus, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    console.log(`Payment callback processed for order ${id}: ${ResultDesc}`);
+
+    res.json({ success: true, message: 'Payment callback processed' });
+  } catch (error) {
+    console.error('Error processing payment callback:', error);
+    res.status(500).json({ success: false, error: 'Failed to process payment callback' });
+  }
+});
+
+// Get user orders (already exists, but ensuring it's properly placed)
+app.get('/api/user/orders/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await query(
+      'SELECT * FROM orders WHERE customer_id = $1 ORDER BY date DESC',
+      [userId]
+    );
+
+    res.json({ success: true, orders: result.rows });
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch user orders' });
   }
 });
 
