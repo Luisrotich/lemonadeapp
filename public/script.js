@@ -17,8 +17,8 @@ class LemonadeApp {
         this.mpesaConfig = {
             consumerKey: 'sJWMb8e5xwZ9APh9d8RAWt1VUjBEnmrM50bA8cBE4vwXxXwT', // Get from Daraja portal
             consumerSecret: 'AecUYi2w8e1Mrjd0tHFAK7Z9WQxKkBN09pXEGs3JM83EGp7ofCJs5PlCI7Jq3KUQ', // Get from Daraja portal
-            shortCode: '3060826', // Your Till Number for Buy Goods
-            passkey: 'YOUR_MPESA_PASSKEY', // From Daraja portal
+            shortCode: '174379', // Your Till Number for Buy Goods
+            passkey: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919', // From Daraja portal
             callbackURL: `${BASE_URL}/api/mpesa-callback`,
             transactionType: 'CustomerBuyGoodsOnline',
             env: 'sandbox' // Change to 'production' when live
