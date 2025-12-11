@@ -3044,121 +3044,242 @@ document.head.appendChild(style);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // M-Pesa configuration for Buy Goods and Services
 const mpesaConfig = {
     consumerKey: 'sJWMb8e5xwZ9APh9d8RAWt1VUjBEnmrM50bA8cBE4vwXxXwT',
     consumerSecret: 'AecUYi2w8e1Mrjd0tHFAK7Z9WQxKkBN09pXEGs3JM83EGp7ofCJs5PlCI7Jq3KUQ',
-    shortCode: '174379', // Till Number for Buy Goods and Services
-    passkey: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+    shortCode: '3060826', // Your Till Number
+    passkey: 'YOUR_PASSKEY',
     callbackURL: 'https://yourdomain.com/mpesa-callback',
-    transactionType: 'CustomerBuyGoodsOnline', // Changed from CustomerPayBillOnline
-    env: 'sandbox'
+    transactionType: 'CustomerBuyGoodsOnline',
+    env: 'sandbox' // Change to 'production' when live
 };
 
-// Get the order amount from your checkout (update this based on your actual implementation)
+// Get order amount from your order summary
 function getOrderAmount() {
-    // Example 1: If you have a cart total element
-    const cartTotal = document.querySelector('.cart-total')?.textContent;
+    // Method 1: Get from order summary element
+    const orderSummary = document.querySelector('.order-summary');
+    if (orderSummary) {
+        const totalElement = orderSummary.querySelector('.total-amount') || 
+                           orderSummary.querySelector('.order-total');
+        if (totalElement) {
+            const amountText = totalElement.textContent || totalElement.innerText;
+            const amount = parseFloat(amountText.replace(/[^0-9.]/g, ''));
+            if (!isNaN(amount) && amount > 0) {
+                return Math.round(amount); // M-Pesa requires whole KSH
+            }
+        }
+    }
+    
+    // Method 2: Get from cart total
+    const cartTotal = document.getElementById('cart-total')?.textContent;
     if (cartTotal) {
         const amount = parseFloat(cartTotal.replace(/[^0-9.]/g, ''));
-        return Math.round(amount); // M-Pesa requires whole numbers
+        if (!isNaN(amount) && amount > 0) {
+            return Math.round(amount);
+        }
     }
     
-    // Example 2: If you have a hidden input with amount
-    const amountInput = document.getElementById('order-amount');
-    if (amountInput?.value) {
-        return Math.round(parseFloat(amountInput.value));
-    }
-    
-    // Example 3: Calculate from order items
-    const orderItems = document.querySelectorAll('.order-item-price');
-    if (orderItems.length > 0) {
+    // Method 3: Calculate from items
+    const itemPrices = document.querySelectorAll('.item-price');
+    if (itemPrices.length > 0) {
         let total = 0;
-        orderItems.forEach(item => {
-            const price = parseFloat(item.textContent.replace(/[^0-9.]/g, ''));
-            total += price;
+        itemPrices.forEach(priceElement => {
+            const price = parseFloat(priceElement.textContent.replace(/[^0-9.]/g, ''));
+            if (!isNaN(price)) total += price;
         });
-        return Math.round(total);
+        if (total > 0) return Math.round(total);
     }
     
-    // Default fallback
-    return 100;
+    // If no amount found, show error
+    showError('Cannot determine order amount. Please check your order.');
+    return null;
 }
 
 // Get order reference
 function getOrderReference() {
-    return `ORDER${Date.now()}`; // Generate unique reference
+    // Generate a unique order ID
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    return `ORDER${timestamp}${random}`;
 }
 
-// Initiate STK Push for Buy Goods and Services
-async function initiateSTKPush(phoneNumber, amount, accountReference, transactionDesc) {
-    try {
-        const accessToken = await getMpesaAccessToken();
+// Get transaction description
+function getTransactionDescription() {
+    // You can customize this based on items in cart
+    const itemCount = document.querySelectorAll('.cart-item, .order-item').length || 1;
+    return `${itemCount} Item${itemCount > 1 ? 's' : ''} Purchase`;
+}
+
+// Show amount confirmation to user before initiating payment
+function confirmPaymentAmount(amount) {
+    return new Promise((resolve) => {
+        // Create a modal to show amount confirmation
+        const modal = document.createElement('div');
+        modal.className = 'amount-confirmation-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>Confirm Payment Amount</h3>
+                <div class="amount-display">
+                    <div class="amount-label">Amount to Pay:</div>
+                    <div class="amount-value">KES ${amount.toLocaleString()}</div>
+                </div>
+                <p class="modal-note">
+                    <i class="fas fa-info-circle"></i>
+                    This exact amount will appear on your M-Pesa prompt
+                </p>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel cancel-payment">Cancel</button>
+                    <button type="button" class="btn-confirm proceed-payment">
+                        <i class="fas fa-check"></i> Proceed to M-Pesa
+                    </button>
+                </div>
+            </div>
+        `;
         
-        // Generate timestamp (format: YYYYMMDDHHmmss)
-        const now = new Date();
-        const timestamp = now.getFullYear().toString() + 
-                         String(now.getMonth() + 1).padStart(2, '0') + 
-                         String(now.getDate()).padStart(2, '0') + 
-                         String(now.getHours()).padStart(2, '0') + 
-                         String(now.getMinutes()).padStart(2, '0') + 
-                         String(now.getSeconds()).padStart(2, '0');
+        document.body.appendChild(modal);
         
-        // Generate password for Buy Goods and Services
-        const password = btoa(mpesaConfig.shortCode + mpesaConfig.passkey + timestamp);
+        // Add styles
+        const styles = document.createElement('style');
+        styles.textContent = `
+            .amount-confirmation-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+            }
+            .amount-confirmation-modal .modal-content {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                max-width: 400px;
+                width: 90%;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+            .amount-confirmation-modal h3 {
+                margin-top: 0;
+                color: #333;
+                text-align: center;
+            }
+            .amount-display {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+                margin: 20px 0;
+                border: 2px solid #4CAF50;
+            }
+            .amount-label {
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 5px;
+            }
+            .amount-value {
+                font-size: 28px;
+                font-weight: bold;
+                color: #4CAF50;
+            }
+            .modal-note {
+                background: #e8f5e9;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 13px;
+                color: #2e7d32;
+                margin: 15px 0;
+            }
+            .modal-note i {
+                margin-right: 5px;
+            }
+            .amount-confirmation-modal .modal-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+            }
+            .amount-confirmation-modal .btn-cancel,
+            .amount-confirmation-modal .btn-confirm {
+                flex: 1;
+                padding: 12px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .amount-confirmation-modal .btn-cancel {
+                background: #f8f9fa;
+                color: #666;
+            }
+            .amount-confirmation-modal .btn-cancel:hover {
+                background: #e9ecef;
+            }
+            .amount-confirmation-modal .btn-confirm {
+                background: #4CAF50;
+                color: white;
+            }
+            .amount-confirmation-modal .btn-confirm:hover {
+                background: #45a049;
+            }
+        `;
+        document.head.appendChild(styles);
         
-        const baseUrl = mpesaConfig.env === 'sandbox' 
-            ? 'https://sandbox.safaricom.co.ke' 
-            : 'https://api.safaricom.co.ke';
-        
-        // STK Push request for Buy Goods and Services
-        const response = await fetch(`${baseUrl}/mpesa/stkpush/v1/processrequest`, {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + accessToken,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                BusinessShortCode: parseInt(mpesaConfig.shortCode), // Till Number
-                Password: password,
-                Timestamp: timestamp,
-                TransactionType: mpesaConfig.transactionType, // CustomerBuyGoodsOnline
-                Amount: amount,
-                PartyA: phoneNumber, // Customer phone number
-                PartyB: parseInt(mpesaConfig.shortCode), // Till Number
-                PhoneNumber: phoneNumber, // Customer phone number
-                CallBackURL: mpesaConfig.callbackURL,
-                AccountReference: accountReference,
-                TransactionDesc: transactionDesc
-            })
+        // Event listeners
+        modal.querySelector('.proceed-payment').addEventListener('click', () => {
+            document.body.removeChild(modal);
+            document.head.removeChild(styles);
+            resolve(true);
         });
         
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error initiating STK Push:', error);
-        throw error;
-    }
+        modal.querySelector('.cancel-payment').addEventListener('click', () => {
+            document.body.removeChild(modal);
+            document.head.removeChild(styles);
+            resolve(false);
+        });
+    });
 }
 
 // Main M-Pesa payment function
 async function initiateMpesaPayment() {
-    // Check if terms are agreed
+    // Check terms agreement
     if (!termsCheckbox.checked) {
-        alert('Please agree to the terms and conditions to proceed.');
+        showError('Please agree to the terms and conditions to proceed.');
         return;
     }
     
     // Get and validate phone number
     const phoneNumber = phoneInput.value.trim();
     if (!phoneNumber) {
-        alert('Please enter your M-Pesa phone number');
+        showError('Please enter your M-Pesa phone number');
         phoneInput.focus();
         return;
     }
     
     if (!validatePhoneNumber(phoneNumber)) {
-        alert('Please enter a valid Kenyan phone number (e.g., 07XXXXXXXX or 2547XXXXXXXX)');
+        showError('Please enter a valid Kenyan phone number (e.g., 07XXXXXXXX or 2547XXXXXXXX)');
         phoneInput.focus();
         return;
     }
@@ -3168,22 +3289,29 @@ async function initiateMpesaPayment() {
     try {
         formattedPhone = formatPhoneNumber(phoneNumber);
     } catch (error) {
-        alert(error.message);
+        showError(error.message);
         phoneInput.focus();
         return;
     }
     
-    // Get order details
+    // Get order amount
     const amount = getOrderAmount();
-    if (amount < 1) {
-        alert('Invalid order amount');
+    if (amount === null || amount < 1) {
+        showError('Invalid order amount. Please check your order.');
         return;
     }
     
-    const accountReference = getOrderReference();
-    const transactionDesc = 'Online Purchase';
+    // Show amount confirmation to user
+    const proceed = await confirmPaymentAmount(amount);
+    if (!proceed) {
+        return; // User cancelled
+    }
     
-    // Show loading state
+    // Get order details
+    const accountReference = getOrderReference();
+    const transactionDesc = getTransactionDescription();
+    
+    // Show loading
     showLoading(true);
     
     try {
@@ -3191,160 +3319,177 @@ async function initiateMpesaPayment() {
         const result = await initiateSTKPush(formattedPhone, amount, accountReference, transactionDesc);
         
         if (result.ResponseCode === '0') {
-            // Success - STK Push initiated
-            alert('✅ M-Pesa prompt sent to your phone!\n\nPlease check your phone and enter your M-Pesa PIN to complete the payment.');
+            // STK Push initiated successfully
+            showSuccess(`
+                ✅ M-Pesa prompt sent!
+                
+                Amount: KES ${amount.toLocaleString()}
+                Phone: ${phoneNumber}
+                
+                Check your phone for the M-Pesa prompt and enter your PIN to complete payment.
+            `);
             
-            // Store checkout request ID for later verification
+            // Store transaction details
             localStorage.setItem('mpesa_checkout_id', result.CheckoutRequestID);
             localStorage.setItem('order_reference', accountReference);
+            localStorage.setItem('payment_amount', amount);
             
-            // Start polling for payment confirmation (simplified)
-            setTimeout(() => {
-                checkPaymentStatus(result.CheckoutRequestID);
-            }, 20000); // Check after 20 seconds
+            // Start payment status monitoring
+            monitorPaymentStatus(result.CheckoutRequestID);
             
         } else {
-            // Error from M-Pesa
-            showError('Failed to initiate payment: ' + (result.errorMessage || result.ResponseDescription || 'Unknown error'));
+            // M-Pesa returned an error
+            showError(`Payment initiation failed: ${result.errorMessage || result.ResponseDescription || 'Unknown error'}`);
         }
         
     } catch (error) {
         console.error('Payment processing error:', error);
-        showError('An error occurred while processing payment. Please try again.');
+        showError('Payment service temporarily unavailable. Please try again in a few moments.');
     } finally {
         showLoading(false);
     }
 }
 
-// Cash on Delivery function
-function placeCashOrder() {
-    if (!termsCheckbox.checked) {
-        alert('Please agree to the terms and conditions to proceed.');
-        return;
-    }
+// Monitor payment status
+function monitorPaymentStatus(checkoutRequestID) {
+    let attempts = 0;
+    const maxAttempts = 30; // Monitor for 5 minutes (30 * 10 seconds)
     
-    const confirmCash = confirm('Are you sure you want to place this order with Cash on Delivery?\n\nYou will pay when you receive the delivery.');
-    
-    if (confirmCash) {
-        showLoading(true);
+    const checkInterval = setInterval(async () => {
+        attempts++;
         
-        // Simulate order processing
-        setTimeout(() => {
-            showLoading(false);
-            alert('✅ Order placed successfully!\n\nYour order will be delivered soon. Please have the exact amount ready.');
+        if (attempts > maxAttempts) {
+            clearInterval(checkInterval);
+            showInfo('Payment monitoring timed out. Please check your M-Pesa messages for confirmation.');
+            return;
+        }
+        
+        try {
+            // In production, this should call your backend
+            // which will check with M-Pesa API
+            const status = await checkPaymentStatusAPI(checkoutRequestID);
             
-            // Redirect to order confirmation page or close modal
-            // window.location.href = '/order-confirmation';
-        }, 2000);
-    }
+            if (status === 'success') {
+                clearInterval(checkInterval);
+                showSuccess('Payment confirmed! Your order is being processed.');
+                // Redirect to success page
+                // window.location.href = `/order-success?ref=${localStorage.getItem('order_reference')}`;
+            } else if (status === 'failed') {
+                clearInterval(checkInterval);
+                showError('Payment was not completed. Please try again.');
+            }
+            // If still pending, continue monitoring
+        } catch (error) {
+            console.error('Status check error:', error);
+        }
+    }, 10000); // Check every 10 seconds
 }
 
-// Check payment status (This should ideally be done on your backend)
-async function checkPaymentStatus(checkoutRequestID) {
+// Simulated payment status check (Replace with actual backend call)
+async function checkPaymentStatusAPI(checkoutRequestID) {
+    // In production, this should call your server
+    // Server should query M-Pesa API or check webhook data
+    
+    // For demo purposes, simulate checking
+    const response = await fetch('/api/check-payment-status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ checkoutRequestID })
+    });
+    
+    if (!response.ok) {
+        throw new Error('Status check failed');
+    }
+    
+    const data = await response.json();
+    return data.status; // 'pending', 'success', 'failed'
+}
+
+// STK Push implementation
+async function initiateSTKPush(phoneNumber, amount, accountReference, transactionDesc) {
     try {
         const accessToken = await getMpesaAccessToken();
+        
+        // Generate timestamp in M-Pesa format (YYYYMMDDHHmmss)
+        const now = new Date();
+        const timestamp = 
+            now.getFullYear().toString() +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0') +
+            String(now.getSeconds()).padStart(2, '0');
+        
+        // Generate password
+        const password = btoa(`${mpesaConfig.shortCode}${mpesaConfig.passkey}${timestamp}`);
+        
         const baseUrl = mpesaConfig.env === 'sandbox' 
             ? 'https://sandbox.safaricom.co.ke' 
             : 'https://api.safaricom.co.ke';
         
-        const response = await fetch(`${baseUrl}/mpesa/stkpushquery/v1/query`, {
+        const requestBody = {
+            BusinessShortCode: parseInt(mpesaConfig.shortCode),
+            Password: password,
+            Timestamp: timestamp,
+            TransactionType: mpesaConfig.transactionType,
+            Amount: amount,
+            PartyA: phoneNumber,
+            PartyB: parseInt(mpesaConfig.shortCode), // Till number for Buy Goods
+            PhoneNumber: phoneNumber,
+            CallBackURL: mpesaConfig.callbackURL,
+            AccountReference: accountReference,
+            TransactionDesc: transactionDesc
+        };
+        
+        console.log('STK Push Request:', requestBody);
+        
+        const response = await fetch(`${baseUrl}/mpesa/stkpush/v1/processrequest`, {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + accessToken,
+                'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                BusinessShortCode: parseInt(mpesaConfig.shortCode),
-                Password: btoa(mpesaConfig.shortCode + mpesaConfig.passkey + new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3)),
-                Timestamp: new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3),
-                CheckoutRequestID: checkoutRequestID
-            })
+            body: JSON.stringify(requestBody)
         });
         
         const data = await response.json();
+        console.log('STK Push Response:', data);
         
-        if (data.ResultCode === '0') {
-            // Payment successful
-            alert('✅ Payment confirmed! Your order is now being processed.');
-            // Redirect to success page or update UI
-        } else {
-            // Payment failed or cancelled
-            console.log('Payment status:', data);
-        }
+        return data;
+        
     } catch (error) {
-        console.error('Error checking payment status:', error);
+        console.error('STK Push Error:', error);
+        throw error;
     }
 }
 
-// UI Helper Functions
+// Helper functions (keep these from previous code)
+async function getMpesaAccessToken() {
+    // ... (same as before)
+}
+
+function formatPhoneNumber(phone) {
+    // ... (same as before)
+}
+
+function validatePhoneNumber(phone) {
+    // ... (same as before)
+}
+
 function showLoading(show) {
-    if (mpesaLoading) {
-        mpesaLoading.style.display = show ? 'block' : 'none';
-    }
-    confirmPaymentBtn.disabled = show;
-    cancelCheckoutBtn.disabled = show;
+    // ... (same as before)
 }
 
 function showError(message) {
-    alert('❌ ' + message);
+    // ... (same as before)
 }
 
 function showSuccess(message) {
-    alert('✅ ' + message);
+    // ... (same as before)
 }
 
-// Cancel button handler
-cancelCheckoutBtn.addEventListener('click', function() {
-    if (confirm('Are you sure you want to cancel this order?')) {
-        // Close modal or redirect
-        window.location.href = '/cart'; // Or close modal
-    }
-});
-
-// Input validation for phone number
-phoneInput.addEventListener('input', function(e) {
-    // Auto-format phone number as user types
-    let value = e.target.value.replace(/\D/g, '');
-    
-    if (value.startsWith('254')) {
-        if (value.length > 12) value = value.substring(0, 12);
-    } else if (value.startsWith('7') || value.startsWith('1')) {
-        if (value.length > 9) value = value.substring(0, 9);
-        value = '0' + value;
-    } else if (value.startsWith('0')) {
-        if (value.length > 10) value = value.substring(0, 10);
-    }
-    
-    e.target.value = value;
-});
-
-// Form validation before submission
-phoneInput.addEventListener('blur', function() {
-    if (this.value && !validatePhoneNumber(this.value)) {
-        this.style.borderColor = '#ff0000';
-    } else {
-        this.style.borderColor = '';
-    }
-});
-
-// Initialize the form based on selected payment method
-document.addEventListener('DOMContentLoaded', function() {
-    // Set initial state
-    if (document.getElementById('payment-mpesa').checked) {
-        mpesaFields.style.display = 'block';
-        cashFields.style.display = 'none';
-        confirmPaymentBtn.onclick = initiateMpesaPayment;
-    } else {
-        mpesaFields.style.display = 'none';
-        cashFields.style.display = 'block';
-        confirmPaymentBtn.onclick = placeCashOrder;
-    }
-    
-    // Prevent form submission on enter in phone field
-    phoneInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            confirmPaymentBtn.click();
-        }
-    });
-});
+function showInfo(message) {
+    // ... (same as before)
+}
