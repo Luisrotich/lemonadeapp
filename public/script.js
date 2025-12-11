@@ -21,7 +21,7 @@ class LemonadeApp {
             passkey: 'YOUR_MPESA_PASSKEY', // From Daraja portal
             callbackURL: `${BASE_URL}/api/mpesa-callback`,
             transactionType: 'CustomerBuyGoodsOnline',
-            env: 'live' // Change to 'production' when live
+            env: 'sandbox' // Change to 'production' when live
         };
 
         this.initializeApp();
