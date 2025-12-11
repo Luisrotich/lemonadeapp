@@ -442,7 +442,7 @@ class LemonadeApp {
         // Validate terms agreement
         const termsCheckbox = document.getElementById('terms-agree');
         if (termsCheckbox && !termsCheckbox.checked) {
-            this.showMessage('Please agree to the terms and conditions');
+            this.showMessage(' agree to the terms and conditions');
             return;
         }
 

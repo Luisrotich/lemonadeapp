@@ -808,12 +808,12 @@ class AdminDashboard {
 
     formatOrderStatus(status) {
         const statusMap = {
-            'pending': '⏳ Pending',
-            'confirmed': '✅ Confirmed',
-            'preparing': '👨‍🍳 Preparing',
-            'ready': '📦 Ready',
-            'completed': '🚚 Completed',
-            'cancelled': '❌ Cancelled'
+            'pending': ' Pending',
+            'confirmed': ' Confirmed',
+            'preparing': ' Preparing',
+            'ready': ' Ready',
+            'completed': ' Completed',
+            'cancelled': ' Cancelled'
         };
         return statusMap[status] || status;
     }
