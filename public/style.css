@@ -528,7 +528,7 @@ html, body {
     text-align: center;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: linear-gradient(135deg, var(--secondary-color) 0%, rgb(243, 242, 242) 100%);
+    background: linear-gradient(135deg, orange, rgb(248, 191, 3) 40%);
     border-radius: 20px;
     color: white;
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
