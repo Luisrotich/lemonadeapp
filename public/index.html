@@ -21,13 +21,14 @@
             </button>
         </div>
         
-        <!-- Navigation Menu Container -->
-        <div class="nav-container" id="navContainer">
+        <!-- Navigation Menu Bar -->
+        <nav class="nav-menu" id="navMenu">
             <ul class="nav-links">
-                <li><a href="#about" class="active"><i class="fas fa-lemon lemon-icon"></i>About</a></li>
-                <li><a href="#contact"><i class="fas fa-envelope lemon-icon"></i>Contact</a></li>
-                <li><a href="#blog"><i class="fas fa-blog lemon-icon"></i>Blog</a></li>
-                <li><a href="#help"><i class="fas fa-question-circle lemon-icon"></i>Help</a></li>
+                <!-- These links would typically point to separate HTML pages -->
+                <li><a href="about.html" class="active"><i class="fas fa-lemon lemon-icon"></i>About</a></li>
+                <li><a href="contact.html"><i class="fas fa-envelope lemon-icon"></i>Contact</a></li>
+                <li><a href="blog.html"><i class="fas fa-blog lemon-icon"></i>Blog</a></li>
+                <li><a href="help.html"><i class="fas fa-question-circle lemon-icon"></i>Help</a></li>
             </ul>
             
             <ul class="social-links">
@@ -41,7 +42,7 @@
                     <i class="fab fa-twitter"></i>
                 </a></li>
             </ul>
-        </div>
+        </nav>
         
         <!-- Search Bar -->
         <div class="search-container">
@@ -50,48 +51,41 @@
         </div>
     </header>
 
-
-
-
-
-  <!-- Main Content -->
-    <main class="content">
-        <section id="about">
-            <h2>About Lemonade</h2>
-            <p>Welcome to the Lemonade app! We're passionate about creating the perfect blend of refreshing digital experiences. Our mission is to bring a splash of freshness to your daily routine with our innovative solutions.</p>
-            <p>Just like a perfect glass of lemonade, we combine the right ingredients - creativity, technology, and user-centric design - to deliver delightful experiences.</p>
-        </section>
-
-        <section id="contact" style="display: none;">
-            <h2>Contact Us</h2>
-            <p>Have questions or feedback? We'd love to hear from you!</p>
-            <p>Email: hello@lemonadeapp.com</p>
-            <p>Phone: +1 (555) 123-4567</p>
-            <p>Address: 123 Citrus Street, Fresh City</p>
-        </section>
-
-        <section id="blog" style="display: none;">
-            <h2>Latest from Our Blog</h2>
-            <p>Discover tips, tricks, and updates from the Lemonade team.</p>
-            <p>Coming soon: "10 Refreshing Ways to Boost Your Productivity"</p>
-            <p>Stay tuned for our weekly blog posts!</p>
-        </section>
-
-        <section id="help" style="display: none;">
-            <h2>Help & Support</h2>
-            <p>Need assistance? We're here to help!</p>
-            <p>Check out our FAQ section for quick answers to common questions.</p>
-            <p>For technical support, please contact our support team at support@lemonadeapp.com</p>
-        </section>
+    <!-- Main Content - This would be on separate pages -->
+    <main class="main-content">
+        <h2>Welcome to Lemonade App</h2>
+        <p>This is the main homepage. When you click on menu items above, you'll be taken to separate pages.</p>
+        <p>Each menu link (About, Contact, Blog, Help) would open its own dedicated page with content.</p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-lemon"></i>
+                <h3>Fresh Experience</h3>
+                <p>Enjoy our refreshing and user-friendly interface</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-glass-whiskey"></i>
+                <h3>Cool Features</h3>
+                <p>Discover amazing features designed for you</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-sun"></i>
+                <h3>Bright Ideas</h3>
+                <p>Innovative solutions for everyday needs</p>
+            </div>
+        </div>
     </main>
 
+    <footer class="footer">
+        <p>© 2023 Lemonade App. All rights reserved. | Made with 🍋</p>
+    </footer>
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Home View -->
         <div class="view active" id="home-view">
             <div class="category-header">
                 <h2 id="current-category">All Products</h2>
-                <p id="category-description"></p>
+                <p id="category-description">Discover our refreshing lemonade collection!</p>
             </div>
 
             <div class="products">
@@ -593,81 +587,7 @@
   Install Lemonade🍋 app
 </button>
 
- <script>
-        // Mobile menu toggle
-        const menuToggle = document.getElementById('menuToggle');
-        const navContainer = document.getElementById('navContainer');
-        
-        menuToggle.addEventListener('click', () => {
-            navContainer.classList.toggle('active');
-            menuToggle.innerHTML = navContainer.classList.contains('active') 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
-        });
 
-        // Navigation functionality
-        const navLinks = document.querySelectorAll('.nav-links a');
-        const contentSections = document.querySelectorAll('section');
-        
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Get the target section id
-                const targetId = this.getAttribute('href').substring(1);
-                
-                // Update active states
-                navLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Show the target section
-                contentSections.forEach(section => {
-                    if (section.id === targetId) {
-                        section.style.display = 'block';
-                    } else {
-                        section.style.display = 'none';
-                    }
-                });
-                
-                // Close mobile menu on selection
-                if (window.innerWidth <= 768) {
-                    navContainer.classList.remove('active');
-                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
-                }
-            });
-        });
-
-        // Social media links confirmation
-        const socialLinks = document.querySelectorAll('.social-links a');
-        socialLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                const platform = this.className.includes('facebook') ? 'Facebook' 
-                               : this.className.includes('instagram') ? 'Instagram' 
-                               : 'Twitter';
-                
-                if (confirm(`You are being redirected to ${platform}. Continue?`)) {
-                    return true;
-                } else {
-                    e.preventDefault();
-                }
-            });
-        });
-
-        // Search functionality
-        const searchInput = document.getElementById('product-search');
-        searchInput.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') {
-                const searchTerm = this.value.trim();
-                if (searchTerm) {
-                    alert(`Searching for: "${searchTerm}" - This would normally show search results`);
-                    this.value = '';
-                }
-            }
-        });
-
-        // Show About section by default
-        document.getElementById('about').style.display = 'block';
-    </script>
     <script src="script.js"></script>
 </body>
 </html>
