@@ -1303,7 +1303,7 @@ input:checked + .slider:before {
     }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 600px) {
     .account-actions {
         margin-left: 0;
     }
