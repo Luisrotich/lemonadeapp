@@ -12,39 +12,49 @@
 <body>
     <!-- Top Header -->
     <header class="main-header">
-        <div class="header-content">
+         <div class="header-content">
             <h1>🍋 Lemonade</h1>
-                  
+            
             <!-- Mobile menu toggle button -->
             <button class="menu-toggle" id="menuToggle">
                 <i class="fas fa-bars"></i>
             </button>
+        </div>
+        
+        <!-- Navigation Menu Container -->
+        <div class="nav-container" id="navContainer">
+            <ul class="nav-links">
+                <li><a href="#about" class="active"><i class="fas fa-lemon lemon-icon"></i>About</a></li>
+                <li><a href="#contact"><i class="fas fa-envelope lemon-icon"></i>Contact</a></li>
+                <li><a href="#blog"><i class="fas fa-blog lemon-icon"></i>Blog</a></li>
+                <li><a href="#help"><i class="fas fa-question-circle lemon-icon"></i>Help</a></li>
+            </ul>
             
-            <!-- Navigation Menu -->
-            <nav class="nav-menu" id="navMenu">
-                <ul class="nav-links">
-                    <li><a href="#about" class="active"><i class="fas fa-lemon lemon-icon"></i> About</a></li>
-                    <li><a href="#contact"><i class="fas fa-envelope lemon-icon"></i> Contact</a></li>
-                    <li><a href="#blog"><i class="fas fa-blog lemon-icon"></i> Blog</a></li>
-                    <li><a href="#help"><i class="fas fa-question-circle lemon-icon"></i> Help</a></li>
-                </ul>
-                
-                <ul class="social-links">
-                    <li><a href="https://facebook.com" target="_blank" class="facebook" title="Facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a></li>
-                    <li><a href="https://instagram.com" target="_blank" class="instagram" title="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a></li>
-                    <li><a href="https://twitter.com" target="_blank" class="twitter" title="Twitter">
-                        <i class="fab fa-twitter"></i>
-                    </a></li>
-                </ul>
-            </nav>
+            <ul class="social-links">
+                <li><a href="https://facebook.com" target="_blank" class="facebook" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a></li>
+                <li><a href="https://instagram.com" target="_blank" class="instagram" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a></li>
+                <li><a href="https://twitter.com" target="_blank" class="twitter" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a></li>
+            </ul>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="product-search" placeholder="Search products...">
         </div>
     </header>
 
-    <!-- Main Content -->
+
+
+
+
+  <!-- Main Content -->
     <main class="content">
         <section id="about">
             <h2>About Lemonade</h2>
@@ -75,25 +85,13 @@
         </section>
     </main>
 
-    <footer class="footer">
-        <p>© 2023 Lemonade App. All rights reserved. | Made with 🍋</p>
-    </footer>
-        </div>
-        
-        <!-- Search Bar -->
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="product-search" placeholder="Search products...">
-        </div>
-    </header>
-
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Home View -->
         <div class="view active" id="home-view">
             <div class="category-header">
                 <h2 id="current-category">All Products</h2>
-                <p id="category-description">Discover our refreshing lemonade collection!</p>
+                <p id="category-description"></p>
             </div>
 
             <div class="products">
@@ -595,6 +593,81 @@
   Install Lemonade🍋 app
 </button>
 
+ <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navContainer = document.getElementById('navContainer');
+        
+        menuToggle.addEventListener('click', () => {
+            navContainer.classList.toggle('active');
+            menuToggle.innerHTML = navContainer.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Navigation functionality
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const contentSections = document.querySelectorAll('section');
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the target section id
+                const targetId = this.getAttribute('href').substring(1);
+                
+                // Update active states
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show the target section
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+                
+                // Close mobile menu on selection
+                if (window.innerWidth <= 768) {
+                    navContainer.classList.remove('active');
+                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+        });
+
+        // Social media links confirmation
+        const socialLinks = document.querySelectorAll('.social-links a');
+        socialLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const platform = this.className.includes('facebook') ? 'Facebook' 
+                               : this.className.includes('instagram') ? 'Instagram' 
+                               : 'Twitter';
+                
+                if (confirm(`You are being redirected to ${platform}. Continue?`)) {
+                    return true;
+                } else {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('product-search');
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    alert(`Searching for: "${searchTerm}" - This would normally show search results`);
+                    this.value = '';
+                }
+            }
+        });
+
+        // Show About section by default
+        document.getElementById('about').style.display = 'block';
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
