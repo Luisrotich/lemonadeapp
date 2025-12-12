@@ -913,7 +913,7 @@ textarea:focus {
 }
 
 .auth-btn {
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    background: linear-gradient(135deg, orange, var(--secondary-color));
     color: white;
     border: none;
     padding: 1rem 1.5rem;
@@ -924,14 +924,14 @@ textarea:focus {
     cursor: pointer;
     margin-top: 1.5rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255,94,0,0.3);
+    box-shadow: 0 4px 15px rgba(238, 108, 2, 0.911);
     position: relative;
     overflow: hidden;
 }
 
 .auth-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255,94,0,0.4);
+    box-shadow: 0 8px 25px rgba(238, 108, 2, 0.911);
 }
 
 .auth-btn:active {
