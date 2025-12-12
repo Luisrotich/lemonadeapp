@@ -1697,14 +1697,7 @@ class LemonadeApp {
                                 <p class="item-price">ksh ${item.price.toFixed(2)} each</p>
                             </div>
                             <div class="item-actions">
-                                <div class="quantity-controls">
-                                    <button class="quantity-btn minus" data-id="${item.id}">-</button>
-                                    <span class="quantity">${item.quantity}</span>
-                                    <button class="quantity-btn plus" data-id="${item.id}">+</button>
-                                </div>
-                                <button class="remove-btn" data-id="${item.id}">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                               
                             </div>
                         </div>
                         <div class="item-total">
