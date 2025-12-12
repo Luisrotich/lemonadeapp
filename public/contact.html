@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Lemonade App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* COPY ALL THE SAME STYLES FROM about.html */
+        /* Only changing the content-specific styles below */
+        
+        /* Contact Page Specific Styles */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .contact-form {
+            background: #fffef7;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #ffeb3b;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ff9800;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ffeb3b;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.3);
+        }
+
+        .submit-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: #ff5722;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .contact-info {
+            background: #fffef7;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #ffeb3b;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .info-item i {
+            color: #ff9800;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+
+        .info-item h3 {
+            color: #ff9800;
+            margin-bottom: 5px;
+        }
+
+        .office-hours {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ffeb3b;
+        }
+
+        .hours-table {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .hours-table tr {
+            border-bottom: 1px solid #eee;
+        }
+
+        .hours-table td {
+            padding: 8px 0;
+        }
+
+        .hours-table td:last-child {
+            font-weight: 600;
+            color: #ff9800;
+        }
+
+        .map-placeholder {
+            background: #ffeb3b;
+            height: 200px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            color: #ff9800;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation Menu -->
+    <header class="main-header">
+        <div class="header-content">
+            <h1><a href="index.html" style="text-decoration: none; color: inherit;">🍋 Lemonade</a></h1>
+            
+            <!-- Mobile menu toggle button -->
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Navigation Menu Bar -->
+        <nav class="nav-menu" id="navMenu">
+            <ul class="nav-links">
+                <li><a href="about.html"><i class="fas fa-lemon lemon-icon"></i>About</a></li>
+                <li><a href="contact.html" class="active"><i class="fas fa-envelope lemon-icon"></i>Contact</a></li>
+                <li><a href="blog.html"><i class="fas fa-blog lemon-icon"></i>Blog</a></li>
+                <li><a href="help.html"><i class="fas fa-question-circle lemon-icon"></i>Help</a></li>
+            </ul>
+            
+            <ul class="social-links">
+                <li><a href="https://facebook.com" target="_blank" class="facebook" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a></li>
+                <li><a href="https://instagram.com" target="_blank" class="instagram" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a></li>
+                <li><a href="https://twitter.com" target="_blank" class="twitter" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a></li>
+            </ul>
+        </nav>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="product-search" placeholder="Search products...">
+        </div>
+    </header>
+
+    <!-- Contact Page Content -->
+    <main class="page-content">
+        <h1 class="page-title"><i class="fas fa-envelope"></i> Contact Us</h1>
+        
+        <p style="font-size: 1.2rem; margin-bottom: 30px; color: #666;">
+            Have questions, feedback, or just want to say hello? We'd love to hear from you! 
+            Reach out to us using any of the methods below.
+        </p>
+        
+        <div class="contact-container">
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h2 style="color: #ff9800; margin-bottom: 25px;">Send us a Message</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject">
+                            <option value="">Select a subject</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="business">Business Partnership</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" rows="6" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h2 style="color: #ff9800; margin-bottom: 25px;">Get in Touch</h2>
+                
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <h3>Visit Our Office</h3>
+                        <p>123 Citrus Street<br>
+                        Fresh City, FC 12345<br>
+                        United States</p>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <div>
+                        <h3>Call Us</h3>
+                        <p>Main: +1 (555) 123-4567<br>
+                        Support: +1 (555) 987-6543</p>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        <h3>Email Us</h3>
+                        <p>General: hello@lemonadeapp.com<br>
+                        Support: support@lemonadeapp.com<br>
+                        Business: partners@lemonadeapp.com</p>
+                    </div>
+                </div>
+                
+                <div class="office-hours">
+                    <h3 style="color: #ff9800;">Office Hours</h3>
+                    <table class="hours-table">
+                        <tr>
+                            <td>Monday - Friday</td>
+                            <td>9:00 AM - 6:00 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Saturday</td>
+                            <td>10:00 AM - 4:00 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Sunday</td>
+                            <td>Closed</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="map-placeholder">
+                    <i class="fas fa-map-marked-alt" style="font-size: 2rem; margin-right: 10px;"></i>
+                    Interactive Map Location
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2023 Lemonade App. All rights reserved. | Made with 🍋</p>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuToggle.innerHTML = navMenu.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Contact form submission
+        const contactForm = document.getElementById('contactForm');
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            
+            alert(`Thank you, ${name}! Your message has been sent.\nWe'll respond to ${email} within 24 hours.`);
+            contactForm.reset();
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('product-search');
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    alert(`Searching for: "${searchTerm}"`);
+                    this.value = '';
+                }
+            }
+        });
+
+        // Social media links confirmation
+        const socialLinks = document.querySelectorAll('.social-links a');
+        socialLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const platform = this.className.includes('facebook') ? 'Facebook' 
+                               : this.className.includes('instagram') ? 'Instagram' 
+                               : 'Twitter';
+                
+                if (confirm(`You are being redirected to ${platform}. Continue?`)) {
+                    return true;
+                } else {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

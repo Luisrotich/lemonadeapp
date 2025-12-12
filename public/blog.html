@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Lemonade App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* COPY ALL THE SAME STYLES FROM about.html */
+        /* Only changing the content-specific styles below */
+        
+        /* Blog Page Specific Styles */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .blog-card {
+            background: #fffef7;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #ffeb3b;
+            transition: transform 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(255, 204, 0, 0.2);
+        }
+
+        .blog-image {
+            height: 200px;
+            background: linear-gradient(45deg, #ffeb3b, #ff9800);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .blog-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .blog-category {
+            display: inline-block;
+            background: #ffeb3b;
+            color: #ff9800;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .blog-title {
+            color: #ff9800;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .blog-excerpt {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #ffeb3b;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .read-more {
+            background: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .read-more:hover {
+            background: #ff5722;
+            transform: translateY(-2px);
+        }
+
+        .featured-post {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .featured-post {
+                grid-template-columns: 1fr;
+            }
+            
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .featured-post .blog-image {
+            height: 300px;
+        }
+
+        .blog-sidebar {
+            background: #fffef7;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #ffeb3b;
+            margin-top: 40px;
+        }
+
+        .sidebar-title {
+            color: #ff9800;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .categories-list {
+            list-style: none;
+        }
+
+        .categories-list li {
+            margin-bottom: 10px;
+        }
+
+        .categories-list a {
+            color: #666;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .categories-list a:hover {
+            color: #ff9800;
+        }
+
+        .categories-list span {
+            background: #ffeb3b;
+            color: #ff9800;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation Menu -->
+    <header class="main-header">
+        <div class="header-content">
+            <h1><a href="index.html" style="text-decoration: none; color: inherit;">🍋 Lemonade</a></h1>
+            
+            <!-- Mobile menu toggle button -->
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Navigation Menu Bar -->
+        <nav class="nav-menu" id="navMenu">
+            <ul class="nav-links">
+                <li><a href="about.html"><i class="fas fa-lemon lemon-icon"></i>About</a></li>
+                <li><a href="contact.html"><i class="fas fa-envelope lemon-icon"></i>Contact</a></li>
+                <li><a href="blog.html" class="active"><i class="fas fa-blog lemon-icon"></i>Blog</a></li>
+                <li><a href="help.html"><i class="fas fa-question-circle lemon-icon"></i>Help</a></li>
+            </ul>
+            
+            <ul class="social-links">
+                <li><a href="https://facebook.com" target="_blank" class="facebook" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a></li>
+                <li><a href="https://instagram.com" target="_blank" class="instagram" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a></li>
+                <li><a href="https://twitter.com" target="_blank" class="twitter" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a></li>
+            </ul>
+        </nav>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="product-search" placeholder="Search blog posts...">
+        </div>
+    </header>
+
+    <!-- Blog Page Content -->
+    <main class="page-content">
+        <h1 class="page-title"><i class="fas fa-blog"></i> Lemonade Blog</h1>
+        
+        <p style="font-size: 1.2rem; margin-bottom: 30px; color: #666;">
+            Fresh insights, tips, and updates from the Lemonade team. Stay refreshed with our latest news!
+        </p>
+        
+        <!-- Featured Post -->
+        <div class="featured-post blog-card">
+            <div class="blog-image">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="blog-content">
+                <span class="blog-category">Featured</span>
+                <h2 class="blog-title">10 Refreshing Ways to Boost Your Productivity</h2>
+                <p class="blog-excerpt">Discover our top tips for staying productive while maintaining that refreshing lemonade attitude. Learn how small changes in your daily routine can lead to significant improvements in your workflow and overall happiness.</p>
+                <div class="blog-meta">
+                    <span><i class="far fa-calendar"></i> November 15, 2023</span>
+                    <span><i class="far fa-clock"></i> 5 min read</span>
+                </div>
+                <button class="read-more" onclick="readFullArticle('featured')">Read Full Article</button>
+            </div>
+        </div>
+        
+        <!-- Blog Grid -->
+        <div class="blog-grid">
+            <!-- Blog Post 1 -->
+            <div class="blog-card">
+                <div class="blog-image" style="background: linear-gradient(45deg, #4CAF50, #8BC34A);">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="blog-content">
+                    <span class="blog-category">Sustainability</span>
+                    <h2 class="blog-title">Going Green: Our Eco-Friendly Initiatives</h2>
+                    <p class="blog-excerpt">Learn about how Lemonade App is reducing its carbon footprint and implementing sustainable practices in our daily operations.</p>
+                    <div class="blog-meta">
+                        <span><i class="far fa-calendar"></i> November 10, 2023</span>
+                        <span><i class="far fa-clock"></i> 4 min read</span>
+                    </div>
+                    <button class="read-more" onclick="readFullArticle('green')">Read More</button>
+                </div>
+            </div>
+            
+            <!-- Blog Post 2 -->
+            <div class="blog-card">
+                <div class="blog-image" style="background: linear-gradient(45deg, #2196F3, #03A9F4);">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="blog-content">
+                    <span class="blog-category">Updates</span>
+                    <h2 class="blog-title">New Features in Version 2.0</h2>
+                    <p class="blog-excerpt">Exciting news! We've just released Lemonade App 2.0 with brand new features that will make your experience even more refreshing.</p>
+                    <div class="blog-meta">
+                        <span><i class="far fa-calendar"></i> November 5, 2023</span>
+                        <span><i class="far fa-clock"></i> 6 min read</span>
+                    </div>
+                    <button class="read-more" onclick="readFullArticle('features')">Read More</button>
+                </div>
+            </div>
+            
+            <!-- Blog Post 3 -->
+            <div class="blog-card">
+                <div class="blog-image" style="background: linear-gradient(45deg, #9C27B0, #E91E63);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="blog-content">
+                    <span class="blog-category">Community</span>
+                    <h2 class="blog-title">User Spotlight: Amazing Stories</h2>
+                    <p class="blog-excerpt">Read inspiring stories from our amazing community members and how Lemonade App has helped them achieve their goals.</p>
+                    <div class="blog-meta">
+                        <span><i class="far fa-calendar"></i> October 28, 2023</span>
+                        <span><i class="far fa-clock"></i> 7 min read</span>
+                    </div>
+                    <button class="read-more" onclick="readFullArticle('stories')">Read More</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="blog-sidebar">
+            <h3 class="sidebar-title">Blog Categories</h3>
+            <ul class="categories-list">
+                <li><a href="#">All Posts <span>12</span></a></li>
+                <li><a href="#">Updates <span>4</span></a></li>
+                <li><a href="#">Tips & Tricks <span>3</span></a></li>
+                <li><a href="#">Community <span>2</span></a></li>
+                <li><a href="#">Sustainability <span>2</span></a></li>
+                <li><a href="#">Behind the Scenes <span>1</span></a></li>
+            </ul>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2023 Lemonade App. All rights reserved. | Made with 🍋</p>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuToggle.innerHTML = navMenu.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Blog article reading function
+        function readFullArticle(articleId) {
+            const articles = {
+                'featured': '10 Refreshing Ways to Boost Your Productivity',
+                'green': 'Going Green: Our Eco-Friendly Initiatives',
+                'features': 'New Features in Version 2.0',
+                'stories': 'User Spotlight: Amazing Stories'
+            };
+            
+            alert(`Reading: "${articles[articleId]}"\n\nIn a real blog, this would open a full article page with complete content.`);
+        }
+
+        // Blog search functionality
+        const searchInput = document.getElementById('product-search');
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    alert(`Searching blog posts for: "${searchTerm}"`);
+                    this.value = '';
+                }
+            }
+        });
+
+        // Social media links confirmation
+        const socialLinks = document.querySelectorAll('.social-links a');
+        socialLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const platform = this.className.includes('facebook') ? 'Facebook' 
+                               : this.className.includes('instagram') ? 'Instagram' 
+                               : 'Twitter';
+                
+                if (confirm(`You are being redirected to ${platform}. Continue?`)) {
+                    return true;
+                } else {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

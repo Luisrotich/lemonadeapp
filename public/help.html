@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - Lemonade App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* COPY ALL THE SAME STYLES FROM about.html */
+        /* Only changing the content-specific styles below */
+        
+        /* Help Page Specific Styles */
+        .help-search {
+            background: #fffef7;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #ffeb3b;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .help-search h2 {
+            color: #ff9800;
+            margin-bottom: 20px;
+        }
+
+        .help-search-input {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .help-search-input input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #ffeb3b;
+            border-radius: 25px;
+            font-size: 1.1rem;
+        }
+
+        .help-search-input i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ff9800;
+            font-size: 1.2rem;
+        }
+
+        .faq-section {
+            margin-bottom: 40px;
+        }
+
+        .faq-title {
+            color: #ff9800;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .faq-item {
+            background: #fffef7;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ffeb3b;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 20px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+
+        .faq-question:hover {
+            background: #fff9c4;
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px 20px;
+            max-height: 500px;
+        }
+
+        .faq-item.active .faq-question {
+            background: #ffeb3b;
+            color: #ff9800;
+        }
+
+        .help-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .help-card {
+            background: #fffef7;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #ffeb3b;
+            transition: transform 0.3s ease;
+        }
+
+        .help-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 204, 0, 0.2);
+        }
+
+        .help-card i {
+            font-size: 3rem;
+            color: #ff9800;
+            margin-bottom: 20px;
+        }
+
+        .help-card h3 {
+            color: #ff9800;
+            margin-bottom: 15px;
+        }
+
+        .contact-support {
+            background: linear-gradient(45deg, #ff9800, #ffeb3b);
+            padding: 40px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .contact-support h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .support-btn {
+            background: white;
+            color: #ff9800;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .support-btn:hover {
+            background: #fff9c4;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation Menu -->
+    <header class="main-header">
+        <div class="header-content">
+            <h1><a href="index.html" style="text-decoration: none; color: inherit;">🍋 Lemonade</a></h1>
+            
+            <!-- Mobile menu toggle button -->
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Navigation Menu Bar -->
+        <nav class="nav-menu" id="navMenu">
+            <ul class="nav-links">
+                <li><a href="about.html"><i class="fas fa-lemon lemon-icon"></i>About</a></li>
+                <li><a href="contact.html"><i class="fas fa-envelope lemon-icon"></i>Contact</a></li>
+                <li><a href="blog.html"><i class="fas fa-blog lemon-icon"></i>Blog</a></li>
+                <li><a href="help.html" class="active"><i class="fas fa-question-circle lemon-icon"></i>Help</a></li>
+            </ul>
+            
+            <ul class="social-links">
+                <li><a href="https://facebook.com" target="_blank" class="facebook" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a></li>
+                <li><a href="https://instagram.com" target="_blank" class="instagram" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a></li>
+                <li><a href="https://twitter.com" target="_blank" class="twitter" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a></li>
+            </ul>
+        </nav>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="product-search" placeholder="Search help articles...">
+        </div>
+    </header>
+
+    <!-- Help Page Content -->
+    <main class="page-content">
+        <h1 class="page-title"><i class="fas fa-question-circle"></i> Help Center</h1>
+        
+        <p style="font-size: 1.2rem; margin-bottom: 30px; color: #666;">
+            Need assistance? You're in the right place. Find answers to common questions or contact our support team.
+        </p>
+        
+        <!-- Help Search -->
+        <div class="help-search">
+            <h2>How can we help you today?</h2>
+            <div class="help-search-input">
+                <i class="fas fa-search"></i>
+                <input type="text" id="help-search" placeholder="Search for answers...">
+            </div>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    How do I create an account?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Creating an account is simple! Click the "Sign Up" button in the top right corner, enter your email address, create a password, and follow the verification steps. You'll be ready to start in just 2 minutes.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Is Lemonade App free to use?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Yes! Lemonade App offers a completely free basic plan with all essential features. We also offer premium plans with additional features for power users and businesses.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    How do I reset my password?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Click "Forgot Password" on the login page, enter your email address, and we'll send you a password reset link. The link will expire in 24 hours for security.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Can I use Lemonade App on multiple devices?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Absolutely! Your Lemonade account syncs across all your devices. Simply download the app from your device's app store or access via web browser.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    How do I cancel my subscription?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Go to Account Settings > Subscription, and click "Cancel Subscription." Your premium features will remain active until the end of your current billing period.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Help Cards -->
+        <div class="help-cards">
+            <div class="help-card">
+                <i class="fas fa-book"></i>
+                <h3>User Guides</h3>
+                <p>Step-by-step tutorials and comprehensive guides to help you get the most out of Lemonade App.</p>
+            </div>
+            
+            <div class="help-card">
+                <i class="fas fa-video"></i>
+                <h3>Video Tutorials</h3>
+                <p>Watch our video tutorials for visual guidance on using all features effectively.</p>
+            </div>
+            
+            <div class="help-card">
+                <i class="fas fa-download"></i>
+                <h3>Downloads</h3>
+                <p>Get the latest version of our app and access downloadable resources.</p>
+            </div>
+            
+            <div class="help-card">
+                <i class="fas fa-comments"></i>
+                <h3>Community Forum</h3>
+                <p>Connect with other users, ask questions, and share tips in our community forum.</p>
+            </div>
+        </div>
+        
+        <!-- Contact Support -->
+        <div class="contact-support">
+            <h2>Still Need Help?</h2>
+            <p>Our support team is here for you 24/7. We're committed to solving your issues quickly and effectively.</p>
+            <button class="support-btn" onclick="contactSupport()">
+                <i class="fas fa-headset"></i> Contact Support
+            </button>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2023 Lemonade App. All rights reserved. | Made with 🍋</p>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuToggle.innerHTML = navMenu.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // FAQ accordion functionality
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            question.addEventListener('click', () => {
+                // Close other items
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current item
+                item.classList.toggle('active');
+            });
+        });
+
+        // Help search functionality
+        const helpSearch = document.getElementById('help-search');
+        helpSearch.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    alert(`Searching help articles for: "${searchTerm}"`);
+                    // In a real app, this would filter FAQ items
+                    faqItems.forEach(item => {
+                        const question = item.querySelector('.faq-question').textContent;
+                        const answer = item.querySelector('.faq-answer').textContent;
+                        
+                        if (question.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            answer.toLowerCase().includes(searchTerm.toLowerCase())) {
+                            item.style.display = 'block';
+                            item.classList.add('active');
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                } else {
+                    // Show all if search is empty
+                    faqItems.forEach(item => {
+                        item.style.display = 'block';
+                        item.classList.remove('active');
+                    });
+                }
+            }
+        });
+
+        // Contact support function
+        function contactSupport() {
+            alert('Opening support chat...\n\nIn a real application, this would open a live chat window or direct you to our support contact form.');
+        }
+
+        // Search bar functionality
+        const searchInput = document.getElementById('product-search');
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    alert(`Searching for: "${searchTerm}"`);
+                    this.value = '';
+                }
+            }
+        });
+
+        // Social media links confirmation
+        const socialLinks = document.querySelectorAll('.social-links a');
+        socialLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const platform = this.className.includes('facebook') ? 'Facebook' 
+                               : this.className.includes('instagram') ? 'Instagram' 
+                               : 'Twitter';
+                
+                if (confirm(`You are being redirected to ${platform}. Continue?`)) {
+                    return true;
+                } else {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
