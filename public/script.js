@@ -3422,69 +3422,208 @@ document.head.appendChild(style);
 
 
 
+
+
+
 // Mobile menu toggle
-        const menuToggle = document.getElementById('menuToggle');
-        const navMenu = document.getElementById('navMenu');
-        
-        menuToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            menuToggle.innerHTML = navMenu.classList.contains('active') 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
-        });
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
 
-        // Highlight active menu item
-        const navLinks = document.querySelectorAll('.nav-links a');
-        const currentPage = window.location.pathname.split('/').pop();
+menuToggle.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+    menuToggle.innerHTML = navMenu.classList.contains('active') 
+        ? '<i class="fas fa-times"></i>' 
+        : '<i class="fas fa-bars"></i>';
+});
+
+// Highlight active menu item based on current page
+const navLinks = document.querySelectorAll('.nav-links a');
+const currentPage = window.location.pathname.split('/').pop();
+
+navLinks.forEach(link => {
+    const linkPage = link.getAttribute('href');
+    
+    // Check if this link is for the current page
+    if (currentPage === linkPage || 
+        (currentPage === '' && linkPage === 'index.html') ||
+        (currentPage === '' && linkPage === '/') ||
+        (currentPage.includes(linkPage.replace('.html', '')))) {
+        link.classList.add('active');
+    } else {
+        link.classList.remove('active');
+    }
+    
+    // REMOVED THE DEMO FUNCTIONALITY - Allow actual navigation
+    // Just update active state when clicked
+    link.addEventListener('click', function() {
+        // Remove active class from all links
+        navLinks.forEach(l => l.classList.remove('active'));
+        // Add active class to clicked link
+        this.classList.add('active');
         
-        navLinks.forEach(link => {
-            const linkPage = link.getAttribute('href');
-            if (currentPage === linkPage || 
-                (currentPage === '' && linkPage === 'index.html') ||
-                (currentPage.includes(linkPage.replace('.html', '')))) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
+        // Close mobile menu if open
+        if (window.innerWidth <= 768) {
+            navMenu.classList.remove('active');
+            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    });
+});
+
+// Search functionality
+const searchInput = document.getElementById('product-search');
+searchInput.addEventListener('keyup', function(e) {
+    if (e.key === 'Enter') {
+        const searchTerm = this.value.trim();
+        if (searchTerm) {
+            // Show search results instead of alert
+            performSearch(searchTerm);
+            this.value = '';
+        }
+    }
+});
+
+function performSearch(term) {
+    // In a real app, this would filter products or redirect to search page
+    console.log('Searching for:', term);
+    
+    // For now, just highlight matching products
+    const products = document.querySelectorAll('.product-card');
+    products.forEach(product => {
+        const productName = product.querySelector('.product-name').textContent.toLowerCase();
+        if (productName.includes(term.toLowerCase())) {
+            product.style.boxShadow = '0 0 0 3px #ff9800';
+            setTimeout(() => {
+                product.style.boxShadow = '';
+            }, 2000);
+        }
+    });
+}
+
+// Social media links confirmation
+const socialLinks = document.querySelectorAll('.social-links a');
+socialLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+        // Only show confirmation for external social media links
+        if (this.getAttribute('href').startsWith('http')) {
+            const platform = this.className.includes('facebook') ? 'Facebook' 
+                           : this.className.includes('instagram') ? 'Instagram' 
+                           : 'Twitter';
             
-            // Demo functionality - for this example only
-            link.addEventListener('click', function(e) {
-                if (this.getAttribute('href').includes('.html') && 
-                    !this.getAttribute('href').startsWith('http')) {
-                    e.preventDefault();
-                    alert(`In a real app, this would navigate to: ${this.getAttribute('href')}\n\nFor this demo, we're staying on the homepage.`);
-                    
-                    // Update active state
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                }
-            });
-        });
-
-        // Search functionality
-        const searchInput = document.getElementById('product-search');
-        searchInput.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') {
-                const searchTerm = this.value.trim();
-                if (searchTerm) {
-                    alert(`Searching for: "${searchTerm}"\nThis would show search results on a separate page`);
-                    this.value = '';
-                }
+            if (!confirm(`You are being redirected to ${platform}. Continue?`)) {
+                e.preventDefault();
             }
-        });
+        }
+    });
+});
 
-        // Social media links confirmation
-        const socialLinks = document.querySelectorAll('.social-links a');
-        socialLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                const platform = this.className.includes('facebook') ? 'Facebook' 
-                               : this.className.includes('instagram') ? 'Instagram' 
-                               : 'Twitter';
-                
-                if (confirm(`You are being redirected to ${platform}. Continue?`)) {
-                    return true;
-                } else {
-                    e.preventDefault();
-                }
-            });
-        });
+// Add to cart functionality
+document.querySelectorAll('.add-to-cart').forEach(button => {
+    button.addEventListener('click', function() {
+        const productCard = this.closest('.product-card');
+        const productName = productCard.querySelector('.product-name').textContent;
+        const productPrice = productCard.querySelector('.product-price').textContent;
+        
+        // Show cart notification
+        showCartNotification(`${productName} added to cart!`);
+        
+        // Update cart count
+        updateCartCount();
+    });
+});
+
+function showCartNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    notification.innerHTML = `
+        <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
+        ${message}
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+function updateCartCount() {
+    let cartCount = localStorage.getItem('cartCount') || 0;
+    cartCount = parseInt(cartCount) + 1;
+    localStorage.setItem('cartCount', cartCount);
+    
+    // Update cart badge if exists
+    const cartBadge = document.querySelector('.cart-badge');
+    if (cartBadge) {
+        cartBadge.textContent = cartCount;
+        cartBadge.style.display = 'flex';
+    }
+}
+
+// Initialize cart count on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const cartCount = localStorage.getItem('cartCount') || 0;
+    // Create or update cart badge
+    const cartLink = document.querySelector('a[href*="cart"]');
+    if (cartLink && parseInt(cartCount) > 0) {
+        let cartBadge = cartLink.querySelector('.cart-badge');
+        if (!cartBadge) {
+            cartBadge = document.createElement('span');
+            cartBadge.className = 'cart-badge';
+            cartBadge.style.cssText = `
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: #ff9800;
+                color: white;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.7rem;
+            `;
+            cartLink.style.position = 'relative';
+            cartLink.appendChild(cartBadge);
+        }
+        cartBadge.textContent = cartCount;
+    }
+});
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
