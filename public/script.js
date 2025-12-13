@@ -2734,17 +2734,18 @@ class LemonadeApp {
 
     formatCategory(category) {
         const categories = {
+            'Hoodies': 'Hoodies',
+            'T- Shirts': 'T- Shirts',
             'oppo': 'Oppo',
             'Apple': 'Apple',
             'Tecno': 'Tecno',
-            'infinix': 'Infinix',
-            'samsung': 'Samsung',
             'nokia': 'Nokia',
             'Xiomi': 'Xiaomi',
+             'infinix': 'Infinix',
+            'samsung': 'Samsung',
             'Machinary': 'Machinary',
             'Shoes': 'Shoes',
             'Electoronics': 'Electoronics',
-            'T- Shirts': 'T- Shirts',
             'Home-Tools': 'Home-Tools'
 
         };
