@@ -2740,7 +2740,13 @@ class LemonadeApp {
             'infinix': 'Infinix',
             'samsung': 'Samsung',
             'nokia': 'Nokia',
-            'Xiomi': 'Xiaomi'
+            'Xiomi': 'Xiaomi',
+            'Machinary': 'Machinary',
+            'Shoes': 'Shoes',
+            'Electoronics': 'Electoronics',
+            'T- Shirts': 'T- Shirts',
+            'Home-Tools': 'Home-Tools'
+
         };
         return categories[category] || category;
     }
@@ -3088,7 +3094,12 @@ class LemonadeApp {
             'infinix': 'Infinix Phones',
             'samsung': 'Samsung Phones',
             'nokia': 'Nokia Phones',
-            'Xiomi': 'Xiaomi Phones'
+            'Xiomi': 'Xiaomi Phones',
+            'Machinary': 'Machinary',
+            'Shoes': 'Shoes',
+            'Electoronics': 'Electoronics',
+            'T- Shirts': 'T- Shirts',
+            'Home-Tools': 'Home-Tools'
         };
 
         const currentCategory = document.getElementById('current-category');
@@ -3185,7 +3196,12 @@ class LemonadeApp {
             'infinix': 'Infinix',
             'samsung': 'Samsung',
             'nokia': 'Nokia',
-            'Xiomi': 'Xiaomi'
+            'Xiomi': 'Xiaomi',
+            'Machinary': 'Machinary',
+            'Shoes': 'Shoes',
+            'Electoronics': 'Electoronics',
+            'T- Shirts': 'T- Shirts',
+            'Home-Tools': 'Home-Tools'
         };
         
         const displayCategory = categoryNames[category] || category;
