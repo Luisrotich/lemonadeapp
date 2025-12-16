@@ -2864,6 +2864,26 @@ class LemonadeApp {
             }
         });
 
+        // Password visibility toggles
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.password-toggle')) {
+                const toggleBtn = e.target.closest('.password-toggle');
+                const targetId = toggleBtn.getAttribute('data-target');
+                const targetInput = document.getElementById(targetId);
+                const icon = toggleBtn.querySelector('i');
+
+                if (targetInput && icon) {
+                    if (targetInput.type === 'password') {
+                        targetInput.type = 'text';
+                        icon.className = 'fas fa-eye-slash';
+                    } else {
+                        targetInput.type = 'password';
+                        icon.className = 'fas fa-eye';
+                    }
+                }
+            }
+        });
+
         // Auth forms
         const loginForm = document.getElementById('login-form');
         if (loginForm) {
@@ -2900,10 +2920,16 @@ class LemonadeApp {
 
     // Updated authentication functions
     async handleLogin() {
-        const identifier = document.getElementById('login-identifier').value.trim();
-        
-        if (!identifier) {
-            this.showMessage('Please enter your email or phone number');
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+
+        if (!email) {
+            this.showMessage('Please enter your email');
+            return;
+        }
+
+        if (!password) {
+            this.showMessage('Please enter your password');
             return;
         }
 
@@ -2915,22 +2941,20 @@ class LemonadeApp {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: identifier.includes('@') ? identifier : null,
-                    phone: !identifier.includes('@') ? identifier : null,
-                    password: 'default-password'
+                    email: email,
+                    password: password
                 })
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 this.currentUser = data.user;
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
                 this.updateUserUI();
                 this.showMessage(`Welcome back, ${data.user.name}! 👋`);
             } else {
-                this.showMessage('Login failed. Please try signing up first.');
-                this.switchAuthTab('signup');
+                this.showMessage('Invalid email or password. Please try again.');
             }
         } catch (error) {
             console.error('Login error:', error);

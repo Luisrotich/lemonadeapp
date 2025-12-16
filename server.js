@@ -1,6 +1,7 @@
 // server.js - Production Ready for Railway with PostgreSQL
 const express = require('express');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 const { query } = require('./db');
 const path = require('path');
 
@@ -195,11 +196,15 @@ app.post('/api/auth/signup', async (req, res) => {
   const { name, email, phone, password } = req.body;
 
   try {
+    // Hash the password before storing
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const result = await query(
       `INSERT INTO users (name, email, phone, password)
        VALUES ($1, $2, $3, $4)
        RETURNING id, name, email, phone`,
-      [name, email, phone, password]
+      [name, email, phone, hashedPassword]
     );
 
     res.json({ success: true, user: result.rows[0] });
@@ -214,15 +219,26 @@ app.post('/api/auth/login', async (req, res) => {
   const { email, phone, password } = req.body;
 
   try {
+    // First, find the user by email or phone
     const result = await query(
-      `SELECT id, name, email, phone
+      `SELECT id, name, email, phone, password
        FROM users
-       WHERE (email = $1 OR phone = $2) AND password = $3`,
-      [email, phone, password]
+       WHERE email = $1 OR phone = $2`,
+      [email, phone]
     );
 
     if (result.rows.length > 0) {
-      res.json({ success: true, user: result.rows[0] });
+      const user = result.rows[0];
+      // Compare the provided password with the hashed password
+      const isValidPassword = await bcrypt.compare(password, user.password);
+
+      if (isValidPassword) {
+        // Return user data without password
+        const { password: _, ...userWithoutPassword } = user;
+        res.json({ success: true, user: userWithoutPassword });
+      } else {
+        res.json({ success: false, error: 'Invalid credentials' });
+      }
     } else {
       res.json({ success: false, error: 'Invalid credentials' });
     }

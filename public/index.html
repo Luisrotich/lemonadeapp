@@ -8,16 +8,24 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Top Header -->
     <header class="main-header">
+<<<<<<< Updated upstream
          <div class="header-content">
             <h1>🍋 Lemonade</h1>
             
             <!-- Mobile menu toggle button -->
             <button class="menu-toggle" id="menuToggle">
                 <i class="fas fa-bars"></i>
+=======
+        <div class="header-content">
+            <h1 class="title">🍋 Lemonade</h1>
+            <button class="theme-toggle" id="theme-toggle">
+                <i class="fas fa-moon"></i>
+>>>>>>> Stashed changes
             </button>
         </div>
         
@@ -188,8 +196,21 @@
                         <!-- Login Form -->
                         <form class="auth-form active" id="login-form">
                             <div class="form-group">
-                                <label>Email or Phone Number</label>
-                                <input type="text" id="login-identifier" placeholder="Email or phone number" required>
+                                <label>Email Address</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                                    <button type="button" class="password-toggle" data-target="login-password">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <button type="submit" class="auth-btn">Login</button>
                         </form>
@@ -197,16 +218,58 @@
                         <!-- Signup Form -->
                         <form class="auth-form" id="signup-form">
                             <div class="form-group">
-                                <label>Full Name</label>
-                                <input type="text" id="signup-name" placeholder="Enter your name" required>
+                                <label>First Name</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" id="signup-firstname" placeholder="Enter your first name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" id="signup-lastname" placeholder="Enter your last name" required>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>Phone Number</label>
-                                <input type="tel" id="signup-phone" placeholder="phone number" required>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-phone input-icon"></i>
+                                    <input type="tel" id="signup-phone" placeholder="Enter your phone number" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Email (Optional)</label>
-                                <input type="email" id="signup-email" placeholder="Enter your email">
+                                <label>Email Address</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <input type="email" id="signup-email" placeholder="Enter your email" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" id="signup-password" placeholder="Create a password" required>
+                                    <button type="button" class="password-toggle" data-target="signup-password">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required>
+                                    <button type="button" class="password-toggle" data-target="signup-confirm-password">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="signup-terms" required>
+                                    <label for="signup-terms">I agree to the <a href="#" target="_blank">Terms & Conditions</a></label>
+                                </div>
                             </div>
                             <button type="submit" class="auth-btn">Sign up</button>
                         </form>
