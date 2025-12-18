@@ -216,13 +216,26 @@ class AdminDashboard {
         const username = document.getElementById('admin-username').value;
         const password = document.getElementById('admin-password').value;
 
-        if (username === 'admin' && password === 'admin123') {
-            this.currentUser = { name: 'Administrator', role: 'admin' };
-            localStorage.setItem('adminUser', JSON.stringify(this.currentUser));
-            this.showDashboard();
-            this.showNotification('Login successful!', 'success');
-        } else {
-            this.showNotification('Invalid credentials! Use admin/admin123', 'error');
+        try {
+            const response = await this.fetchWithFallback('/api/auth/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.currentUser = data.user;
+                localStorage.setItem('adminUser', JSON.stringify(this.currentUser));
+                this.showDashboard();
+                this.showNotification('Login successful!', 'success');
+            } else {
+                this.showNotification(data.error || 'Invalid credentials', 'error');
+            }
+        } catch (error) {
+            console.error('Admin login error:', error);
+            this.showNotification('Login failed. Please try again.', 'error');
         }
     }
 

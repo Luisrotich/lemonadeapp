@@ -184,9 +184,6 @@ html, body {
     color: var(--text-light);
 }
 
-
-
-
 .products {
   display: grid;
   gap: 1.5rem;
@@ -531,7 +528,7 @@ html, body {
 .account-header {
     text-align: center;
     margin-bottom: 2rem;
-    padding: 1.5rem;
+    padding: 1rem;
     background: linear-gradient(135deg, orange, var(--secondary-color));
     border-radius: 20px;
     color: white;
@@ -886,6 +883,7 @@ textarea:focus {
 .form-group label {
     display: block;
     margin-bottom: 0.75rem;
+    text-align: left;
     color: var(--text-color);
     font-weight: 600;
     font-size: 0.95rem;
@@ -1200,7 +1198,11 @@ textarea:focus {
     padding: 1.5rem;
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     border: 1px solid var(--border-color);
-    margin-left: 360px
+    margin: 0 auto;
+}
+
+.account-actions .form-group label {
+    text-align: left;
 }
 
 /* Toggle Switch */

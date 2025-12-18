@@ -2920,11 +2920,11 @@ class LemonadeApp {
 
     // Updated authentication functions
     async handleLogin() {
-        const email = document.getElementById('login-email').value.trim();
+        const loginInput = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value.trim();
 
-        if (!email) {
-            this.showMessage('Please enter your email');
+        if (!loginInput) {
+            this.showMessage('Please enter your email or phone number');
             return;
         }
 
@@ -2934,16 +2934,19 @@ class LemonadeApp {
         }
 
         try {
+            // Determine if input is email or phone
+            const isEmail = loginInput.includes('@');
+            const loginData = isEmail
+                ? { email: loginInput, password: password }
+                : { phone: loginInput, password: password };
+
             // Call backend login API
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
+                body: JSON.stringify(loginData)
             });
 
             const data = await response.json();
@@ -2954,7 +2957,7 @@ class LemonadeApp {
                 this.updateUserUI();
                 this.showMessage(`Welcome back, ${data.user.name}! 👋`);
             } else {
-                this.showMessage('Invalid email or password. Please try again.');
+                this.showMessage('Invalid credentials. Please try again.');
             }
         } catch (error) {
             console.error('Login error:', error);
@@ -2963,12 +2966,16 @@ class LemonadeApp {
     }
 
     async handleSignup() {
-        const name = document.getElementById('signup-name').value.trim();
+        const firstName = document.getElementById('signup-firstname').value.trim();
+        const lastName = document.getElementById('signup-lastname').value.trim();
         const email = document.getElementById('signup-email').value.trim();
         const phone = document.getElementById('signup-phone').value.trim();
+        const password = document.getElementById('signup-password').value.trim();
+        const confirmPassword = document.getElementById('signup-confirm-password').value.trim();
 
-        if (!name) {
-            this.showMessage('Please enter your name');
+        // Validate required fields
+        if (!firstName || !lastName) {
+            this.showMessage('Please enter your first and last name');
             return;
         }
 
@@ -2976,6 +2983,18 @@ class LemonadeApp {
             this.showMessage('Please enter either email or phone number');
             return;
         }
+
+        if (!password) {
+            this.showMessage('Please enter a password');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            this.showMessage('Passwords do not match');
+            return;
+        }
+
+        const fullName = `${firstName} ${lastName}`;
 
         try {
             // Call backend signup API
@@ -2985,20 +3004,20 @@ class LemonadeApp {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    name: name,
+                    name: fullName,
                     email: email || null,
                     phone: phone || null,
-                    password: 'default-password'
+                    password: password
                 })
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 this.currentUser = data.user;
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
                 this.updateUserUI();
-                this.showMessage(`Welcome to Lily's Lemonade, ${name}! 🎉`);
+                this.showMessage(`Welcome to Lemonade, ${fullName}! 🎉`);
             } else {
                 this.showMessage('Signup failed. Please try again.');
             }

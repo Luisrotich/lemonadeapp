@@ -16,7 +16,8 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
   'https://lemonadekenya.up.railway.app',
   'http://localhost:5000',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://127.0.0.1:5000'
 ];
 
 app.use(cors({
@@ -245,6 +246,56 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ success: false, error: 'Login failed' });
+  }
+});
+
+// Admin login route
+app.post('/api/auth/admin/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if admin user exists, if not create default admin
+    let adminResult = await query(
+      `SELECT id, name, email, password
+       FROM users
+       WHERE email = 'admin@lemonade.com'`,
+      []
+    );
+
+    if (adminResult.rows.length === 0) {
+      // Create default admin user if not exists
+      const saltRounds = 10;
+      const defaultPassword = 'admin123'; // Default password for first login
+      const hashedPassword = await bcrypt.hash(defaultPassword, saltRounds);
+
+      await query(
+        `INSERT INTO users (name, email, password)
+         VALUES ($1, $2, $3)`,
+        ['Administrator', 'admin@lemonade.com', hashedPassword]
+      );
+
+      console.log('Default admin user created');
+      adminResult = await query(
+        `SELECT id, name, email, password
+         FROM users
+         WHERE email = 'admin@lemonade.com'`,
+        []
+      );
+    }
+
+    const admin = adminResult.rows[0];
+
+    // For admin login, check username and password
+    if (username === 'admin' && await bcrypt.compare(password, admin.password)) {
+      // Return admin user data without password
+      const { password: _, ...adminWithoutPassword } = admin;
+      res.json({ success: true, user: { ...adminWithoutPassword, role: 'admin' } });
+    } else {
+      res.json({ success: false, error: 'Invalid admin credentials' });
+    }
+  } catch (err) {
+    console.error('Admin login error:', err);
+    res.status(500).json({ success: false, error: 'Admin login failed' });
   }
 });
 
