@@ -667,7 +667,83 @@
     </div>
 </div>
    
-
+<script>
+// EMERGENCY BUTTON FIX - Add this right after your popup HTML
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('EMERGENCY FIX RUNNING');
+    
+    // Force add click handlers to ALL buttons
+    setTimeout(function() {
+        // Get all buttons in the popup
+        const popup = document.getElementById('install-popup');
+        if (!popup) return;
+        
+        // Add click handlers to ALL buttons in popup
+        const allButtons = popup.querySelectorAll('button');
+        console.log('Found buttons in popup:', allButtons.length);
+        
+        allButtons.forEach(function(button, index) {
+            console.log('Button', index, ':', button.textContent || button.innerHTML);
+            
+            // Remove all existing events
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            // Add new click handler
+            newButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Button clicked:', this.textContent || this.innerHTML);
+                
+                // Based on button text/content
+                const btnText = (this.textContent || this.innerHTML).toLowerCase();
+                
+                if (btnText.includes('install now') || btnText.includes('download')) {
+                    console.log('Install Now action');
+                    localStorage.setItem('lemonadeInstallChoice', 'installed');
+                    alert('App install starting...');
+                } 
+                else if (btnText.includes('remind') || btnText.includes('later')) {
+                    console.log('Remind Later action');
+                    localStorage.setItem('lemonadeInstallChoice', 'later');
+                }
+                else if (btnText.includes('don\'t show') || btnText.includes('never')) {
+                    console.log('Never Show action');
+                    localStorage.setItem('lemonadeInstallChoice', 'never');
+                }
+                else if (btnText.includes('×') || btnText === '×') {
+                    console.log('X button action');
+                    localStorage.setItem('lemonadeInstallChoice', 'later');
+                }
+                
+                // Hide popup
+                const popup = document.getElementById('install-popup');
+                const overlay = document.getElementById('install-popup-overlay');
+                if (popup) popup.style.display = 'none';
+                if (overlay) overlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                
+                return false;
+            });
+        });
+        
+        // Also handle overlay click
+        const overlay = document.getElementById('install-popup-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    localStorage.setItem('lemonadeInstallChoice', 'later');
+                    this.style.display = 'none';
+                    const popup = document.getElementById('install-popup');
+                    if (popup) popup.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+        
+    }, 1000);
+});
+</script>
     <script src="script.js"></script>
 </body>
 

@@ -3556,180 +3556,231 @@ document.head.appendChild(style);
 
 
 
- // SIMPLE IMMEDIATE POPUP - NO COMPLEXITY
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Starting popup...');
+ // ULTRA SIMPLE POPUP FIX
+console.log('Popup script loading...');
+
+// First, check immediately if we should show popup
+window.addEventListener('load', function() {
+    console.log('Page fully loaded');
     
-    // Check if user said "never" or app is already installed
+    // Check user preference
     const userChoice = localStorage.getItem('lemonadeInstallChoice');
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
     
+    console.log('User choice:', userChoice, 'Installed:', isInstalled);
+    
+    // Don't show if never or installed
     if (userChoice === 'never' || userChoice === 'installed' || isInstalled) {
         console.log('Not showing popup');
         hidePopup();
         return;
     }
     
-    // Show popup immediately
-    console.log('Showing popup NOW');
-    showPopupNow();
-    
-    // Setup all button clicks
-    setupSimpleButtons();
+    // Show the popup IMMEDIATELY
+    console.log('SHOWING POPUP');
+    setTimeout(function() {
+        showPopup();
+    }, 100);
 });
 
-// Show popup with basic style
-function showPopupNow() {
+// SHOW POPUP FUNCTION
+function showPopup() {
     const popup = document.getElementById('install-popup');
     const overlay = document.getElementById('install-popup-overlay');
     
+    console.log('Show popup called, elements:', popup, overlay);
+    
     if (popup && overlay) {
-        // Make sure they're visible
-        popup.style.display = 'block';
-        overlay.style.display = 'block';
+        // Make absolutely sure they're visible
+        popup.style.cssText = `
+            display: block !important;
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 10000 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        `;
         
-        // Prevent scrolling
+        overlay.style.cssText = `
+            display: block !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0,0,0,0.8) !important;
+            z-index: 9999 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        `;
+        
         document.body.style.overflow = 'hidden';
         
-        console.log('Popup is visible');
+        console.log('Popup should be visible now');
+        
+        // Setup button clicks
+        setupButtonClicks();
     }
 }
 
-// Hide popup
+// HIDE POPUP FUNCTION
 function hidePopup() {
     const popup = document.getElementById('install-popup');
     const overlay = document.getElementById('install-popup-overlay');
     
-    if (popup && overlay) {
-        popup.style.display = 'none';
-        overlay.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
+    if (popup) popup.style.display = 'none';
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
-// Setup all button clicks - SIMPLE VERSION
-function setupSimpleButtons() {
-    console.log('Setting up buttons...');
+// SETUP BUTTON CLICKS - DIRECT METHOD
+function setupButtonClicks() {
+    console.log('Setting up button clicks...');
     
-    // 1. X (Close) Button - Remind Later
+    // Get all buttons
     const closeBtn = document.getElementById('close-install-popup');
+    const installBtn = document.getElementById('btn-install-now');
+    const laterBtn = document.getElementById('btn-install-later');
+    const neverBtn = document.getElementById('btn-never-show');
+    const overlay = document.getElementById('install-popup-overlay');
+    
+    console.log('Buttons found:', {closeBtn, installBtn, laterBtn, neverBtn, overlay});
+    
+    // 1. X (Close) Button - REMIND LATER
     if (closeBtn) {
-        closeBtn.onclick = function() {
+        closeBtn.onclick = function(e) {
             console.log('X button clicked');
+            e.stopPropagation();
             localStorage.setItem('lemonadeInstallChoice', 'later');
             hidePopup();
-            showMessage('Reminder set for 24 hours');
+            showQuickMessage('We\'ll remind you later');
+            return false;
         };
     }
     
     // 2. Install Now Button
-    const installBtn = document.getElementById('btn-install-now');
     if (installBtn) {
-        installBtn.onclick = function() {
+        installBtn.onclick = function(e) {
             console.log('Install Now clicked');
-            // Try PWA install first
+            e.stopPropagation();
+            
+            // Check if PWA is available
             if (window.deferredPrompt) {
                 window.deferredPrompt.prompt();
                 window.deferredPrompt.userChoice.then(function(choiceResult) {
                     if (choiceResult.outcome === 'accepted') {
                         localStorage.setItem('lemonadeInstallChoice', 'installed');
-                        showMessage('App installing!');
+                        showQuickMessage('🎉 Installing app...');
                     } else {
                         localStorage.setItem('lemonadeInstallChoice', 'later');
-                        showMessage('Installation cancelled');
+                        showQuickMessage('Installation cancelled');
                     }
                     hidePopup();
                 });
             } else {
-                // No PWA, show instructions
-                showInstallInstructions();
+                // Show manual instructions
+                showManualInstructions();
                 localStorage.setItem('lemonadeInstallChoice', 'later');
                 hidePopup();
             }
+            return false;
         };
     }
     
     // 3. Remind Me Later Button
-    const laterBtn = document.getElementById('btn-install-later');
     if (laterBtn) {
-        laterBtn.onclick = function() {
+        laterBtn.onclick = function(e) {
             console.log('Remind Later clicked');
+            e.stopPropagation();
             localStorage.setItem('lemonadeInstallChoice', 'later');
             hidePopup();
-            showMessage('We\'ll remind you later');
+            showQuickMessage('We\'ll remind you in 24 hours');
+            return false;
         };
     }
     
     // 4. Don't Show Again Button
-    const neverBtn = document.getElementById('btn-never-show');
     if (neverBtn) {
-        neverBtn.onclick = function() {
+        neverBtn.onclick = function(e) {
             console.log('Never Show clicked');
+            e.stopPropagation();
             localStorage.setItem('lemonadeInstallChoice', 'never');
             hidePopup();
-            showMessage('Won\'t show again');
+            showQuickMessage('Won\'t show this again');
+            return false;
         };
     }
     
-    // 5. Click outside to close (overlay)
-    const overlay = document.getElementById('install-popup-overlay');
+    // 5. Click Outside (Overlay)
     if (overlay) {
         overlay.onclick = function(e) {
             if (e.target === overlay) {
-                console.log('Clicked outside');
+                console.log('Clicked outside popup');
                 localStorage.setItem('lemonadeInstallChoice', 'later');
                 hidePopup();
-                showMessage('Reminder set');
+                showQuickMessage('Reminder set for later');
             }
         };
     }
     
-    // 6. Escape key to close
+    // 6. Escape Key
     document.onkeydown = function(e) {
         if (e.key === 'Escape') {
             const popup = document.getElementById('install-popup');
             if (popup && popup.style.display === 'block') {
-                console.log('Escape pressed');
+                console.log('Escape key pressed');
                 localStorage.setItem('lemonadeInstallChoice', 'later');
                 hidePopup();
-                showMessage('Reminder set');
+                showQuickMessage('Reminder set');
             }
         }
     };
     
-    console.log('All buttons ready');
+    console.log('All buttons setup complete');
 }
 
-// Show a simple message
-function showMessage(text) {
-    // Create a simple message
+// QUICK MESSAGE FUNCTION
+function showQuickMessage(text) {
+    // Remove any existing message
+    const existing = document.getElementById('quick-message');
+    if (existing) existing.remove();
+    
+    // Create message
     const msg = document.createElement('div');
+    msg.id = 'quick-message';
     msg.textContent = text;
     msg.style.cssText = `
         position: fixed;
-        bottom: 20px;
+        bottom: 30px;
         left: 50%;
         transform: translateX(-50%);
         background: #4CAF50;
         color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
+        padding: 12px 24px;
+        border-radius: 8px;
         z-index: 99999;
         font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        animation: fadeInUp 0.3s ease;
     `;
+    
     document.body.appendChild(msg);
     
     // Remove after 2 seconds
-    setTimeout(() => {
-        if (msg.parentNode) {
-            msg.parentNode.removeChild(msg);
-        }
+    setTimeout(function() {
+        msg.style.animation = 'fadeOutDown 0.3s ease';
+        setTimeout(function() {
+            if (msg.parentNode) msg.parentNode.removeChild(msg);
+        }, 300);
     }, 2000);
 }
 
-// Show install instructions
-function showInstallInstructions() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+// MANUAL INSTRUCTIONS
+function showManualInstructions() {
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
     const isAndroid = /Android/.test(navigator.userAgent);
     
     let instructions = '';
@@ -3739,42 +3790,73 @@ function showInstallInstructions() {
     } else if (isAndroid) {
         instructions = 'Android: Tap menu → Add to Home screen → Add';
     } else {
-        instructions = 'Desktop: Look for install icon in address bar';
+        instructions = 'Desktop: Look for install icon (⬇️) in address bar';
     }
     
     alert('How to install:\n\n' + instructions);
 }
 
-// Setup PWA listener
+// PWA SETUP
 window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     window.deferredPrompt = e;
-    console.log('PWA available');
+    console.log('PWA install available');
 });
 
-// Listen for app installed
 window.addEventListener('appinstalled', function() {
-    console.log('App installed!');
+    console.log('App was installed!');
     localStorage.setItem('lemonadeInstallChoice', 'installed');
 });
 
-// Debug: Add this to test
-console.log('Simple popup script loaded');
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+    
+    @keyframes fadeOutDown {
+        from {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+    }
+`;
+document.head.appendChild(style);
 
-// For testing in console
-window.testPopup = {
+// DEBUG: Test functions in console
+window.popupTest = {
     reset: function() {
         localStorage.removeItem('lemonadeInstallChoice');
-        console.log('Reset. Reload page.');
+        console.log('✅ Preferences reset. Reload page.');
         location.reload();
     },
     show: function() {
-        showPopupNow();
+        showPopup();
     },
     hide: function() {
         hidePopup();
+    },
+    status: function() {
+        return {
+            choice: localStorage.getItem('lemonadeInstallChoice'),
+            hasPrompt: !!window.deferredPrompt
+        };
     }
 };
+
+console.log('Popup script ready. Use window.popupTest.reset() to test.');
         
 
         
