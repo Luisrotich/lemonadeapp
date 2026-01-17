@@ -614,7 +614,7 @@ body {
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
-    border-radius: 25px;
+    border-radius: 15px;
     cursor: pointer;
     font-weight: 600;
     font-size: 0.95rem;
@@ -641,7 +641,7 @@ body {
 /* Cart Item Card */
 .cart-item {
     background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 255, 255, 0.95) 100%);
-    border-radius: 20px;
+    border-radius: 15px;
     padding: 1.5rem;
     display: flex;
     align-items: center;
@@ -803,7 +803,7 @@ body {
 /* Cart Footer */
 .cart-footer {
     background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 255, 255, 0.95) 100%);
-    border-radius: 20px;
+    border-radius: 15px;
     padding: 2rem;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-color);
