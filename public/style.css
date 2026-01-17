@@ -867,7 +867,6 @@ body {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(56, 197, 38, 0.3);
-    position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -882,7 +881,6 @@ body {
 
 .checkout-btn::before {
     content: '';
-    position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
