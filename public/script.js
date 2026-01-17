@@ -3556,229 +3556,340 @@ document.head.appendChild(style);
 
 
 
- 
-       // IMMEDIATE POPUP - NO DELAYS - COMPLETE FUNCTIONALITY
+ // IMMEDIATE POPUP - COMPLETE FIXED FUNCTIONALITY
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded - checking for popup elements');
+    console.log('DOM loaded - initializing popup');
     
+    // Initialize immediately
+    initializePopup();
+});
+
+// Global variables for popup state
+let deferredPrompt = null;
+let popupManager = null;
+
+function initializePopup() {
     const popup = document.getElementById('install-popup');
     const overlay = document.getElementById('install-popup-overlay');
     
     if (!popup || !overlay) {
-        console.error('Popup elements not found! Check your HTML IDs');
+        console.error('Popup elements not found!');
         return;
     }
     
-    console.log('Popup elements found');
+    console.log('Popup elements found, checking user preferences...');
     
-    // FIRST: Check localStorage for previous choices
+    // Check user preferences
     const userChoice = localStorage.getItem('lemonadeInstallChoice');
-    const isAlreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || 
-                               window.navigator.standalone;
+    const isAlreadyInstalled = isAppInstalled();
     
-    console.log('User choice from localStorage:', userChoice);
-    console.log('App already installed?', isAlreadyInstalled);
+    console.log('User choice:', userChoice, 'Installed:', isAlreadyInstalled);
     
     // Don't show if user chose "never" or app is already installed
     if (userChoice === 'never' || userChoice === 'installed' || isAlreadyInstalled) {
-        console.log('Not showing popup - user choice:', userChoice);
+        console.log('Not showing popup due to user preference');
         hidePopup();
         return;
     }
     
-    // FORCE SHOW THE POPUP IMMEDIATELY
-    console.log('FORCING POPUP TO SHOW IMMEDIATELY');
+    // Show the popup immediately
+    console.log('Showing popup immediately');
     showPopup();
     
-    // Record that we showed the popup
+    // Record popup shown time
     localStorage.setItem('lemonadePopupShownTime', Date.now().toString());
     
-    // Setup all event listeners
-    setupAllEventListeners();
+    // Setup PWA listeners
+    setupPWAListeners();
     
-    // Setup PWA install if available
-    setupPWAInstall();
-});
+    // Setup all button listeners
+    setupAllButtonListeners();
+}
 
 // ============================================
-// ALL BUTTON FUNCTIONS
+// BUTTON FUNCTIONALITY - FIXED
 // ============================================
 
-function setupAllEventListeners() {
+function setupAllButtonListeners() {
+    console.log('Setting up all button listeners...');
+    
+    // 1. X (Close) Button - Top Right X
     const closeBtn = document.getElementById('close-install-popup');
-    const installNowBtn = document.getElementById('btn-install-now');
-    const installLaterBtn = document.getElementById('btn-install-later');
-    const neverShowBtn = document.getElementById('btn-never-show');
-    const overlay = document.getElementById('install-popup-overlay');
-    
-    // 1. X (Close) Button - Remind Later
     if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            console.log('X button clicked - Remind Later');
+        // Remove any existing listeners first
+        closeBtn.replaceWith(closeBtn.cloneNode(true));
+        const newCloseBtn = document.getElementById('close-install-popup');
+        newCloseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('X (Close) button clicked');
             handleRemindLater();
         });
     }
     
     // 2. Install Now Button
+    const installNowBtn = document.getElementById('btn-install-now');
     if (installNowBtn) {
-        installNowBtn.addEventListener('click', function() {
+        installNowBtn.replaceWith(installNowBtn.cloneNode(true));
+        const newInstallNowBtn = document.getElementById('btn-install-now');
+        newInstallNowBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('Install Now button clicked');
             handleInstallNow();
         });
     }
     
     // 3. Remind Me Later Button
+    const installLaterBtn = document.getElementById('btn-install-later');
     if (installLaterBtn) {
-        installLaterBtn.addEventListener('click', function() {
+        installLaterBtn.replaceWith(installLaterBtn.cloneNode(true));
+        const newInstallLaterBtn = document.getElementById('btn-install-later');
+        newInstallLaterBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('Remind Me Later button clicked');
             handleRemindLater();
         });
     }
     
     // 4. Don't Show Again Button
+    const neverShowBtn = document.getElementById('btn-never-show');
     if (neverShowBtn) {
-        neverShowBtn.addEventListener('click', function() {
+        neverShowBtn.replaceWith(neverShowBtn.cloneNode(true));
+        const newNeverShowBtn = document.getElementById('btn-never-show');
+        newNeverShowBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('Don\'t Show Again button clicked');
             handleNeverShow();
         });
     }
     
-    // 5. Click Overlay to Close (Remind Later)
+    // 5. Overlay Click (outside popup)
+    const overlay = document.getElementById('install-popup-overlay');
     if (overlay) {
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                console.log('Overlay clicked - Remind Later');
+        overlay.replaceWith(overlay.cloneNode(true));
+        const newOverlay = document.getElementById('install-popup-overlay');
+        newOverlay.addEventListener('click', function(e) {
+            if (e.target === newOverlay) {
+                console.log('Overlay clicked (outside popup)');
                 handleRemindLater();
             }
         });
     }
     
-    // 6. Escape Key to Close (Remind Later)
+    // 6. Escape Key
     document.addEventListener('keydown', function(e) {
         const popup = document.getElementById('install-popup');
         if (e.key === 'Escape' && popup && popup.style.display === 'block') {
-            console.log('Escape key pressed - Remind Later');
+            console.log('Escape key pressed');
             handleRemindLater();
         }
     });
+    
+    console.log('All button listeners setup complete');
 }
 
 // ============================================
-// BUTTON HANDLER FUNCTIONS
+// BUTTON HANDLERS - FIXED
 // ============================================
 
 function handleInstallNow() {
-    console.log('handleInstallNow called');
+    console.log('=== INSTALL NOW CLICKED ===');
     
-    if (window.deferredPrompt) {
-        // Show the PWA install prompt
-        window.deferredPrompt.prompt();
+    if (deferredPrompt) {
+        console.log('Showing PWA install prompt...');
+        deferredPrompt.prompt();
         
-        window.deferredPrompt.userChoice.then((choiceResult) => {
+        deferredPrompt.userChoice.then((choiceResult) => {
+            console.log('User choice result:', choiceResult.outcome);
+            
             if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the install prompt');
+                console.log('✅ User accepted installation');
                 localStorage.setItem('lemonadeInstallChoice', 'installed');
-                showSuccessMessage('🎉 Lemonade app is being installed!');
+                showToast('🎉 App is being installed!', 'success');
             } else {
-                console.log('User dismissed the install prompt');
+                console.log('❌ User declined installation');
                 localStorage.setItem('lemonadeInstallChoice', 'later');
-                showToast('Installation cancelled. You can install anytime from the menu.');
+                showToast('Installation cancelled', 'info');
             }
-            window.deferredPrompt = null;
+            
+            deferredPrompt = null;
+            hidePopup();
+        }).catch((error) => {
+            console.error('Install prompt error:', error);
+            showManualInstallInstructions();
+            localStorage.setItem('lemonadeInstallChoice', 'later');
+            hidePopup();
         });
     } else {
-        // PWA not available, show manual instructions
+        console.log('No PWA prompt available, showing manual instructions');
         showManualInstallInstructions();
         localStorage.setItem('lemonadeInstallChoice', 'later');
+        hidePopup();
     }
-    
-    hidePopup();
 }
 
 function handleRemindLater() {
-    console.log('handleRemindLater called');
+    console.log('=== REMIND LATER CLICKED ===');
     
-    // Save choice to show again in 24 hours
+    // Save the choice with timestamp
     localStorage.setItem('lemonadeInstallChoice', 'later');
+    localStorage.setItem('lemonadeRemindTime', Date.now().toString());
     
-    // Show a subtle feedback message
-    showToast('We\'ll remind you again in 24 hours 👍');
+    // Show feedback
+    showToast('We\'ll remind you again in 24 hours 👍', 'info');
     
+    // Hide popup
     hidePopup();
 }
 
 function handleNeverShow() {
-    console.log('handleNeverShow called');
+    console.log('=== NEVER SHOW AGAIN CLICKED ===');
     
-    // Save choice to never show again
+    // Save the choice
     localStorage.setItem('lemonadeInstallChoice', 'never');
     
-    // Show feedback message
-    showToast('Got it! We won\'t show this popup again.');
+    // Clear any reminder timestamps
+    localStorage.removeItem('lemonadeRemindTime');
+    localStorage.removeItem('lemonadePopupShownTime');
     
+    // Show feedback
+    showToast('Got it! We won\'t show this again.', 'info');
+    
+    // Hide popup
     hidePopup();
 }
 
 // ============================================
-// HELPER FUNCTIONS
+// CORE FUNCTIONS
 // ============================================
 
 function showPopup() {
     const popup = document.getElementById('install-popup');
     const overlay = document.getElementById('install-popup-overlay');
     
-    if (popup && overlay) {
-        popup.style.display = 'block';
-        overlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        document.body.classList.add('popup-open');
-        
-        // Add visual feedback that popup is active
-        popup.style.opacity = '1';
-        popup.style.visibility = 'visible';
-        overlay.style.opacity = '1';
-        overlay.style.visibility = 'visible';
-        
-        console.log('Popup shown successfully');
-    }
+    if (!popup || !overlay) return;
+    
+    // Force show with inline styles
+    popup.style.display = 'block';
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.zIndex = '10000';
+    popup.style.opacity = '1';
+    popup.style.visibility = 'visible';
+    
+    overlay.style.display = 'block';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+    overlay.style.zIndex = '9999';
+    overlay.style.opacity = '1';
+    overlay.style.visibility = 'visible';
+    
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('popup-open');
+    
+    console.log('Popup is now visible');
 }
 
 function hidePopup() {
     const popup = document.getElementById('install-popup');
     const overlay = document.getElementById('install-popup-overlay');
     
-    if (popup && overlay) {
-        popup.style.display = 'none';
-        overlay.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        document.body.classList.remove('popup-open');
-        
-        console.log('Popup hidden');
-    }
+    if (!popup || !overlay) return;
+    
+    popup.style.display = 'none';
+    overlay.style.display = 'none';
+    
+    // Restore body scrolling
+    document.body.style.overflow = 'auto';
+    document.body.classList.remove('popup-open');
+    
+    console.log('Popup hidden');
 }
 
-function showToast(message) {
+function isAppInstalled() {
+    // Check multiple ways to detect if app is installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isNavigatorStandalone = window.navigator.standalone;
+    const hasReferrer = document.referrer.includes('android-app://');
+    
+    return isStandalone || isNavigatorStandalone || hasReferrer;
+}
+
+function setupPWAListeners() {
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('✅ PWA install prompt is available');
+        
+        // Update button text if PWA is available
+        const installBtn = document.getElementById('btn-install-now');
+        if (installBtn) {
+            installBtn.innerHTML = '<i class="fas fa-download"></i> Install App Now';
+            installBtn.style.background = 'linear-gradient(135deg, var(--accent-color) 0%, #2e7d32 100%)';
+        }
+    });
+    
+    window.addEventListener('appinstalled', () => {
+        console.log('✅ App was installed successfully!');
+        localStorage.setItem('lemonadeInstallChoice', 'installed');
+        showToast('🎉 App installed successfully!', 'success');
+        hidePopup();
+    });
+}
+
+// ============================================
+// FEEDBACK FUNCTIONS
+// ============================================
+
+function showToast(message, type = 'info') {
+    // Remove any existing toast
+    const existingToast = document.querySelector('.popup-toast');
+    if (existingToast) existingToast.remove();
+    
     // Create toast element
     const toast = document.createElement('div');
-    toast.className = 'install-toast';
+    toast.className = 'popup-toast';
     toast.textContent = message;
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%) translateY(100px);
-        background: var(--accent-color);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        z-index: 10001;
-        font-weight: 500;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        text-align: center;
-        max-width: 90%;
-        word-wrap: break-word;
-    `;
+    
+    // Style based on type
+    const styles = {
+        position: 'fixed',
+        bottom: '30px',
+        left: '50%',
+        transform: 'translateX(-50%) translateY(100px)',
+        padding: '12px 24px',
+        borderRadius: '10px',
+        zIndex: '10001',
+        fontWeight: '500',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+        transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        textAlign: 'center',
+        maxWidth: '90%',
+        wordWrap: 'break-word',
+        fontSize: '14px',
+        backdropFilter: 'blur(10px)'
+    };
+    
+    if (type === 'success') {
+        styles.background = 'linear-gradient(135deg, var(--accent-color) 0%, #2e7d32 100%)';
+        styles.color = 'white';
+    } else if (type === 'info') {
+        styles.background = 'var(--card-bg)';
+        styles.color = 'var(--text-color)';
+        styles.border = '1px solid var(--border-color)';
+    }
+    
+    Object.assign(toast.style, styles);
     
     document.body.appendChild(toast);
     
@@ -3798,20 +3909,40 @@ function showToast(message) {
     }, 3000);
 }
 
-function showSuccessMessage(message) {
-    // Create success message overlay
-    const successOverlay = document.createElement('div');
-    successOverlay.className = 'install-success-overlay';
-    successOverlay.innerHTML = `
-        <div class="install-success-popup">
-            <div class="success-icon">🎉</div>
-            <h3>Success!</h3>
-            <p>${message}</p>
-            <button class="success-ok-btn">OK</button>
+function showManualInstallInstructions() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    let title = '';
+    let message = '';
+    
+    if (isIOS) {
+        title = '📱 Install on iOS';
+        message = `1. Tap the Share button (📤)<br>
+                   2. Scroll and tap "Add to Home Screen"<br>
+                   3. Tap "Add" in the top right`;
+    } else if (isAndroid) {
+        title = '🤖 Install on Android';
+        message = `1. Tap menu (⋮) or settings<br>
+                   2. Tap "Add to Home screen"<br>
+                   3. Tap "Add" or "Install"`;
+    } else {
+        title = '💻 Install on Desktop';
+        message = `Look for the install icon (⬇️) in your browser's address bar`;
+    }
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'manual-instructions-modal';
+    modal.innerHTML = `
+        <div class="manual-content">
+            <h3>${title}</h3>
+            <div class="instructions">${message}</div>
+            <button class="close-manual-btn">Got it!</button>
         </div>
     `;
     
-    successOverlay.style.cssText = `
+    modal.style.cssText = `
         position: fixed;
         top: 0;
         left: 0;
@@ -3822,270 +3953,75 @@ function showSuccessMessage(message) {
         align-items: center;
         justify-content: center;
         z-index: 10002;
-        animation: fadeIn 0.3s ease;
     `;
     
-    document.body.appendChild(successOverlay);
+    document.body.appendChild(modal);
     
-    // Style the success popup
-    const successPopup = successOverlay.querySelector('.install-success-popup');
-    successPopup.style.cssText = `
-        background: var(--card-bg);
-        padding: 2rem;
-        border-radius: 20px;
-        text-align: center;
-        max-width: 300px;
-        width: 90%;
-        animation: slideIn 0.3s ease;
-    `;
-    
-    const successIcon = successOverlay.querySelector('.success-icon');
-    successIcon.style.cssText = `
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        animation: bounce 0.5s ease;
-    `;
-    
-    const okBtn = successOverlay.querySelector('.success-ok-btn');
-    okBtn.style.cssText = `
-        background: var(--accent-color);
-        color: white;
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 10px;
-        font-size: 1rem;
-        margin-top: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    `;
-    
-    okBtn.addEventListener('mouseover', function() {
-        this.style.transform = 'scale(1.05)';
-    });
-    
-    okBtn.addEventListener('mouseout', function() {
-        this.style.transform = 'scale(1)';
-    });
-    
-    okBtn.addEventListener('click', function() {
-        successOverlay.style.animation = 'fadeOut 0.3s ease';
-        setTimeout(() => {
-            if (successOverlay.parentNode) {
-                successOverlay.parentNode.removeChild(successOverlay);
-            }
-        }, 300);
-    });
-    
-    // Add animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-function showManualInstallInstructions() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
-    
-    let message = '';
-    let title = '';
-    
-    if (isIOS) {
-        title = '📱 iOS Installation';
-        message = `1. Tap the Share button (📤) at the bottom<br>
-                   2. Scroll down and tap "Add to Home Screen"<br>
-                   3. Tap "Add" in the top right`;
-    } else if (isAndroid) {
-        title = '🤖 Android Installation';
-        message = `1. Tap the menu button (⋮) at the top right<br>
-                   2. Tap "Add to Home screen" or "Install app"<br>
-                   3. Tap "Add" or "Install"`;
-    } else {
-        title = '💻 Desktop Installation';
-        message = `Look for the install icon (⬇️) in your browser's address bar.<br>
-                   Or check your browser menu for "Install" or "Add to Home screen" option.`;
-    }
-    
-    // Create manual instructions modal
-    const manualModal = document.createElement('div');
-    manualModal.className = 'manual-instructions-modal';
-    manualModal.innerHTML = `
-        <div class="manual-instructions-content">
-            <button class="close-manual-btn">&times;</button>
-            <h3>${title}</h3>
-            <div class="instructions">${message}</div>
-            <button class="got-it-btn">Got it!</button>
-        </div>
-    `;
-    
-    manualModal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10002;
-        animation: fadeIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(manualModal);
-    
-    // Style the modal content
-    const content = manualModal.querySelector('.manual-instructions-content');
+    // Style content
+    const content = modal.querySelector('.manual-content');
     content.style.cssText = `
         background: var(--card-bg);
         padding: 2rem;
         border-radius: 20px;
-        max-width: 400px;
+        max-width: 350px;
         width: 90%;
-        position: relative;
-        animation: slideIn 0.3s ease;
+        text-align: center;
     `;
     
-    const closeBtn = manualModal.querySelector('.close-manual-btn');
+    const closeBtn = modal.querySelector('.close-manual-btn');
     closeBtn.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: var(--text-light);
-    `;
-    
-    const gotItBtn = manualModal.querySelector('.got-it-btn');
-    gotItBtn.style.cssText = `
         background: var(--accent-color);
         color: white;
         border: none;
         padding: 0.75rem 2rem;
         border-radius: 10px;
-        font-size: 1rem;
         margin-top: 1.5rem;
         cursor: pointer;
+        font-size: 1rem;
         width: 100%;
-        transition: all 0.3s ease;
     `;
     
-    gotItBtn.addEventListener('mouseover', function() {
-        this.style.transform = 'scale(1.05)';
-    });
-    
-    gotItBtn.addEventListener('mouseout', function() {
-        this.style.transform = 'scale(1)';
-    });
-    
-    // Event listeners for closing
-    closeBtn.addEventListener('click', function() {
-        manualModal.style.animation = 'fadeOut 0.3s ease';
-        setTimeout(() => {
-            if (manualModal.parentNode) {
-                manualModal.parentNode.removeChild(manualModal);
-            }
-        }, 300);
-    });
-    
-    gotItBtn.addEventListener('click', function() {
-        manualModal.style.animation = 'fadeOut 0.3s ease';
-        setTimeout(() => {
-            if (manualModal.parentNode) {
-                manualModal.parentNode.removeChild(manualModal);
-            }
-        }, 300);
-    });
-    
-    manualModal.addEventListener('click', function(e) {
-        if (e.target === manualModal) {
-            manualModal.style.animation = 'fadeOut 0.3s ease';
-            setTimeout(() => {
-                if (manualModal.parentNode) {
-                    manualModal.parentNode.removeChild(manualModal);
-                }
-            }, 300);
-        }
+    // Close modal
+    closeBtn.addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
     });
 }
 
-function setupPWAInstall() {
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        window.deferredPrompt = e;
-        console.log('PWA install prompt is available');
+// ============================================
+// DEBUG & TEST FUNCTIONS
+// ============================================
+
+// Expose for testing in console
+window.popupDebug = {
+    reset: function() {
+        localStorage.removeItem('lemonadeInstallChoice');
+        localStorage.removeItem('lemonadeRemindTime');
+        localStorage.removeItem('lemonadePopupShownTime');
+        console.log('✅ Preferences reset. Reload page to see popup.');
+        location.reload();
+    },
+    
+    show: function() {
+        showPopup();
+    },
+    
+    hide: function() {
+        hidePopup();
+    },
+    
+    status: function() {
+        return {
+            choice: localStorage.getItem('lemonadeInstallChoice'),
+            remindTime: localStorage.getItem('lemonadeRemindTime'),
+            shownTime: localStorage.getItem('lemonadePopupShownTime'),
+            isInstalled: isAppInstalled(),
+            hasPrompt: deferredPrompt !== null
+        };
+    }
+};
+
+console.log('Popup manager initialized. Use window.popupDebug for testing.');
         
-        // Update Install Now button text if PWA is available
-        const installBtn = document.getElementById('btn-install-now');
-        if (installBtn) {
-            installBtn.innerHTML = '<i class="fas fa-download"></i> Install PWA App';
-        }
-    });
-    
-    window.addEventListener('appinstalled', () => {
-        console.log('App was installed successfully!');
-        localStorage.setItem('lemonadeInstallChoice', 'installed');
-        showSuccessMessage('Lemonade app installed successfully! 🎉');
-    });
-}
-
-// DEBUGGING HELP
-console.log('Popup script loaded - Complete functionality version');
-
-// Add CSS for toast and success messages
-const popupStyles = document.createElement('style');
-popupStyles.textContent = `
-    body.popup-open {
-        overflow: hidden !important;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    
-    @keyframes slideIn {
-        from { transform: translate(-50%, -40%); opacity: 0; }
-        to { transform: translate(-50%, -50%); opacity: 1; }
-    }
-    
-    /* Success message styles */
-    .install-success-popup h3 {
-        color: var(--accent-color);
-        margin-bottom: 1rem;
-    }
-    
-    .install-success-popup p {
-        color: var(--text-color);
-        line-height: 1.5;
-    }
-    
-    /* Manual instructions styles */
-    .manual-instructions-content h3 {
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-    
-    .instructions {
-        color: var(--text-color);
-        line-height: 1.6;
-        padding: 1rem;
-        background: var(--bg-color);
-        border-radius: 10px;
-        text-align: left;
-    }
-`;
-document.head.appendChild(popupStyles); 
 
         
