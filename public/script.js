@@ -3557,7 +3557,7 @@ document.head.appendChild(style);
 
 
 
-        // Install App Logic with LocalStorage - Immediate Popup
+ // Install App Logic with LocalStorage - Immediate Popup
 class InstallAppManager {
     constructor() {
         console.log('InstallAppManager initializing...');
@@ -3575,14 +3575,7 @@ class InstallAppManager {
             return;
         }
         
-        console.log('All popup elements found:', {
-            popup: !!this.installPopup,
-            overlay: !!this.installOverlay,
-            closeBtn: !!this.closePopupBtn,
-            installBtn: !!this.installNowBtn,
-            laterBtn: !!this.installLaterBtn,
-            neverBtn: !!this.neverShowBtn
-        });
+        console.log('All popup elements found');
         
         this.deferredPrompt = null;
         this.installChoice = localStorage.getItem('installChoice');
@@ -3616,6 +3609,8 @@ class InstallAppManager {
             if (now - lastShown > oneDay) {
                 console.log('24 hours passed, showing popup again');
                 this.showImmediatePopup();
+            } else {
+                this.hidePopup();
             }
         } else {
             console.log('Not showing popup - choice:', this.installChoice);
@@ -3633,26 +3628,25 @@ class InstallAppManager {
         window.addEventListener('appinstalled', () => {
             console.log('App was installed successfully!');
             localStorage.setItem('installChoice', 'installed');
-            this.hidePopup();
+            this.hidePopupAndGoToHome();
         });
     }
     
     setupEventListeners() {
         console.log('Setting up event listeners...');
         
-        // Close popup (X button) - REMIND LATER
+        // 1. X (Close) Button - Close and go to home
         if (this.closePopupBtn) {
-            console.log('Setting up close button');
+            console.log('Setting up X (close) button');
             this.closePopupBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Close (X) button clicked');
-                this.setRemindLater();
-                this.hidePopup();
+                console.log('X (Close) button clicked');
+                this.hidePopupAndGoToHome();
             });
         }
         
-        // Install now button
+        // 2. Install now button
         if (this.installNowBtn) {
             console.log('Setting up install now button');
             this.installNowBtn.addEventListener('click', (e) => {
@@ -3663,7 +3657,7 @@ class InstallAppManager {
             });
         }
         
-        // Install later button
+        // 3. Install later button - Close and go to home
         if (this.installLaterBtn) {
             console.log('Setting up install later button');
             this.installLaterBtn.addEventListener('click', (e) => {
@@ -3671,11 +3665,11 @@ class InstallAppManager {
                 e.stopPropagation();
                 console.log('Install Later button clicked');
                 this.setRemindLater();
-                this.hidePopup();
+                this.hidePopupAndGoToHome();
             });
         }
         
-        // Never show again button
+        // 4. Never show again button - Close and go to home
         if (this.neverShowBtn) {
             console.log('Setting up never show button');
             this.neverShowBtn.addEventListener('click', (e) => {
@@ -3683,28 +3677,28 @@ class InstallAppManager {
                 e.stopPropagation();
                 console.log('Never Show button clicked');
                 this.setNeverShow();
-                this.hidePopup();
+                this.hidePopupAndGoToHome();
             });
         }
         
-        // Close popup when clicking overlay
+        // 5. Click overlay - Close and go to home
         if (this.installOverlay) {
             console.log('Setting up overlay click');
             this.installOverlay.addEventListener('click', (e) => {
                 if (e.target === this.installOverlay) {
                     console.log('Overlay clicked');
                     this.setRemindLater();
-                    this.hidePopup();
+                    this.hidePopupAndGoToHome();
                 }
             });
         }
         
-        // Escape key to close
+        // 6. Escape key - Close and go to home
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.installPopup.style.display === 'block') {
                 console.log('Escape key pressed');
                 this.setRemindLater();
-                this.hidePopup();
+                this.hidePopupAndGoToHome();
             }
         });
         
@@ -3732,7 +3726,7 @@ class InstallAppManager {
         if (this.isAppInstalled()) {
             console.log('App is already installed');
             localStorage.setItem('installChoice', 'installed');
-            this.hidePopup();
+            this.hidePopupAndGoToHome();
             return;
         }
         
@@ -3791,6 +3785,16 @@ class InstallAppManager {
         document.body.classList.remove('popup-open');
     }
     
+    hidePopupAndGoToHome() {
+        console.log('Hiding popup and going to home');
+        
+        // Hide the popup
+        this.hidePopup();
+        
+        // Navigate to home view
+        this.goToHomePage();
+    }
+    
     async installApp() {
         console.log('Starting app installation...');
         
@@ -3815,18 +3819,67 @@ class InstallAppManager {
                 }
                 
                 this.deferredPrompt = null;
+                
+                // Close and go to home after installation attempt
+                this.hidePopupAndGoToHome();
+                
             } catch (error) {
                 console.error('Install error:', error);
                 this.showManualInstallInstructions();
                 localStorage.setItem('installChoice', 'remind_later');
+                this.hidePopupAndGoToHome();
             }
         } else {
             console.log('No PWA prompt, showing manual instructions');
             this.showManualInstallInstructions();
             localStorage.setItem('installChoice', 'remind_later');
+            this.hidePopupAndGoToHome();
+        }
+    }
+    
+    goToHomePage() {
+        console.log('Navigating to home page...');
+        
+        // Method 1: If you have a single page app with views
+        try {
+            // Check if there's a home view in your app
+            const homeView = document.getElementById('home-view');
+            const bottomNavHome = document.querySelector('[data-view="home"]');
+            
+            if (homeView) {
+                // Hide all views
+                const allViews = document.querySelectorAll('.view');
+                allViews.forEach(view => {
+                    view.classList.remove('active');
+                });
+                
+                // Show home view
+                homeView.classList.add('active');
+                
+                // Update bottom navigation if exists
+                if (bottomNavHome) {
+                    const allNavItems = document.querySelectorAll('.nav-item');
+                    allNavItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    bottomNavHome.classList.add('active');
+                }
+                
+                console.log('Switched to home view');
+            } else {
+                // If not a single page app, just scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        } catch (error) {
+            console.log('Error switching to home:', error);
+            // Fallback: Just scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
-        this.hidePopup();
+        // Method 2: If you want to reload the page to go to home
+        // window.location.href = 'index.html';
+        // OR
+        // window.location.reload();
     }
     
     showToast(message, type = 'info') {
@@ -3954,3 +4007,25 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
     console.log('Global: App installed');
 });
+
+// Add CSS for smooth home navigation
+const homeNavStyle = document.createElement('style');
+homeNavStyle.textContent = `
+    .view {
+        transition: opacity 0.3s ease;
+    }
+    
+    .view.active {
+        opacity: 1;
+    }
+    
+    .view:not(.active) {
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+`;
+document.head.appendChild(homeNavStyle);       
