@@ -582,6 +582,8 @@ body {
 /* ==========================================================================
    Cart View
    ========================================================================== */
+
+/* Cart View */
 .cart-header {
     display: flex;
     justify-content: space-between;
@@ -609,7 +611,6 @@ body {
 .cart-item {
     background: var(--card-bg);
     border-radius: 10px;
-    
     padding: 1rem;
     margin-bottom: 0.75rem;
     display: flex;
@@ -668,6 +669,7 @@ body {
     width: 100%;
     cursor: pointer;
 }
+
 
 /* ==========================================================================
    Account View

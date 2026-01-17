@@ -1,7 +1,4 @@
-// ==========================================================================
 // Mobile E-Commerce App - Complete Implementation
-// ==========================================================================
-
 const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://lemonadekenya.up.railway.app';
 
 class LemonadeApp {
@@ -18,21 +15,17 @@ class LemonadeApp {
 
         // M-Pesa Configuration
         this.mpesaConfig = {
-            consumerKey: 'sJWMb8e5xwZ9APh9d8RAWt1VUjBEnmrM50bA8cBE4vwXxXwT',
-            consumerSecret: 'AecUYi2w8e1Mrjd0tHFAK7Z9WQxKkBN09pXEGs3JM83EGp7ofCJs5PlCI7Jq3KUQ',
-            shortCode: '174379',
-            passkey: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+            consumerKey: 'sJWMb8e5xwZ9APh9d8RAWt1VUjBEnmrM50bA8cBE4vwXxXwT', // Get from Daraja portal
+            consumerSecret: 'AecUYi2w8e1Mrjd0tHFAK7Z9WQxKkBN09pXEGs3JM83EGp7ofCJs5PlCI7Jq3KUQ', // Get from Daraja portal
+            shortCode: '174379', // Your Till Number for Buy Goods
+            passkey: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919', // From Daraja portal
             callbackURL: `${BASE_URL}/api/mpesa-callback`,
             transactionType: 'CustomerBuyGoodsOnline',
-            env: 'sandbox'
+            env: 'sandbox' // Change to 'production' when live
         };
 
         this.initializeApp();
     }
-
-    // ==========================================================================
-    // INITIALIZATION
-    // ==========================================================================
 
     async fetchWithFallback(url, options = {}) {
         const urls = [
@@ -53,6 +46,7 @@ class LemonadeApp {
                 }
             } catch (error) {
                 console.warn(`❌ Failed to fetch from ${fullUrl}:`, error.message);
+                // Continue to next URL
             }
         }
 
@@ -80,9 +74,9 @@ class LemonadeApp {
         }, 2000);
     }
 
-    // ==========================================================================
+    // ==============================
     // M-PESA PAYMENT INTEGRATION
-    // ==========================================================================
+    // ==============================
 
     // Get M-Pesa access token
     async getMpesaAccessToken() {
@@ -269,6 +263,8 @@ class LemonadeApp {
             // Store modal reference
             this.mpesaConfirmationModal = modal;
             this.mpesaConfirmationStyle = style;
+            
+            // Store promise resolve function
             this.mpesaConfirmationResolve = resolve;
             
             // Handle modal close via X button
@@ -287,6 +283,8 @@ class LemonadeApp {
                         this.mpesaConfirmationResolve(true);
                         this.mpesaConfirmationResolve = null;
                     }
+                    // The actual payment processing will be done by confirmMpesaPayment()
+                    // which is already bound to the button's onclick event
                 };
             }
 
@@ -313,9 +311,59 @@ class LemonadeApp {
             document.head.removeChild(this.mpesaConfirmationStyle);
             this.mpesaConfirmationStyle = null;
         }
+        // Resolve the promise with false if it's still pending
         if (this.mpesaConfirmationResolve) {
             this.mpesaConfirmationResolve(false);
             this.mpesaConfirmationResolve = null;
+        }
+    }
+
+    // Cancel M-Pesa payment
+    cancelMpesaPayment() {
+        this.hideMpesaConfirmation();
+        this.showMessage('Payment cancelled');
+    }
+
+    // Confirm M-Pesa payment and initiate STK Push
+    async confirmMpesaPayment(amount, phoneNumber) {
+        try {
+            // Format phone number
+            const formattedPhone = this.formatPhoneForMpesa(phoneNumber);
+            
+            // Generate order reference
+            const orderReference = `LEMONADE${Date.now()}${Math.floor(Math.random() * 1000)}`;
+            const transactionDesc = 'Lemonade Shopping';
+            
+            // Show processing message
+            this.showMessage('📱 Sending M-Pesa prompt to your phone...');
+            
+            // Hide confirmation modal
+            this.hideMpesaConfirmation();
+            
+            // Initiate STK Push
+            const result = await this.initiateMpesaSTKPush(formattedPhone, amount, orderReference, transactionDesc);
+            
+            if (result.ResponseCode === '0') {
+                this.showMessage(`✅ M-Pesa prompt sent! Check ${phoneNumber} and enter your PIN to complete payment.`);
+                
+                // Store transaction details
+                this.storeMpesaTransactionDetails(result.CheckoutRequestID, orderReference, amount);
+                
+                // Monitor payment status
+                this.monitorMpesaPaymentStatus(result.CheckoutRequestID);
+                
+                // Hide M-Pesa modal and clear cart if payment initiated
+                this.hideMpesaModal();
+                this.clearCart();
+                
+            } else {
+                const errorMsg = result.errorMessage || result.ResponseDescription || 'Payment initiation failed';
+                this.showMessage(`❌ ${errorMsg}`);
+            }
+            
+        } catch (error) {
+            console.error('M-Pesa payment error:', error);
+            this.showMessage('Payment service temporarily unavailable. Please try again.');
         }
     }
 
@@ -390,66 +438,37 @@ class LemonadeApp {
         // Store in localStorage
         let transactions = JSON.parse(localStorage.getItem('lemonadeMpesaTransactions') || '[]');
         transactions.push(transaction);
-        localStorage.setItem('lemonadeMpesaTransactions', JSON.stringify(transactions.slice(-20)));
+        localStorage.setItem('lemonadeMpesaTransactions', JSON.stringify(transactions.slice(-20))); // Keep last 20
     }
 
     // Monitor M-Pesa payment status
     monitorMpesaPaymentStatus(checkoutRequestID) {
         console.log(`🔍 Monitoring payment status for: ${checkoutRequestID}`);
         
+        // In a real implementation, you would:
+        // 1. Set up webhook endpoints to receive M-Pesa callbacks
+        // 2. Poll your backend for payment status
+        // 3. Update UI when payment is confirmed
+        
+        // For demo purposes, show a message and simulate checking
         setTimeout(() => {
             this.showMessage('⏳ Waiting for payment confirmation... Check your M-Pesa messages.');
         }, 5000);
     }
 
-    // Confirm M-Pesa payment and initiate STK Push
-    async confirmMpesaPayment(amount, phoneNumber) {
-        try {
-            // Format phone number
-            const formattedPhone = this.formatPhoneForMpesa(phoneNumber);
-            
-            // Generate order reference
-            const orderReference = `LEMONADE${Date.now()}${Math.floor(Math.random() * 1000)}`;
-            const transactionDesc = 'Lemonade Shopping';
-            
-            // Show processing message
-            this.showMessage('📱 Sending M-Pesa prompt to your phone...');
-            
-            // Hide confirmation modal
-            this.hideMpesaConfirmation();
-            
-            // Initiate STK Push
-            const result = await this.initiateMpesaSTKPush(formattedPhone, amount, orderReference, transactionDesc);
-            
-            if (result.ResponseCode === '0') {
-                this.showMessage(`✅ M-Pesa prompt sent! Check ${phoneNumber} and enter your PIN to complete payment.`);
-                
-                // Store transaction details
-                this.storeMpesaTransactionDetails(result.CheckoutRequestID, orderReference, amount);
-                
-                // Monitor payment status
-                this.monitorMpesaPaymentStatus(result.CheckoutRequestID);
-                
-                // Hide M-Pesa modal and clear cart if payment initiated
-                this.hideMpesaModal();
-                this.clearCart();
-                
-            } else {
-                const errorMsg = result.errorMessage || result.ResponseDescription || 'Payment initiation failed';
-                this.showMessage(`❌ ${errorMsg}`);
-            }
-            
-        } catch (error) {
-            console.error('M-Pesa payment error:', error);
-            this.showMessage('Payment service temporarily unavailable. Please try again.');
+    // Show M-Pesa loading state
+    showMpesaLoading(show) {
+        const loadingElement = document.getElementById('mpesa-loading');
+        if (loadingElement) {
+            loadingElement.style.display = show ? 'block' : 'none';
         }
     }
 
-    // ==========================================================================
-    // CHECKOUT & PAYMENT PROCESSING
-    // ==========================================================================
+    // ==============================
+    // UPDATED CHECKOUT PAYMENT PROCESS
+    // ==============================
 
-    // Main payment processing
+    // Main payment processing - Updated to use M-Pesa confirmation
     async processPayment() {
         console.log('🔍 Starting payment process...');
         
@@ -597,9 +616,12 @@ class LemonadeApp {
         }
     }
 
-    // ==========================================================================
-    // APP DOWNLOAD POPUP
-    // ==========================================================================
+    // Rest of the existing methods remain exactly the same...
+    // All your existing code below continues without changes...
+
+    // ==============================
+    // EXISTING CODE CONTINUES...
+    // ==============================
 
     setupAppDownloadPopup() {
         console.log('🔧 Setting up app download popup...');
@@ -714,6 +736,7 @@ class LemonadeApp {
     }
 
     updateDownloadButtonForChrome() {
+        // Update button for Chrome download
         const downloadBtn = document.getElementById('download-chrome');
         
         if (downloadBtn) {
@@ -932,8 +955,9 @@ class LemonadeApp {
     }
 
     triggerChromeDownload() {
+        // Create a valid ZIP file that works on all systems
         const filename = 'Lemonade-Shopping-App.zip';
-        const fileSize = 12.5 * 1024 * 1024;
+        const fileSize = 12.5 * 1024 * 1024; // 12.5 MB in bytes
         
         // Create realistic file content
         const fileContent = this.createRealisticZipContent(fileSize);
@@ -963,20 +987,25 @@ class LemonadeApp {
     }
 
     createRealisticZipContent(targetSize) {
+        // Create a simple but valid ZIP file structure
         let content = '';
         
         // Add ZIP file header
-        content += 'PK\x03\x04';
-        content += this.stringToBytes('\x14\x00');
-        content += this.stringToBytes('\x00\x00');
-        content += this.stringToBytes('\x00\x00');
-        content += this.stringToBytes('\x00\x00');
-        content += this.stringToBytes('\x00\x00');
-        content += this.stringToBytes('\x00\x00\x00\x00');
-        content += this.intToBytes(targetSize - 30, 4);
-        content += this.intToBytes(targetSize - 30, 4);
-        content += this.intToBytes(25, 2);
-        content += this.stringToBytes('\x00\x00');
+        content += 'PK\x03\x04'; // Local file header signature
+        
+        // Add file metadata
+        content += this.stringToBytes('\x14\x00'); // Version needed to extract
+        content += this.stringToBytes('\x00\x00'); // General purpose bit flag
+        content += this.stringToBytes('\x00\x00'); // Compression method (store)
+        content += this.stringToBytes('\x00\x00'); // File last modification time
+        content += this.stringToBytes('\x00\x00'); // File last modification date
+        content += this.stringToBytes('\x00\x00\x00\x00'); // CRC-32
+        content += this.intToBytes(targetSize - 30, 4); // Compressed size
+        content += this.intToBytes(targetSize - 30, 4); // Uncompressed size
+        content += this.intToBytes(25, 2); // File name length
+        content += this.stringToBytes('\x00\x00'); // Extra field length
+        
+        // Add file name
         content += 'Lemonade-Shopping-App.exe';
         
         // Add main file content
@@ -1090,6 +1119,7 @@ class LemonadeApp {
         console.log('📊 Download stats:', downloadStats);
     }
 
+    // Add smart popup trigger based on user behavior
     setupSmartPopupTrigger() {
         // Track page views
         let pageViews = parseInt(localStorage.getItem('lemonadePageViews') || '0');
@@ -1114,97 +1144,70 @@ class LemonadeApp {
         }.bind(this);
     }
 
-    // ==========================================================================
-    // EVENT LISTENERS SETUP
-    // ==========================================================================
-
-    setupEventListeners() {
-        // Bottom navigation
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.nav-item')) {
-                const navItem = e.target.closest('.nav-item');
-                const view = navItem.getAttribute('data-view');
-                this.switchView(view);
-            }
+    // Add this method to debug category issues:
+    debugProductCategories() {
+        console.log('🔍 DEBUG: Product Categories');
+        
+        // Check all products and their categories
+        this.products.forEach((product, index) => {
+            console.log(`📱 ${index + 1}. ${product.name}: Category = "${product.category}"`);
         });
-
-        // Search functionality
-        const searchInput = document.getElementById('product-search');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                this.filterProducts(e.target.value);
-            });
-        }
-
-        // Theme toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
-                this.toggleTheme();
-            });
-        }
-
-        // Checkout button
-        const checkoutBtn = document.getElementById('checkout-btn');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', () => {
-                this.initiateCheckout();
-            });
-        }
-
-        // Product detail events
-        const backButton = document.getElementById('back-to-products');
-        if (backButton) {
-            backButton.addEventListener('click', () => {
-                this.hideProductDetail();
-            });
-        }
-
-        const minusBtn = document.querySelector('.quantity-btn.minus');
-        if (minusBtn) {
-            minusBtn.addEventListener('click', () => {
-                if (this.currentDetailQuantity > 1) {
-                    this.currentDetailQuantity--;
-                    this.updateDetailQuantityDisplay();
-                }
-            });
-        }
-
-        const plusBtn = document.querySelector('.quantity-btn.plus');
-        if (plusBtn) {
-            plusBtn.addEventListener('click', () => {
-                this.currentDetailQuantity++;
-                this.updateDetailQuantityDisplay();
-            });
-        }
-
-        const addToCartDetail = document.getElementById('add-to-cart-detail');
-        if (addToCartDetail) {
-            addToCartDetail.addEventListener('click', () => {
-                this.addToCartFromDetail();
-            });
-        }
-
-        const buyNowBtn = document.getElementById('buy-now-btn');
-        if (buyNowBtn) {
-            buyNowBtn.addEventListener('click', () => {
-                this.buyNowFromDetail();
-            });
-        }
-
-        // Cart actions
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'clear-cart-top') {
-                if (this.cart.length > 0 && confirm('Are you sure you want to clear your cart?')) {
-                    this.clearCart();
-                }
-            }
+        
+        // Check what categories are available
+        const uniqueCategories = [...new Set(this.products.map(p => p.category))];
+        console.log('🏷️ Available categories in products:', uniqueCategories);
+        
+        // Check category cards in HTML
+        const categoryCards = document.querySelectorAll('.category-card');
+        console.log('🃏 Category cards in HTML:');
+        categoryCards.forEach(card => {
+            console.log(`   - ${card.textContent.trim()}: data-category = "${card.getAttribute('data-category')}"`);
         });
-
-        // Setup authentication event listeners
-        this.setupAuthEventListeners();
     }
 
+
+
+    setupBottomNavigation() {
+        console.log('🔧 Setting up bottom navigation...');
+        
+        // Home button
+        const homeBtn = document.getElementById('nav-home');
+        if (homeBtn) {
+            homeBtn.addEventListener('click', () => {
+                console.log('🏠 Home button clicked');
+                this.switchView('home-view');
+            });
+        }
+
+        // Cart button
+        const cartBtn = document.getElementById('nav-cart');
+        if (cartBtn) {
+            cartBtn.addEventListener('click', () => {
+                console.log('🛒 Cart button clicked');
+                this.switchView('cart-view');
+            });
+        }
+
+        // Account button
+        const accountBtn = document.getElementById('nav-account');
+        if (accountBtn) {
+            accountBtn.addEventListener('click', () => {
+                console.log('👤 Account button clicked');
+                this.switchView('account-view');
+            });
+        }
+
+        // Search button
+        const searchBtn = document.getElementById('nav-search');
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => {
+                console.log('🔍 Search button clicked');
+                this.switchView('search-view');
+            });
+        }
+    }
+
+    // Setup checkout listeners
     setupCheckoutListeners() {
         const confirmPaymentBtn = document.getElementById('confirm-payment');
         const cancelCheckoutBtn = document.getElementById('cancel-checkout');
@@ -1244,6 +1247,7 @@ class LemonadeApp {
         }
     }
 
+    // Setup account navigation
     setupAccountNavigation() {
         document.addEventListener('click', (e) => {
             // Handle account menu items
@@ -1269,7 +1273,8 @@ class LemonadeApp {
             }
         });
     }
-
+    
+    // Update the setupCategoryListeners method:
     setupCategoryListeners() {
         console.log('🔧 Setting up category listeners...');
         
@@ -1291,7 +1296,9 @@ class LemonadeApp {
         });
     }
 
-    setupProductDetailListeners() {
+    setupProductDetailListeners()
+    {
+        
         // Back to products button
         const backButton = document.getElementById('back-to-products');
         if (backButton) {
@@ -1333,64 +1340,92 @@ class LemonadeApp {
         });
     }
 
-    setupAuthEventListeners() {
-        // Auth tabs
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.auth-tab')) {
-                const tab = e.target.closest('.auth-tab').getAttribute('data-tab');
-                this.switchAuthTab(tab);
-            }
-        });
 
-        // Password visibility toggles
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.password-toggle')) {
-                const toggleBtn = e.target.closest('.password-toggle');
-                const targetId = toggleBtn.getAttribute('data-target');
-                const targetInput = document.getElementById(targetId);
-                const icon = toggleBtn.querySelector('i');
+    // Add these methods to your LemonadeApp class
+    showProductDetail(product) {
+        const detailView = document.getElementById('product-detail-view');
+        if (!detailView) return;
 
-                if (targetInput && icon) {
-                    if (targetInput.type === 'password') {
-                        targetInput.type = 'text';
-                        icon.className = 'fas fa-eye-slash';
-                    } else {
-                        targetInput.type = 'password';
-                        icon.className = 'fas fa-eye';
-                    }
-                }
-            }
-        });
-
-        // Auth forms
-        const loginForm = document.getElementById('login-form');
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleLogin();
-            });
+        // Populate product details
+        document.getElementById('product-detail-title').textContent = product.name;
+        document.getElementById('product-detail-price').textContent = `ksh ${product.price.toFixed(2)}`;
+        document.getElementById('product-detail-description').textContent = product.description;
+        document.getElementById('product-category').textContent = product.category;
+        document.getElementById('product-stock').textContent = product.stock > 0 ? 'In Stock' : 'Out of Stock';
+        
+        // Set main image
+        const mainImage = document.getElementById('main-product-image');
+        if (mainImage) {
+            mainImage.src = product.image;
+            mainImage.alt = product.name;
         }
 
-        const signupForm = document.getElementById('signup-form');
-        if (signupForm) {
-            signupForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleSignup();
-            });
-        }
+        // Show the detail view
+        document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+        detailView.style.display = 'block';
+        
+        // Update cart badge
+        this.updateCartBadgeDetail();
+    }
 
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                this.logout();
-            });
+    hideProductDetail() {
+        const detailView = document.getElementById('product-detail-view');
+        if (detailView) {
+            detailView.style.display = 'none';
         }
     }
 
-    // ==========================================================================
-    // PRODUCT MANAGEMENT
-    // ==========================================================================
+    updateCartBadge() {
+        console.log('🔄 Updating cart badge, count:', this.cartCount);
+        
+        // Update bottom navigation cart badge
+        const bottomCartBadge = document.getElementById('bottom-cart-count');
+        if (bottomCartBadge) {
+            bottomCartBadge.textContent = this.cartCount;
+            bottomCartBadge.style.display = this.cartCount > 0 ? 'flex' : 'none';
+        }
+        
+        // Update detail view cart badge
+        this.updateDetailCartBadge();
+        
+        console.log('✅ Cart badges updated');
+    }
 
+    addToCartFromDetail() {
+        const productTitle = document.getElementById('product-detail-title').textContent;
+        const productPrice = parseFloat(document.getElementById('product-detail-price').textContent.replace('$', ''));
+        const quantity = parseInt(document.querySelector('#product-detail-view .quantity-display').textContent);
+        
+        // Find the actual product from your products array
+        const product = this.products.find(p => p.name === productTitle);
+        
+        if (product) {
+            this.addToCart(product.id, product.name, product.price, quantity);
+            this.showMessage(`${quantity} ${product.name}(s) added to cart! 🎉`);
+            this.updateCartBadgeDetail();
+        }
+    }
+
+    handleDetailQuantityChange(e) {
+        const quantityDisplay = document.querySelector('#product-detail-view .quantity-display');
+        let quantity = parseInt(quantityDisplay.textContent);
+        
+        if (e.target.classList.contains('plus')) {
+            quantity++;
+        } else if (e.target.classList.contains('minus') && quantity > 1) {
+            quantity--;
+        }
+        
+        quantityDisplay.textContent = quantity;
+    }
+
+    buyNowFromDetail() {
+        this.addToCartFromDetail();
+        this.hideProductDetail();
+        this.initiateCheckout();
+    }
+
+    // Product Management
     loadProducts() {
         this.fetchProductsFromBackend();
     }
@@ -1422,10 +1457,12 @@ class LemonadeApp {
             console.error('❌ Error fetching products:', error);
             this.products = [];
         } finally {
+            // Always render (even with empty array)
             this.renderProducts();
         }
     }
 
+    // In the renderProducts method, ensure data-category is set correctly:
     renderProducts() {
         const productsContainer = document.querySelector('.products');
         if (!productsContainer) {
@@ -1507,6 +1544,8 @@ class LemonadeApp {
         this.setupProductInteractions();
     }
 
+    // Update setupProductInteractions method:
+    // Replace the setupProductInteractions method:
     setupProductInteractions() {
         // Quantity buttons in product cards
         document.addEventListener('click', (e) => {
@@ -1568,10 +1607,7 @@ class LemonadeApp {
         });
     }
 
-    // ==========================================================================
-    // CART MANAGEMENT
-    // ==========================================================================
-
+    // Make sure addToCart also recalculates from scratch:
     addToCart(productId, productName, price, quantity) {
         console.log('🛒 addToCart called:', { productId, productName, price, quantity });
         
@@ -1617,6 +1653,10 @@ class LemonadeApp {
         this.showMessage('Cart cleared! 🧹');
     }
 
+
+
+    // Update updateCartDisplay method:
+    // In updateCartDisplay method, ensure data-id attributes are set correctly:
     updateCartDisplay() {
         console.log('🔄 Updating cart display, items:', this.cart.length);
         
@@ -1682,6 +1722,7 @@ class LemonadeApp {
         this.setupCartItemListeners();
     }
 
+    // Update setupCartItemListeners to ensure proper event handling:
     setupCartItemListeners() {
         console.log('🔧 Setting up cart item listeners...');
         
@@ -1717,6 +1758,7 @@ class LemonadeApp {
         });
     }
 
+    // Replace the updateCartQuantity method:
     updateCartQuantity(productId, increase = true) {
         console.log('🔄 updateCartQuantity called:', { productId, increase, currentCart: this.cart });
         
@@ -1754,105 +1796,81 @@ class LemonadeApp {
         }
     }
 
-    updateCartBadge() {
-        console.log('🔄 Updating cart badge, count:', this.cartCount);
+    debugCartMath() {
+        console.log('🧮 DEBUG CART MATH:');
+        console.log('Cart items:', this.cart);
         
-        // Update bottom navigation cart badge
-        const bottomCartBadge = document.getElementById('bottom-cart-count');
-        if (bottomCartBadge) {
-            bottomCartBadge.textContent = this.cartCount;
-            bottomCartBadge.style.display = this.cartCount > 0 ? 'flex' : 'none';
-        }
+        const calculatedCount = this.cart.reduce((total, item) => total + item.quantity, 0);
+        console.log(`Calculated count: ${calculatedCount}`);
+        console.log(`Stored cartCount: ${this.cartCount}`);
+        console.log(`Match: ${calculatedCount === this.cartCount ? '✅' : '❌'}`);
         
-        // Update detail view cart badge
-        this.updateDetailCartBadge();
-        
-        console.log('✅ Cart badges updated');
-    }
-
-    // ==========================================================================
-    // PRODUCT DETAIL MANAGEMENT
-    // ==========================================================================
-
-    showProductDetail(product) {
-        const detailView = document.getElementById('product-detail-view');
-        if (!detailView) return;
-
-        // Populate product details
-        document.getElementById('product-detail-title').textContent = product.name;
-        document.getElementById('product-detail-price').textContent = `ksh ${product.price.toFixed(2)}`;
-        document.getElementById('product-detail-description').textContent = product.description;
-        document.getElementById('product-category').textContent = product.category;
-        document.getElementById('product-stock').textContent = product.stock > 0 ? 'In Stock' : 'Out of Stock';
-        
-        // Set main image
-        const mainImage = document.getElementById('main-product-image');
-        if (mainImage) {
-            mainImage.src = product.image;
-            mainImage.alt = product.name;
-        }
-
-        // Show the detail view
-        document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-        detailView.style.display = 'block';
-        
-        // Update cart badge
-        this.updateCartBadgeDetail();
-    }
-
-    hideProductDetail() {
-        const detailView = document.getElementById('product-detail-view');
-        if (detailView) {
-            detailView.style.display = 'none';
+        if (calculatedCount !== this.cartCount) {
+            console.error('🚨 COUNT MISMATCH! Resetting...');
+            this.cartCount = calculatedCount;
+            this.updateCartBadge();
         }
     }
 
-    addToCartFromDetail() {
-        const productTitle = document.getElementById('product-detail-title').textContent;
-        const productPrice = parseFloat(document.getElementById('product-detail-price').textContent.replace('$', ''));
-        const quantity = parseInt(document.querySelector('#product-detail-view .quantity-display').textContent);
+    removeFromCart(productId) {
+        this.cart = this.cart.filter(item => item.id !== productId);
         
-        // Find the actual product from your products array
-        const product = this.products.find(p => p.name === productTitle);
+        // Update cart count and save
+        this.cartCount = this.cart.reduce((total, item) => total + item.quantity, 0);
+        this.saveCartToStorage();
+        this.updateCartBadge();
+        this.updateCartDisplay();
         
-        if (product) {
-            this.addToCart(product.id, product.name, product.price, quantity);
-            this.showMessage(`${quantity} ${product.name}(s) added to cart! 🎉`);
-            this.updateCartBadgeDetail();
-        }
+        this.showMessage('🗑️ Item removed from cart');
+        console.log('❌ Item removed from cart:', productId);
     }
 
-    handleDetailQuantityChange(e) {
-        const quantityDisplay = document.querySelector('#product-detail-view .quantity-display');
-        let quantity = parseInt(quantityDisplay.textContent);
+    updateCartView() {
+        const cartItems = document.getElementById('cart-items');
+        if (!cartItems) return;
+
+        const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         
-        if (e.target.classList.contains('plus')) {
-            quantity++;
-        } else if (e.target.classList.contains('minus') && quantity > 1) {
-            quantity--;
-        }
+        const cartTotalElement = document.getElementById('cart-total-amount');
+        if (cartTotalElement) cartTotalElement.textContent = `ksh ${total.toFixed(2)}`;
         
-        quantityDisplay.textContent = quantity;
+        cartItems.innerHTML = this.cart.map(item => `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <h4>${item.product}</h4>
+                    <p>ksh ${item.price.toFixed(2)} × ${item.quantity}</p>
+                </div>
+                <div class="cart-item-actions">
+                    <span>ksh ${(item.price * item.quantity).toFixed(2)}</span>
+                    <button class="remove-item" data-id="${item.id}" type="button">Remove</button>
+                </div>
+            </div>
+        `).join('') || '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Your cart is empty</p>';
+
+        document.querySelectorAll('.remove-item').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const itemId = parseInt(e.target.getAttribute('data-id'));
+                this.removeFromCart(itemId);
+                this.updateCartView();
+            });
+        });
     }
 
-    buyNowFromDetail() {
-        this.addToCartFromDetail();
-        this.hideProductDetail();
-        this.initiateCheckout();
+    // Add this method to debug cart issues:
+    debugCart() {
+        console.log('🔍 DEBUG CART:');
+        console.log('Cart items:', this.cart);
+        console.log('Cart count:', this.cartCount);
+        console.log('Products in system:', this.products.length);
+        
+        // Check if all cart items exist in products
+        this.cart.forEach(cartItem => {
+            const productExists = this.products.some(p => p.id === cartItem.id);
+            console.log(`Cart item ${cartItem.id} (${cartItem.product}): ${productExists ? '✅ Exists' : '❌ Missing'}`);
+        });
     }
 
-    updateCartBadgeDetail() {
-        const cartBadge = document.getElementById('cart-badge-detail');
-        if (cartBadge) {
-            cartBadge.textContent = this.cartCount;
-            cartBadge.style.display = this.cartCount > 0 ? 'flex' : 'none';
-        }
-    }
-
-    // ==========================================================================
-    // CHECKOUT FUNCTIONS
-    // ==========================================================================
-
+    // Checkout Functions
     initiateCheckout() {
         if (this.cart.length === 0) {
             this.showMessage('Your cart is empty! 🛒');
@@ -1953,6 +1971,25 @@ class LemonadeApp {
         if (addressInputSection) addressInputSection.style.display = 'block';
     }
 
+    validatePhone(phone) {
+        const phoneRegex = /^07[0-9]{8}$/;
+        return phoneRegex.test(phone.replace(/\s/g, ''));
+    }
+
+    showMpesaConfirmation(order, deliveryAddress) {
+        const orderSummary = this.cart.map(item => 
+            `${item.product} x${item.quantity}`
+        ).join(', ');
+        
+        this.showMessage(`✅ M-Pesa Order Confirmed! Order #${order.orderNumber}. Check your phone for payment prompt.`);
+        
+        // Add to notifications
+        this.addOrderNotification(order, deliveryAddress, 'mpesa');
+        
+        // Update user's last order
+        this.updateUserOrderStats(order);
+    }
+
     showCashConfirmation(order, deliveryAddress) {
         const orderSummary = this.cart.map(item => 
             `${item.product} x${item.quantity}`
@@ -2009,56 +2046,49 @@ class LemonadeApp {
         this.updateUserUI();
     }
 
-    // ==========================================================================
-    // ACCOUNT MANAGEMENT
-    // ==========================================================================
-
-    showSection(sectionName) {
-        // Hide all sections first
-        document.querySelectorAll('.account-section').forEach(section => {
-            section.style.display = 'none';
-        });
+    
+    // Replace the addOrderNotification method:
+    addOrderNotification(order, deliveryAddress, paymentMethod) {
+        if (!this.currentUser) return;
         
-        const userMenu = document.getElementById('user-menu');
-        const authSection = document.getElementById('auth-section');
+        const paymentIcons = {
+            'mpesa': 'fas fa-mobile-alt',
+            'cash': 'fas fa-money-bill-wave',
+            'card': 'fas fa-credit-card'
+        };
         
-        if (userMenu) userMenu.style.display = 'none';
-        if (authSection) authSection.style.display = 'none';
-
-        if (sectionName === 'main') {
-            if (this.currentUser) {
-                if (userMenu) userMenu.style.display = 'block';
-            } else {
-                if (authSection) authSection.style.display = 'block';
-            }
-        } else {
-            const section = document.getElementById(`${sectionName}-section`);
-            if (section) {
-                section.style.display = 'block';
-                
-                // Load section-specific data
-                switch(sectionName) {
-                    case 'profile':
-                        this.loadProfileData();
-                        break;
-                    case 'address':
-                        this.loadAddressData();
-                        break;
-                    case 'order-history':
-                        this.loadOrderHistory();
-                        break;
-                    case 'notifications':
-                        this.loadNotifications();
-                        break;
-                }
-            }
-        }
+        // Get product images from the order
+        const orderItems = order.items || this.cart;
+        const productImages = orderItems.map(item => {
+            const product = this.products.find(p => p.id === item.id);
+            return product ? product.image : 'https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱';
+        }).slice(0, 3); // Show max 3 product images
+        
+        const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+        const itemNames = orderItems.map(item => item.product).join(', ');
+        
+        const notification = {
+            id: `notif_${Date.now()}`,
+            type: 'order',
+            title: `Order #${order.orderNumber || order.id} Confirmed`,
+            message: `Your ${paymentMethod.toUpperCase()} order with ${totalItems} item${totalItems !== 1 ? 's' : ''} is being prepared`,
+            deliveryInfo: `Delivery to: ${deliveryAddress}`,
+            paymentMethod: paymentMethod,
+            paymentIcon: paymentIcons[paymentMethod] || 'fas fa-shopping-bag',
+            productImages: productImages,
+            itemNames: itemNames,
+            totalItems: totalItems,
+            timestamp: new Date().toISOString(),
+            orderId: order.id
+        };
+        
+        // Save to user-specific notifications
+        let userNotifications = JSON.parse(localStorage.getItem(`lemonadeNotifications_${this.currentUser.id}`) || '[]');
+        userNotifications.unshift(notification);
+        localStorage.setItem(`lemonadeNotifications_${this.currentUser.id}`, JSON.stringify(userNotifications.slice(0, 20)));
     }
 
-    showNotifications() {
-        this.showSection('notifications');
-    }
-
+    // Update the loadNotifications method:
     loadNotifications() {
         const notificationsList = document.getElementById('notifications-list');
         if (!notificationsList || !this.currentUser) return;
@@ -2124,6 +2154,81 @@ class LemonadeApp {
         }
     }
 
+    // Modal functions
+    showMpesaModal() {
+        const modal = document.getElementById('mpesa-modal');
+        if (modal) modal.style.display = 'block';
+    }
+
+    hideMpesaModal() {
+        const modal = document.getElementById('mpesa-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    updateConfirmButton(paymentMethod) {
+        const confirmBtn = document.getElementById('confirm-payment');
+        if (!confirmBtn) return;
+        
+        switch(paymentMethod) {
+            case 'mpesa':
+                confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Pay with M-Pesa';
+                break;
+            case 'cash':
+                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Confirm Cash Order';
+                break;
+            default:
+                confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Order';
+        }
+    }
+
+    // Account Management Methods
+    showSection(sectionName) {
+        // Hide all sections first
+        document.querySelectorAll('.account-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        const userMenu = document.getElementById('user-menu');
+        const authSection = document.getElementById('auth-section');
+        
+        if (userMenu) userMenu.style.display = 'none';
+        if (authSection) authSection.style.display = 'none';
+
+        if (sectionName === 'main') {
+            if (this.currentUser) {
+                if (userMenu) userMenu.style.display = 'block';
+            } else {
+                if (authSection) authSection.style.display = 'block';
+            }
+        } else {
+            const section = document.getElementById(`${sectionName}-section`);
+            if (section) {
+                section.style.display = 'block';
+                
+                // Load section-specific data
+                switch(sectionName) {
+                    case 'profile':
+                        this.loadProfileData();
+                        break;
+                    case 'address':
+                        this.loadAddressData();
+                        break;
+                    case 'order-history':
+                        this.loadOrderHistory();
+                        break;
+                    case 'notifications':
+                        this.loadNotifications();
+                        break;
+                }
+            }
+        }
+    }
+
+    showNotifications() {
+        this.showSection('notifications');
+    }
+
+    // Replace the loadOrderHistory method:
     async loadOrderHistory() {
         if (!this.currentUser) return;
 
@@ -2215,7 +2320,9 @@ class LemonadeApp {
             }
         }
     }
-
+   
+   
+    // Update formatOrderStatus method:
     formatOrderStatus(status) {
         const statusMap = {
             'pending': 'Pending',
@@ -2372,50 +2479,440 @@ class LemonadeApp {
         }
     }
 
-    addOrderNotification(order, deliveryAddress, paymentMethod) {
-        if (!this.currentUser) return;
-        
-        const paymentIcons = {
-            'mpesa': 'fas fa-mobile-alt',
-            'cash': 'fas fa-money-bill-wave',
-            'card': 'fas fa-credit-card'
-        };
-        
-        // Get product images from the order
-        const orderItems = order.items || this.cart;
-        const productImages = orderItems.map(item => {
-            const product = this.products.find(p => p.id === item.id);
-            return product ? product.image : 'https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱';
-        }).slice(0, 3);
-        
-        const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
-        const itemNames = orderItems.map(item => item.product).join(', ');
-        
-        const notification = {
-            id: `notif_${Date.now()}`,
-            type: 'order',
-            title: `Order #${order.orderNumber || order.id} Confirmed`,
-            message: `Your ${paymentMethod.toUpperCase()} order with ${totalItems} item${totalItems !== 1 ? 's' : ''} is being prepared`,
-            deliveryInfo: `Delivery to: ${deliveryAddress}`,
-            paymentMethod: paymentMethod,
-            paymentIcon: paymentIcons[paymentMethod] || 'fas fa-shopping-bag',
-            productImages: productImages,
-            itemNames: itemNames,
-            totalItems: totalItems,
-            timestamp: new Date().toISOString(),
-            orderId: order.id
-        };
-        
-        // Save to user-specific notifications
-        let userNotifications = JSON.parse(localStorage.getItem(`lemonadeNotifications_${this.currentUser.id}`) || '[]');
-        userNotifications.unshift(notification);
-        localStorage.setItem(`lemonadeNotifications_${this.currentUser.id}`, JSON.stringify(userNotifications.slice(0, 20)));
+    // Storage Management
+    saveCartToStorage() {
+        localStorage.setItem('lemonadeCart', JSON.stringify(this.cart));
     }
 
-    // ==========================================================================
-    // AUTHENTICATION
-    // ==========================================================================
+    loadCartFromStorage() {
+        const savedCart = localStorage.getItem('lemonadeCart');
+        if (savedCart) {
+            this.cart = JSON.parse(savedCart);
+            this.cartCount = this.cart.reduce((total, item) => total + item.quantity, 0);
+        }
+    }
 
+    loadUserPreferences() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            this.currentTheme = savedTheme;
+            document.documentElement.setAttribute('data-theme', this.currentTheme);
+        }
+
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            this.currentUser = JSON.parse(savedUser);
+        }
+    }
+
+    // Product Detail Methods
+    setupProductDetailListeners() {
+        // Add click handlers to product cards
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.product-card')) {
+                const productCard = e.target.closest('.product-card');
+                const productId = parseInt(productCard.querySelector('.add-to-cart')?.getAttribute('data-id'));
+                
+                if (productId) {
+                    const product = this.products.find(p => p.id === productId);
+                    if (product) {
+                        this.showProductDetail(product);
+                    }
+                }
+            }
+        });
+
+        // Cart button in product detail
+        const cartButtonDetail = document.getElementById('cart-button-detail');
+        if (cartButtonDetail) {
+            cartButtonDetail.addEventListener('click', () => {
+                this.goToCartFromDetail();
+            });
+        }
+    }
+
+    showProductDetail(product) {
+        // Hide all main views but KEEP bottom navigation visible
+        document.querySelectorAll('.view').forEach(view => {
+            view.style.display = 'none';
+        });
+        document.querySelector('.main-header').style.display = 'none';
+        // DON'T hide the bottom navigation - this is the fix!
+        
+        // Show product detail view
+        document.getElementById('product-detail-view').style.display = 'block';
+        
+        // Update cart badge
+        this.updateDetailCartBadge();
+        
+        // Update product details
+        document.getElementById('product-detail-title').textContent = product.name;
+        document.getElementById('product-detail-price').textContent = `ksh ${product.price.toFixed(2)}`;
+        document.getElementById('product-detail-description').textContent = product.description || 'No description available';
+        document.getElementById('product-category').textContent = this.formatCategory(product.category);
+        document.getElementById('product-stock').textContent = product.stock > 0 ? `${product.stock} in stock` : 'Out of stock';
+        
+        // Load product images
+        this.loadProductImages(product);
+        
+        // Load reviews
+        this.loadProductReviews(product);
+        
+        // Set current product
+        this.currentProductDetail = product;
+        this.currentDetailQuantity = 1;
+        this.updateDetailQuantityDisplay();
+    }
+
+    hideProductDetail() {
+        document.getElementById('product-detail-view').style.display = 'none';
+        document.querySelector('.main-header').style.display = 'block';
+        document.getElementById('home-view').style.display = 'block';
+        
+        // Make sure bottom nav is visible
+        document.querySelector('.bottom-nav').style.display = 'flex';
+    }
+
+    loadProductImages(product) {
+        const mainImage = document.getElementById('main-product-image');
+        const thumbnailContainer = document.getElementById('thumbnail-container');
+        
+        if (!mainImage || !thumbnailContainer) return;
+        
+        // For demonstration, create multiple image variations
+        const baseImage = product.image || 'https://via.placeholder.com/300x200/fff9c4/ff6f00?text=🍋';
+        const imageUrls = [
+            baseImage,
+            baseImage.replace('300x200', '300x201'),
+            baseImage.replace('300x200', '300x202'),
+            baseImage.replace('300x200', '301x200')
+        ];
+        
+        // Set main image
+        mainImage.src = imageUrls[0];
+        
+        // Create thumbnails
+        thumbnailContainer.innerHTML = '';
+        imageUrls.forEach((url, index) => {
+            const thumbnail = document.createElement('img');
+            thumbnail.src = url;
+            thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
+            thumbnail.alt = `${product.name} - Image ${index + 1}`;
+            
+            thumbnail.addEventListener('click', () => {
+                this.setMainProductImage(url, index);
+            });
+            
+            thumbnailContainer.appendChild(thumbnail);
+        });
+    }
+
+    setMainProductImage(url, index) {
+        document.getElementById('main-product-image').src = url;
+        document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+            thumb.classList.toggle('active', i === index);
+        });
+    }
+
+    loadProductReviews(product) {
+        // Sample reviews - in real app, fetch from backend
+        const reviews = [
+            {
+                id: 1,
+                customerName: 'John D.',
+                rating: 5,
+                comment: 'Excellent product! Fast delivery and great quality.',
+                date: '2023-10-15'
+            },
+            {
+                id: 2,
+                customerName: 'Sarah M.',
+                rating: 4,
+                comment: 'Good value for money. Would recommend to others.',
+                date: '2023-10-10'
+            }
+        ];
+        
+        const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+        document.getElementById('average-rating').textContent = averageRating.toFixed(1);
+        
+        const ratingStars = document.getElementById('rating-stars');
+        if (ratingStars) {
+            ratingStars.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                star.className = `fas fa-star ${i <= Math.round(averageRating) ? 'star' : ''}`;
+                ratingStars.appendChild(star);
+            }
+        }
+        
+        document.getElementById('review-count').textContent = `Based on ${reviews.length} reviews`;
+        
+        const reviewList = document.getElementById('review-list');
+        if (reviewList) {
+            if (reviews.length > 0) {
+                reviewList.innerHTML = reviews.map(review => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">${review.customerName}</span>
+                            <span class="review-date">${new Date(review.date).toLocaleDateString()}</span>
+                        </div>
+                        <div class="review-rating">
+                            ${this.generateStarRating(review.rating)}
+                        </div>
+                        <p class="review-text">${review.comment}</p>
+                    </div>
+                `).join('');
+            } else {
+                reviewList.innerHTML = `
+                    <div class="no-reviews">
+                        <i class="fas fa-comment-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>No reviews yet</p>
+                        <small>Be the first to review this product!</small>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    generateStarRating(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            stars += i <= rating ? '<i class="fas fa-star star"></i>' : '<i class="far fa-star"></i>';
+        }
+        return stars;
+    }
+
+    updateDetailQuantityDisplay() {
+        const quantityDisplay = document.querySelector('.quantity-display');
+        if (quantityDisplay) {
+            quantityDisplay.textContent = this.currentDetailQuantity;
+        }
+    }
+
+    addToCartFromDetail() {
+        if (!this.currentProductDetail) return;
+        
+        this.addToCart(
+            this.currentProductDetail.id,
+            this.currentProductDetail.name,
+            this.currentProductDetail.price,
+            this.currentDetailQuantity
+        );
+        
+        this.showMessage(`${this.currentDetailQuantity} ${this.currentProductDetail.name}(s) added to cart! 🎉`);
+    }
+
+    buyNowFromDetail() {
+        if (!this.currentProductDetail) return;
+        
+        // Add to cart
+        this.addToCart(
+            this.currentProductDetail.id,
+            this.currentProductDetail.name,
+            this.currentProductDetail.price,
+            this.currentDetailQuantity
+        );
+        
+        // Hide product detail and show checkout directly
+        this.hideProductDetail();
+        this.initiateCheckout();
+    }
+
+    goToCartFromDetail() {
+        this.hideProductDetail();
+        this.switchView('cart-view');
+    }
+
+    updateDetailCartBadge() {
+        const cartBadge = document.getElementById('cart-badge-detail');
+        if (cartBadge) {
+            cartBadge.textContent = this.cartCount;
+            cartBadge.style.display = this.cartCount > 0 ? 'flex' : 'none';
+        }
+    }
+
+    formatCategory(category) {
+        const categories = {
+            'Hoodies': 'Hoodies',
+            'T- Shirts': 'T- Shirts',
+            'oppo': 'Oppo',
+            'Apple': 'Apple',
+            'Tecno': 'Tecno',
+            'nokia': 'Nokia',
+            'Xiomi': 'Xiaomi',
+            'infinix': 'Infinix',
+            'samsung': 'Samsung',
+            'Retaills': 'Retaills',
+            'Wholesales': 'Wholesales',
+            'Lemonade flash salles': 'Lemonade flash salles',
+            'Machinary': 'Machinary',
+            'Shoes': 'Shoes',
+            'Electoronics': 'Electoronics',
+            'Home-Tools': 'Home-Tools'
+
+        };
+        return categories[category] || category;
+    }
+
+    checkProductCategories() {
+        console.log('🔍 CHECKING PRODUCT CATEGORIES:');
+        this.products.forEach((product, index) => {
+            console.log(`Product ${index + 1}: "${product.name}" → Category: "${product.category}"`);
+        });
+        
+        // Also check what categories are in your HTML
+        console.log('🔍 CHECKING CATEGORY CARDS IN HTML:');
+        const categoryCards = document.querySelectorAll('.category-card');
+        categoryCards.forEach(card => {
+            console.log(`Category Card: ${card.textContent.trim()} → data-category: "${card.getAttribute('data-category')}"`);
+        });
+    }
+
+    // Navigation
+    setupEventListeners() {
+    // Bottom navigation
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.nav-item')) {
+            const navItem = e.target.closest('.nav-item');
+            const view = navItem.getAttribute('data-view');
+            this.switchView(view);
+        }
+    });
+
+     
+        // Search functionality
+        const searchInput = document.getElementById('product-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.filterProducts(e.target.value);
+            });
+        }
+
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                this.toggleTheme();
+            });
+        }
+
+        // Checkout button
+        const checkoutBtn = document.getElementById('checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', () => {
+                this.initiateCheckout();
+            });
+        }
+
+        // Product detail events
+        const backButton = document.getElementById('back-to-products');
+        if (backButton) {
+            backButton.addEventListener('click', () => {
+                this.hideProductDetail();
+            });
+        }
+
+        const minusBtn = document.querySelector('.quantity-btn.minus');
+        if (minusBtn) {
+            minusBtn.addEventListener('click', () => {
+                if (this.currentDetailQuantity > 1) {
+                    this.currentDetailQuantity--;
+                    this.updateDetailQuantityDisplay();
+                }
+            });
+        }
+
+        const plusBtn = document.querySelector('.quantity-btn.plus');
+        if (plusBtn) {
+            plusBtn.addEventListener('click', () => {
+                this.currentDetailQuantity++;
+                this.updateDetailQuantityDisplay();
+            });
+        }
+
+        const addToCartDetail = document.getElementById('add-to-cart-detail');
+        if (addToCartDetail) {
+            addToCartDetail.addEventListener('click', () => {
+                this.addToCartFromDetail();
+            });
+        }
+
+        const buyNowBtn = document.getElementById('buy-now-btn');
+        if (buyNowBtn) {
+            buyNowBtn.addEventListener('click', () => {
+                this.buyNowFromDetail();
+            });
+        }
+
+        // Cart actions
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'clear-cart-top') {
+                if (this.cart.length > 0 && confirm('Are you sure you want to clear your cart?')) {
+                    this.clearCart();
+                }
+            }
+        });
+
+        // Setup authentication event listeners
+        this.setupAuthEventListeners();
+    }
+
+    setupAuthEventListeners() {
+        // Auth tabs
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.auth-tab')) {
+                const tab = e.target.closest('.auth-tab').getAttribute('data-tab');
+                this.switchAuthTab(tab);
+            }
+        });
+
+        // Password visibility toggles
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.password-toggle')) {
+                const toggleBtn = e.target.closest('.password-toggle');
+                const targetId = toggleBtn.getAttribute('data-target');
+                const targetInput = document.getElementById(targetId);
+                const icon = toggleBtn.querySelector('i');
+
+                if (targetInput && icon) {
+                    if (targetInput.type === 'password') {
+                        targetInput.type = 'text';
+                        icon.className = 'fas fa-eye-slash';
+                    } else {
+                        targetInput.type = 'password';
+                        icon.className = 'fas fa-eye';
+                    }
+                }
+            }
+        });
+
+        // Auth forms
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleLogin();
+            });
+        }
+
+        const signupForm = document.getElementById('signup-form');
+        if (signupForm) {
+            signupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleSignup();
+            });
+        }
+
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                this.logout();
+            });
+        }
+    }
+
+    // Simplified Authentication
     switchAuthTab(tab) {
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
@@ -2424,6 +2921,7 @@ class LemonadeApp {
         document.getElementById(`${tab}-form`).classList.add('active');
     }
 
+    // Updated authentication functions
     async handleLogin() {
         const loginInput = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value.trim();
@@ -2565,10 +3063,9 @@ class LemonadeApp {
         }
     }
 
-    // ==========================================================================
-    // NAVIGATION & VIEW MANAGEMENT
-    // ==========================================================================
+    // Other methods remain the same...
 
+    // Update switchView method:
     switchView(viewId) {
         console.log('🔄 Switching to view:', viewId);
         
@@ -2607,6 +3104,7 @@ class LemonadeApp {
                     this.renderProducts();
                     break;
                 case 'categories-view':
+                    // Ensure categories view is properly set up
                     break;
             }
         } else {
@@ -2630,10 +3128,8 @@ class LemonadeApp {
         }
     }
 
-    // ==========================================================================
-    // PRODUCT FILTERING & CATEGORIES
-    // ==========================================================================
-
+    // Replace the filterByCategory method:
+    // Update the filterByCategory method:
     filterByCategory(category) {
         console.log('🎯 FILTER BY CATEGORY CALLED:', category);
         
@@ -2646,6 +3142,7 @@ class LemonadeApp {
             'samsung': 'Samsung Phones',
             'nokia': 'Nokia Phones',
             'Xiomi': 'Xiaomi Phones',
+            
             'Machinary': 'Machinary',
             'Shoes': 'Shoes',
             'Electoronics': 'Electoronics',
@@ -2675,6 +3172,7 @@ class LemonadeApp {
         }, 100);
     }
 
+    // Replace the current filterProducts method with this:
     filterProducts(searchTerm = '', category = 'all') {
         console.log('🔍 FILTER PRODUCTS CALLED - Category:', category, 'Search:', searchTerm);
         
@@ -2729,6 +3227,7 @@ class LemonadeApp {
         this.setupProductInteractions();
     }
 
+    // Update the showNoProductsMessage method:
     showNoProductsMessage(category, searchTerm) {
         const productsContainer = document.querySelector('.products');
         if (!productsContainer) return;
@@ -2785,61 +3284,8 @@ class LemonadeApp {
         }
     }
 
-    formatCategory(category) {
-        const categories = {
-            'Hoodies': 'Hoodies',
-            'T- Shirts': 'T- Shirts',
-            'oppo': 'Oppo',
-            'Apple': 'Apple',
-            'Tecno': 'Tecno',
-            'nokia': 'Nokia',
-            'Xiomi': 'Xiaomi',
-            'infinix': 'Infinix',
-            'samsung': 'Samsung',
-            'Retaills': 'Retaills',
-            'Wholesales': 'Wholesales',
-            'Lemonade flash salles': 'Lemonade flash salles',
-            'Machinary': 'Machinary',
-            'Shoes': 'Shoes',
-            'Electoronics': 'Electoronics',
-            'Home-Tools': 'Home-Tools'
-        };
-        return categories[category] || category;
-    }
 
-    // ==========================================================================
-    // STORAGE MANAGEMENT
-    // ==========================================================================
-
-    saveCartToStorage() {
-        localStorage.setItem('lemonadeCart', JSON.stringify(this.cart));
-    }
-
-    loadCartFromStorage() {
-        const savedCart = localStorage.getItem('lemonadeCart');
-        if (savedCart) {
-            this.cart = JSON.parse(savedCart);
-            this.cartCount = this.cart.reduce((total, item) => total + item.quantity, 0);
-        }
-    }
-
-    loadUserPreferences() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            this.currentTheme = savedTheme;
-            document.documentElement.setAttribute('data-theme', this.currentTheme);
-        }
-
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            this.currentUser = JSON.parse(savedUser);
-        }
-    }
-
-    // ==========================================================================
-    // UTILITY FUNCTIONS
-    // ==========================================================================
-
+    // Theme Management
     toggleTheme() {
         this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', this.currentTheme);
@@ -2851,6 +3297,8 @@ class LemonadeApp {
         }
     }
 
+    
+    // Utility Functions
     showMessage(message) {
         const existingMessage = document.querySelector('.message-toast');
         if (existingMessage) existingMessage.remove();
@@ -2880,91 +3328,9 @@ class LemonadeApp {
         this.updateCartDisplay();
         this.updateUserUI();
     }
-
-    updateConfirmButton(paymentMethod) {
-        const confirmBtn = document.getElementById('confirm-payment');
-        if (!confirmBtn) return;
-        
-        switch(paymentMethod) {
-            case 'mpesa':
-                confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Pay with M-Pesa';
-                break;
-            case 'cash':
-                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Confirm Cash Order';
-                break;
-            default:
-                confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Order';
-        }
-    }
-
-    showMpesaModal() {
-        const modal = document.getElementById('mpesa-modal');
-        if (modal) modal.style.display = 'block';
-    }
-
-    hideMpesaModal() {
-        const modal = document.getElementById('mpesa-modal');
-        if (modal) modal.style.display = 'none';
-    }
-
-    // ==========================================================================
-    // DEBUG FUNCTIONS
-    // ==========================================================================
-
-    debugProductCategories() {
-        console.log('🔍 DEBUG: Product Categories');
-        
-        // Check all products and their categories
-        this.products.forEach((product, index) => {
-            console.log(`📱 ${index + 1}. ${product.name}: Category = "${product.category}"`);
-        });
-        
-        // Check what categories are available
-        const uniqueCategories = [...new Set(this.products.map(p => p.category))];
-        console.log('🏷️ Available categories in products:', uniqueCategories);
-        
-        // Check category cards in HTML
-        const categoryCards = document.querySelectorAll('.category-card');
-        console.log('🃏 Category cards in HTML:');
-        categoryCards.forEach(card => {
-            console.log(`   - ${card.textContent.trim()}: data-category = "${card.getAttribute('data-category')}"`);
-        });
-    }
-
-    debugCart() {
-        console.log('🔍 DEBUG CART:');
-        console.log('Cart items:', this.cart);
-        console.log('Cart count:', this.cartCount);
-        console.log('Products in system:', this.products.length);
-        
-        // Check if all cart items exist in products
-        this.cart.forEach(cartItem => {
-            const productExists = this.products.some(p => p.id === cartItem.id);
-            console.log(`Cart item ${cartItem.id} (${cartItem.product}): ${productExists ? '✅ Exists' : '❌ Missing'}`);
-        });
-    }
-
-    debugCartMath() {
-        console.log('🧮 DEBUG CART MATH:');
-        console.log('Cart items:', this.cart);
-        
-        const calculatedCount = this.cart.reduce((total, item) => total + item.quantity, 0);
-        console.log(`Calculated count: ${calculatedCount}`);
-        console.log(`Stored cartCount: ${this.cartCount}`);
-        console.log(`Match: ${calculatedCount === this.cartCount ? '✅' : '❌'}`);
-        
-        if (calculatedCount !== this.cartCount) {
-            console.error('🚨 COUNT MISMATCH! Resetting...');
-            this.cartCount = calculatedCount;
-            this.updateCartBadge();
-        }
-    }
 }
 
-// ==========================================================================
-// GLOBAL INITIALIZATION
-// ==========================================================================
-
+// Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
     window.lemonadeApp = new LemonadeApp();
 });
@@ -2990,7 +3356,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     // Show your custom install button
     const installBtn = document.getElementById('install-btn');
     if (installBtn) {
-        installBtn.style.display = 'block';
+        installBtn.style.display = 'block'; // Show the button
         console.log('🍋 PWA: Install button shown');
 
         installBtn.addEventListener('click', async () => {
@@ -3006,6 +3372,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
                 installBtn.style.display = 'none';
             } else {
                 console.log('🍋 PWA: User dismissed the install prompt');
+                // Keep button visible for future attempts
             }
 
             // Reset the deferred prompt
@@ -3014,8 +3381,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
+// Fallback: Show install button if PWA criteria are met but beforeinstallprompt didn't fire
 window.addEventListener('load', () => {
     setTimeout(() => {
+        // Check if we're in a PWA-capable environment
         const isPWAReady = (
             'serviceWorker' in navigator &&
             window.matchMedia('(display-mode: standalone)').matches === false &&
@@ -3031,17 +3400,20 @@ window.addEventListener('load', () => {
                 installBtn.textContent = '📱 Install Lemonade App';
 
                 installBtn.addEventListener('click', () => {
+                    // Since we don't have the deferred prompt, try to trigger installation manually
                     if (deferredPrompt) {
                         deferredPrompt.prompt();
                     } else {
+                        // Fallback: Show instructions
                         alert('To install this app:\n1. Click the menu (⋮) in your browser\n2. Select "Add to Home screen"\n3. Follow the prompts');
                     }
                 });
             }
         }
-    }, 3000);
+    }, 3000); // Wait 3 seconds for beforeinstallprompt to potentially fire
 });
 
+// Check if app is already installed
 window.addEventListener('appinstalled', (e) => {
     console.log('🍋 PWA: App was installed successfully!');
     const installBtn = document.getElementById('install-btn');
@@ -3050,80 +3422,44 @@ window.addEventListener('appinstalled', (e) => {
     }
 });
 
-// ==========================================================================
-// MENU & HEADER FUNCTIONALITY
-// ==========================================================================
+// Debug PWA readiness
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        console.log('🍋 PWA Debug Info:');
+        console.log('- Service Worker support:', 'serviceWorker' in navigator);
+        console.log('- Manifest link exists:', !!document.querySelector('link[rel="manifest"]'));
+        console.log('- Is HTTPS or localhost:', location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+        console.log('- BeforeInstallPrompt support:', 'onbeforeinstallprompt' in window);
+        console.log('- Current URL:', window.location.href);
+        console.log('- Display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
 
-// Mobile menu toggle
-const menuToggle = document.getElementById('menuToggle');
-const navMenu = document.getElementById('navMenu');
+        // Check if manifest is accessible
+        fetch('/manifest.json')
+            .then(response => {
+                console.log('- Manifest fetch status:', response.status);
+                return response.json();
+            })
+            .then(manifest => {
+                console.log('- Manifest loaded successfully:', manifest.name);
+                console.log('- Manifest icons:', manifest.icons);
+                console.log('- Manifest start_url:', manifest.start_url);
+                console.log('- Manifest scope:', manifest.scope);
+            })
+            .catch(error => {
+                console.error('- Manifest fetch failed:', error);
+            });
 
-if (menuToggle && navMenu) {
-    menuToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        menuToggle.innerHTML = navMenu.classList.contains('active') 
-            ? '<i class="fas fa-times"></i>' 
-            : '<i class="fas fa-bars"></i>';
-    });
-}
-
-// Highlight active menu item
-const navLinks = document.querySelectorAll('.nav-links a');
-const currentPage = window.location.pathname.split('/').pop();
-
-navLinks.forEach(link => {
-    const linkPage = link.getAttribute('href');
-    if (currentPage === linkPage || 
-        (currentPage === '' && linkPage === 'index.html') ||
-        (currentPage.includes(linkPage.replace('.html', '')))) {
-        link.classList.add('active');
-    } else {
-        link.classList.remove('active');
-    }
-    
-    link.addEventListener('click', function() {
-        // Remove active class from all links
-        navLinks.forEach(l => l.classList.remove('active'));
-        // Add active class to clicked link
-        this.classList.add('active');
-        
-        // Close mobile menu if open
-        if (window.innerWidth <= 768) {
-            if (navMenu) navMenu.classList.remove('active');
-            if (menuToggle) menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        // Check service worker status
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                console.log('- Service Worker registrations:', registrations.length);
+                registrations.forEach(reg => {
+                    console.log('  - SW scope:', reg.scope);
+                    console.log('  - SW state:', reg.active?.state);
+                });
+            });
         }
-    });
-});
-
-// Search functionality
-const searchInput = document.getElementById('product-search');
-if (searchInput) {
-    searchInput.addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') {
-            const searchTerm = this.value.trim();
-            if (searchTerm) {
-                alert(`Searching for: "${searchTerm}"\nThis would show search results on a separate page`);
-                this.value = '';
-            }
-        }
-    });
-}
-
-// Social media links confirmation
-const socialLinks = document.querySelectorAll('.social-links a');
-socialLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-        const platform = this.className.includes('facebook') ? 'Facebook' 
-                       : this.className.includes('instagram') ? 'Instagram' 
-                       : this.className.includes('twitter') ? 'Twitter'
-                       : 'TikTok';
-        
-        if (confirm(`You are being redirected to ${platform}. Continue?`)) {
-            return true;
-        } else {
-            e.preventDefault();
-        }
-    });
+    }, 2000);
 });
 
 // Add CSS animations
@@ -3140,3 +3476,77 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+
+
+
+
+
+
+// Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuToggle.innerHTML = navMenu.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Highlight active menu item
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const currentPage = window.location.pathname.split('/').pop();
+        
+        navLinks.forEach(link => {
+            const linkPage = link.getAttribute('href');
+            if (currentPage === linkPage || 
+                (currentPage === '' && linkPage === 'index.html') ||
+                (currentPage.includes(linkPage.replace('.html', '')))) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+            
+             link.addEventListener('click', function() {
+        // Remove active class from all links
+        navLinks.forEach(l => l.classList.remove('active'));
+        // Add active class to clicked link
+        this.classList.add('active');
+        
+        // Close mobile menu if open
+        if (window.innerWidth <= 768) {
+            navMenu.classList.remove('active');
+            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('product-search');
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    alert(`Searching for: "${searchTerm}"\nThis would show search results on a separate page`);
+                    this.value = '';
+                }
+            }
+        });
+
+        // Social media links confirmation
+        const socialLinks = document.querySelectorAll('.social-links a');
+        socialLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const platform = this.className.includes('facebook') ? 'Facebook' 
+                               : this.className.includes('instagram') ? 'Instagram' 
+                               : 'Twitter';
+                
+                if (confirm(`You are being redirected to ${platform}. Continue?`)) {
+                    return true;
+                } else {
+                    e.preventDefault();
+                }
+            });
+        });
+ 
