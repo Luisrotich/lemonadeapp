@@ -609,6 +609,7 @@ body {
 .cart-item {
     background: var(--card-bg);
     border-radius: 10px;
+    
     padding: 1rem;
     margin-bottom: 0.75rem;
     display: flex;
