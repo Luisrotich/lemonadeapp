@@ -1627,7 +1627,8 @@ body {
    Product Detail View
    ========================================================================== */
 .product-detail-container {
-    max-width: 100%;
+    max-width: 1500px;
+    justify-content: center;
     margin: 0 auto;
     padding: 1rem;
     padding-bottom: 100px;
@@ -2723,7 +2724,7 @@ body {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
-        align-items: start;
+        align-items: center;
     }
 
     .product-gallery {
