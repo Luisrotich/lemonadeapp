@@ -3560,13 +3560,29 @@ document.head.appendChild(style);
         // Install App Logic with LocalStorage - Immediate Popup
 class InstallAppManager {
     constructor() {
-        this.installButton = document.getElementById('install-btn');
+        console.log('InstallAppManager initializing...');
+        
         this.installPopup = document.getElementById('install-popup');
         this.installOverlay = document.getElementById('install-popup-overlay');
         this.closePopupBtn = document.getElementById('close-install-popup');
         this.installNowBtn = document.getElementById('btn-install-now');
         this.installLaterBtn = document.getElementById('btn-install-later');
         this.neverShowBtn = document.getElementById('btn-never-show');
+        
+        // Check if elements exist
+        if (!this.installPopup || !this.installOverlay) {
+            console.error('Popup elements not found!');
+            return;
+        }
+        
+        console.log('All popup elements found:', {
+            popup: !!this.installPopup,
+            overlay: !!this.installOverlay,
+            closeBtn: !!this.closePopupBtn,
+            installBtn: !!this.installNowBtn,
+            laterBtn: !!this.installLaterBtn,
+            neverBtn: !!this.neverShowBtn
+        });
         
         this.deferredPrompt = null;
         this.installChoice = localStorage.getItem('installChoice');
@@ -3576,86 +3592,123 @@ class InstallAppManager {
     }
     
     init() {
-        // Only show popup if user hasn't made a choice
-        if (!this.installChoice) {
-            this.setupInstallPrompt();
-            this.showImmediatePopup();
-        }
+        console.log('Initializing with choice:', this.installChoice);
         
-        this.setupEventListeners();
+        // Setup PWA listeners first
+        this.setupInstallPrompt();
+        
+        // Setup service worker
         this.setupServiceWorker();
         
-        // Also show install button if PWA is available
-        this.setupInstallButtonVisibility();
+        // Setup event listeners BEFORE showing popup
+        this.setupEventListeners();
+        
+        // Only show popup if user hasn't made a choice AND app is not already installed
+        if (!this.installChoice && !this.isAppInstalled()) {
+            console.log('No previous choice, showing popup immediately');
+            this.showImmediatePopup();
+        } else if (this.installChoice === 'remind_later') {
+            // Check if 24 hours have passed
+            const now = Date.now();
+            const lastShown = parseInt(this.showPopupTime) || 0;
+            const oneDay = 24 * 60 * 60 * 1000;
+            
+            if (now - lastShown > oneDay) {
+                console.log('24 hours passed, showing popup again');
+                this.showImmediatePopup();
+            }
+        } else {
+            console.log('Not showing popup - choice:', this.installChoice);
+            this.hidePopup();
+        }
     }
     
     setupInstallPrompt() {
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
             e.preventDefault();
-            // Stash the event so it can be triggered later
             this.deferredPrompt = e;
-            // Update UI to show install is available
             console.log('PWA install available');
-            // Show install button even if popup was dismissed
-            if (this.installChoice !== 'never') {
-                this.showInstallButton();
-            }
         });
         
         window.addEventListener('appinstalled', () => {
             console.log('App was installed successfully!');
-            // Hide install button
-            this.installButton.style.display = 'none';
-            // Set install choice to 'installed'
             localStorage.setItem('installChoice', 'installed');
-            // Close popup if open
-            this.closePopup();
+            this.hidePopup();
         });
     }
     
     setupEventListeners() {
-        // Install button click - shows popup again
-        this.installButton.addEventListener('click', () => {
-            this.showPopup();
-        });
+        console.log('Setting up event listeners...');
         
-        // Close popup
-        this.closePopupBtn.addEventListener('click', () => {
-            this.closePopup();
-            this.setRemindLater();
-        });
+        // Close popup (X button) - REMIND LATER
+        if (this.closePopupBtn) {
+            console.log('Setting up close button');
+            this.closePopupBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Close (X) button clicked');
+                this.setRemindLater();
+                this.hidePopup();
+            });
+        }
         
         // Install now button
-        this.installNowBtn.addEventListener('click', () => {
-            this.installApp();
-        });
+        if (this.installNowBtn) {
+            console.log('Setting up install now button');
+            this.installNowBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Install Now button clicked');
+                this.installApp();
+            });
+        }
         
         // Install later button
-        this.installLaterBtn.addEventListener('click', () => {
-            this.closePopup();
-            this.setRemindLater();
-        });
+        if (this.installLaterBtn) {
+            console.log('Setting up install later button');
+            this.installLaterBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Install Later button clicked');
+                this.setRemindLater();
+                this.hidePopup();
+            });
+        }
         
         // Never show again button
-        this.neverShowBtn.addEventListener('click', () => {
-            this.closePopup();
-            this.setNeverShow();
-        });
+        if (this.neverShowBtn) {
+            console.log('Setting up never show button');
+            this.neverShowBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Never Show button clicked');
+                this.setNeverShow();
+                this.hidePopup();
+            });
+        }
         
         // Close popup when clicking overlay
-        this.installOverlay.addEventListener('click', () => {
-            this.closePopup();
-            this.setRemindLater();
-        });
+        if (this.installOverlay) {
+            console.log('Setting up overlay click');
+            this.installOverlay.addEventListener('click', (e) => {
+                if (e.target === this.installOverlay) {
+                    console.log('Overlay clicked');
+                    this.setRemindLater();
+                    this.hidePopup();
+                }
+            });
+        }
         
-        // Prevent body scroll when popup is open
+        // Escape key to close
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.installPopup.style.display === 'block') {
-                this.closePopup();
+                console.log('Escape key pressed');
                 this.setRemindLater();
+                this.hidePopup();
             }
         });
+        
+        console.log('Event listeners setup complete');
     }
     
     setupServiceWorker() {
@@ -3672,152 +3725,232 @@ class InstallAppManager {
         }
     }
     
-    setupInstallButtonVisibility() {
-        // Show install button if PWA is supported and user hasn't chosen "never"
-        if ('beforeinstallprompt' in window && this.installChoice !== 'never') {
-            setTimeout(() => {
-                this.installButton.style.display = 'block';
-            }, 1000); // Show button after 1 second
-        }
-    }
-    
     showImmediatePopup() {
-        // Don't show popup if app is already installed
+        console.log('Showing popup immediately');
+        
+        // Don't show if app is already installed
         if (this.isAppInstalled()) {
             console.log('App is already installed');
             localStorage.setItem('installChoice', 'installed');
+            this.hidePopup();
             return;
         }
         
-        // Check if we're on a mobile device (better UX for mobile)
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        
-        // On mobile, wait a tiny bit for page to load, then show immediately
-        // On desktop, show immediately
-        const delay = isMobile ? 800 : 300;
-        
+        // Show immediately without delay
         setTimeout(() => {
-            // Only show if user hasn't made a choice and PWA is available
-            if (!this.installChoice && 'beforeinstallprompt' in window) {
-                this.showPopup();
-            }
-        }, delay);
+            this.showPopup();
+        }, 100);
     }
     
     showPopup() {
-        this.installPopup.style.display = 'block';
-        this.installOverlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+        console.log('Showing popup now');
         
-        // Record the time we showed the popup
-        localStorage.setItem('showPopupTime', Date.now().toString());
-        
-        // Add animation class for entrance
-        this.installPopup.classList.add('popup-visible');
+        if (this.installPopup && this.installOverlay) {
+            // Force show with inline styles
+            this.installPopup.style.cssText = `
+                display: block !important;
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                z-index: 10000 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            `;
+            
+            this.installOverlay.style.cssText = `
+                display: block !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: rgba(0, 0, 0, 0.85) !important;
+                z-index: 9999 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            `;
+            
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('popup-open');
+            
+            // Record the time we showed the popup
+            localStorage.setItem('showPopupTime', Date.now().toString());
+            
+            console.log('Popup is now visible');
+        }
     }
     
-    closePopup() {
-        this.installPopup.style.display = 'none';
-        this.installOverlay.style.display = 'none';
+    hidePopup() {
+        console.log('Hiding popup');
+        
+        if (this.installPopup) this.installPopup.style.display = 'none';
+        if (this.installOverlay) this.installOverlay.style.display = 'none';
+        
         document.body.style.overflow = 'auto';
-        this.installPopup.classList.remove('popup-visible');
+        document.body.classList.remove('popup-open');
     }
     
     async installApp() {
+        console.log('Starting app installation...');
+        
         if (this.deferredPrompt) {
-            // Show the install prompt
-            this.deferredPrompt.prompt();
-            
-            // Wait for the user to respond to the prompt
-            const { outcome } = await this.deferredPrompt.userChoice;
-            
-            console.log(`User response to install prompt: ${outcome}`);
-            
-            if (outcome === 'accepted') {
-                console.log('User accepted the install prompt');
-                localStorage.setItem('installChoice', 'installed');
-                // Show success message
-                this.showInstallSuccess();
-            } else {
-                console.log('User dismissed the install prompt');
-                this.setRemindLater();
+            try {
+                // Show the install prompt
+                this.deferredPrompt.prompt();
+                
+                // Wait for the user to respond
+                const { outcome } = await this.deferredPrompt.userChoice;
+                
+                console.log(`User response: ${outcome}`);
+                
+                if (outcome === 'accepted') {
+                    console.log('User accepted installation');
+                    localStorage.setItem('installChoice', 'installed');
+                    this.showToast('🎉 App is being installed!', 'success');
+                } else {
+                    console.log('User declined installation');
+                    localStorage.setItem('installChoice', 'remind_later');
+                    this.showToast('Installation cancelled', 'info');
+                }
+                
+                this.deferredPrompt = null;
+            } catch (error) {
+                console.error('Install error:', error);
+                this.showManualInstallInstructions();
+                localStorage.setItem('installChoice', 'remind_later');
             }
-            
-            // Clear the saved prompt since it can't be used again
-            this.deferredPrompt = null;
-            
-            this.closePopup();
         } else {
-            // If PWA prompt is not available, show manual install instructions
+            console.log('No PWA prompt, showing manual instructions');
             this.showManualInstallInstructions();
-            this.setRemindLater();
+            localStorage.setItem('installChoice', 'remind_later');
         }
+        
+        this.hidePopup();
     }
     
-    showInstallSuccess() {
-        // Optional: Show a success message
-        alert('🎉 Lemonade app is being installed! Check your home screen.');
+    showToast(message, type = 'info') {
+        // Remove existing toast
+        const existing = document.querySelector('.install-toast');
+        if (existing) existing.remove();
+        
+        // Create toast
+        const toast = document.createElement('div');
+        toast.className = 'install-toast';
+        toast.textContent = message;
+        
+        const styles = {
+            position: 'fixed',
+            bottom: '30px',
+            left: '50%',
+            transform: 'translateX(-50%) translateY(100px)',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            zIndex: '10001',
+            fontWeight: '500',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+            transition: 'transform 0.3s ease',
+            textAlign: 'center',
+            maxWidth: '90%',
+            fontSize: '14px'
+        };
+        
+        if (type === 'success') {
+            styles.background = 'linear-gradient(135deg, #4CAF50, #2e7d32)';
+            styles.color = 'white';
+        } else {
+            styles.background = 'white';
+            styles.color = '#333';
+            styles.border = '1px solid #ddd';
+        }
+        
+        Object.assign(toast.style, styles);
+        document.body.appendChild(toast);
+        
+        // Animate in
+        setTimeout(() => {
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+        }, 10);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.style.transform = 'translateX(-50%) translateY(100px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
     
     showManualInstallInstructions() {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
         const isAndroid = /Android/.test(navigator.userAgent);
         
-        let instructions = '';
+        let title = '';
+        let message = '';
         
         if (isIOS) {
-            instructions = 'To install the app:\n1. Tap the Share button (📤)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right';
+            title = '📱 Install on iOS';
+            message = '1. Tap the Share button (📤)\n2. Scroll and tap "Add to Home Screen"\n3. Tap "Add" in the top right';
         } else if (isAndroid) {
-            instructions = 'To install the app:\n1. Tap the menu button (⋮)\n2. Tap "Add to Home screen"\n3. Tap "Add"';
+            title = '🤖 Install on Android';
+            message = '1. Tap menu (⋮)\n2. Tap "Add to Home screen"\n3. Tap "Add" or "Install"';
         } else {
-            instructions = 'To install the app, look for the install icon (⬇️) in your browser\'s address bar or menu.';
+            title = '💻 Install on Desktop';
+            message = 'Look for the install icon (⬇️) in your browser address bar';
         }
         
-        alert(instructions);
+        alert(`${title}\n\n${message}`);
     }
     
     setRemindLater() {
-        // User chose to be reminded later - show again in 24 hours
+        console.log('Setting remind later');
         localStorage.setItem('installChoice', 'remind_later');
-        this.installButton.style.display = 'block'; // Keep button visible
+        localStorage.setItem('showPopupTime', Date.now().toString());
+        this.showToast('We\'ll remind you in 24 hours 👍', 'info');
     }
     
     setNeverShow() {
-        // User chose to never see the popup again
+        console.log('Setting never show again');
         localStorage.setItem('installChoice', 'never');
-        this.installButton.style.display = 'none'; // Hide install button
+        this.showToast('Won\'t show this again', 'info');
     }
     
-    // Check if app is already installed
     isAppInstalled() {
-        return window.matchMedia('(display-mode: standalone)').matches || 
-               window.navigator.standalone ||
-               document.referrer.includes('android-app://');
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        const isNavigatorStandalone = window.navigator.standalone;
+        
+        return isStandalone || isNavigatorStandalone;
     }
     
-    // Reset user choice (for testing)
+    // Reset for testing
     resetChoice() {
         localStorage.removeItem('installChoice');
         localStorage.removeItem('showPopupTime');
-        this.installChoice = null;
-        this.showPopupTime = null;
-        this.installButton.style.display = 'none';
-        console.log('Install preferences reset');
+        console.log('Preferences reset');
     }
 }
 
-// Initialize immediately when script loads
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    // Don't initialize if app is already installed
-    const isAlreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || 
-                               window.navigator.standalone;
+    console.log('DOM Content Loaded - starting InstallAppManager');
     
-    if (!isAlreadyInstalled) {
+    // Check if popup exists
+    const popupExists = document.getElementById('install-popup');
+    
+    if (popupExists) {
         const manager = new InstallAppManager();
-        // Expose manager globally for debugging
-        window.installAppManager = manager;
+        window.installAppManager = manager; // For debugging
+        
+        console.log('InstallAppManager initialized successfully');
     } else {
-        console.log('App is already installed as PWA');
-        localStorage.setItem('installChoice', 'installed');
+        console.error('Popup HTML not found on page');
     }
+});
+
+// Add global PWA event listeners
+window.addEventListener('beforeinstallprompt', (e) => {
+    // This is already handled in the class, but keep global reference
+    console.log('Global PWA event: beforeinstallprompt');
+});
+
+window.addEventListener('appinstalled', () => {
+    console.log('Global: App installed');
 });
