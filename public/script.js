@@ -3553,310 +3553,271 @@ document.head.appendChild(style);
         });
  
 
+        
 
 
 
- // ULTRA SIMPLE POPUP FIX
-console.log('Popup script loading...');
-
-// First, check immediately if we should show popup
-window.addEventListener('load', function() {
-    console.log('Page fully loaded');
-    
-    // Check user preference
-    const userChoice = localStorage.getItem('lemonadeInstallChoice');
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
-    
-    console.log('User choice:', userChoice, 'Installed:', isInstalled);
-    
-    // Don't show if never or installed
-    if (userChoice === 'never' || userChoice === 'installed' || isInstalled) {
-        console.log('Not showing popup');
-        hidePopup();
-        return;
+        // Install App Logic with LocalStorage - Immediate Popup
+class InstallAppManager {
+    constructor() {
+        this.installButton = document.getElementById('install-btn');
+        this.installPopup = document.getElementById('install-popup');
+        this.installOverlay = document.getElementById('install-popup-overlay');
+        this.closePopupBtn = document.getElementById('close-install-popup');
+        this.installNowBtn = document.getElementById('btn-install-now');
+        this.installLaterBtn = document.getElementById('btn-install-later');
+        this.neverShowBtn = document.getElementById('btn-never-show');
+        
+        this.deferredPrompt = null;
+        this.installChoice = localStorage.getItem('installChoice');
+        this.showPopupTime = localStorage.getItem('showPopupTime');
+        
+        this.init();
     }
     
-    // Show the popup IMMEDIATELY
-    console.log('SHOWING POPUP');
-    setTimeout(function() {
-        showPopup();
-    }, 100);
-});
-
-// SHOW POPUP FUNCTION
-function showPopup() {
-    const popup = document.getElementById('install-popup');
-    const overlay = document.getElementById('install-popup-overlay');
-    
-    console.log('Show popup called, elements:', popup, overlay);
-    
-    if (popup && overlay) {
-        // Make absolutely sure they're visible
-        popup.style.cssText = `
-            display: block !important;
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            z-index: 10000 !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        `;
+    init() {
+        // Only show popup if user hasn't made a choice
+        if (!this.installChoice) {
+            this.setupInstallPrompt();
+            this.showImmediatePopup();
+        }
         
-        overlay.style.cssText = `
-            display: block !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: rgba(0,0,0,0.8) !important;
-            z-index: 9999 !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        `;
+        this.setupEventListeners();
+        this.setupServiceWorker();
         
+        // Also show install button if PWA is available
+        this.setupInstallButtonVisibility();
+    }
+    
+    setupInstallPrompt() {
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            this.deferredPrompt = e;
+            // Update UI to show install is available
+            console.log('PWA install available');
+            // Show install button even if popup was dismissed
+            if (this.installChoice !== 'never') {
+                this.showInstallButton();
+            }
+        });
+        
+        window.addEventListener('appinstalled', () => {
+            console.log('App was installed successfully!');
+            // Hide install button
+            this.installButton.style.display = 'none';
+            // Set install choice to 'installed'
+            localStorage.setItem('installChoice', 'installed');
+            // Close popup if open
+            this.closePopup();
+        });
+    }
+    
+    setupEventListeners() {
+        // Install button click - shows popup again
+        this.installButton.addEventListener('click', () => {
+            this.showPopup();
+        });
+        
+        // Close popup
+        this.closePopupBtn.addEventListener('click', () => {
+            this.closePopup();
+            this.setRemindLater();
+        });
+        
+        // Install now button
+        this.installNowBtn.addEventListener('click', () => {
+            this.installApp();
+        });
+        
+        // Install later button
+        this.installLaterBtn.addEventListener('click', () => {
+            this.closePopup();
+            this.setRemindLater();
+        });
+        
+        // Never show again button
+        this.neverShowBtn.addEventListener('click', () => {
+            this.closePopup();
+            this.setNeverShow();
+        });
+        
+        // Close popup when clicking overlay
+        this.installOverlay.addEventListener('click', () => {
+            this.closePopup();
+            this.setRemindLater();
+        });
+        
+        // Prevent body scroll when popup is open
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.installPopup.style.display === 'block') {
+                this.closePopup();
+                this.setRemindLater();
+            }
+        });
+    }
+    
+    setupServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered successfully');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    }
+    
+    setupInstallButtonVisibility() {
+        // Show install button if PWA is supported and user hasn't chosen "never"
+        if ('beforeinstallprompt' in window && this.installChoice !== 'never') {
+            setTimeout(() => {
+                this.installButton.style.display = 'block';
+            }, 1000); // Show button after 1 second
+        }
+    }
+    
+    showImmediatePopup() {
+        // Don't show popup if app is already installed
+        if (this.isAppInstalled()) {
+            console.log('App is already installed');
+            localStorage.setItem('installChoice', 'installed');
+            return;
+        }
+        
+        // Check if we're on a mobile device (better UX for mobile)
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        // On mobile, wait a tiny bit for page to load, then show immediately
+        // On desktop, show immediately
+        const delay = isMobile ? 800 : 300;
+        
+        setTimeout(() => {
+            // Only show if user hasn't made a choice and PWA is available
+            if (!this.installChoice && 'beforeinstallprompt' in window) {
+                this.showPopup();
+            }
+        }, delay);
+    }
+    
+    showPopup() {
+        this.installPopup.style.display = 'block';
+        this.installOverlay.style.display = 'block';
         document.body.style.overflow = 'hidden';
         
-        console.log('Popup should be visible now');
+        // Record the time we showed the popup
+        localStorage.setItem('showPopupTime', Date.now().toString());
         
-        // Setup button clicks
-        setupButtonClicks();
-    }
-}
-
-// HIDE POPUP FUNCTION
-function hidePopup() {
-    const popup = document.getElementById('install-popup');
-    const overlay = document.getElementById('install-popup-overlay');
-    
-    if (popup) popup.style.display = 'none';
-    if (overlay) overlay.style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-// SETUP BUTTON CLICKS - DIRECT METHOD
-function setupButtonClicks() {
-    console.log('Setting up button clicks...');
-    
-    // Get all buttons
-    const closeBtn = document.getElementById('close-install-popup');
-    const installBtn = document.getElementById('btn-install-now');
-    const laterBtn = document.getElementById('btn-install-later');
-    const neverBtn = document.getElementById('btn-never-show');
-    const overlay = document.getElementById('install-popup-overlay');
-    
-    console.log('Buttons found:', {closeBtn, installBtn, laterBtn, neverBtn, overlay});
-    
-    // 1. X (Close) Button - REMIND LATER
-    if (closeBtn) {
-        closeBtn.onclick = function(e) {
-            console.log('X button clicked');
-            e.stopPropagation();
-            localStorage.setItem('lemonadeInstallChoice', 'later');
-            hidePopup();
-            showQuickMessage('We\'ll remind you later');
-            return false;
-        };
+        // Add animation class for entrance
+        this.installPopup.classList.add('popup-visible');
     }
     
-    // 2. Install Now Button
-    if (installBtn) {
-        installBtn.onclick = function(e) {
-            console.log('Install Now clicked');
-            e.stopPropagation();
+    closePopup() {
+        this.installPopup.style.display = 'none';
+        this.installOverlay.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        this.installPopup.classList.remove('popup-visible');
+    }
+    
+    async installApp() {
+        if (this.deferredPrompt) {
+            // Show the install prompt
+            this.deferredPrompt.prompt();
             
-            // Check if PWA is available
-            if (window.deferredPrompt) {
-                window.deferredPrompt.prompt();
-                window.deferredPrompt.userChoice.then(function(choiceResult) {
-                    if (choiceResult.outcome === 'accepted') {
-                        localStorage.setItem('lemonadeInstallChoice', 'installed');
-                        showQuickMessage('🎉 Installing app...');
-                    } else {
-                        localStorage.setItem('lemonadeInstallChoice', 'later');
-                        showQuickMessage('Installation cancelled');
-                    }
-                    hidePopup();
-                });
+            // Wait for the user to respond to the prompt
+            const { outcome } = await this.deferredPrompt.userChoice;
+            
+            console.log(`User response to install prompt: ${outcome}`);
+            
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                localStorage.setItem('installChoice', 'installed');
+                // Show success message
+                this.showInstallSuccess();
             } else {
-                // Show manual instructions
-                showManualInstructions();
-                localStorage.setItem('lemonadeInstallChoice', 'later');
-                hidePopup();
+                console.log('User dismissed the install prompt');
+                this.setRemindLater();
             }
-            return false;
-        };
-    }
-    
-    // 3. Remind Me Later Button
-    if (laterBtn) {
-        laterBtn.onclick = function(e) {
-            console.log('Remind Later clicked');
-            e.stopPropagation();
-            localStorage.setItem('lemonadeInstallChoice', 'later');
-            hidePopup();
-            showQuickMessage('We\'ll remind you in 24 hours');
-            return false;
-        };
-    }
-    
-    // 4. Don't Show Again Button
-    if (neverBtn) {
-        neverBtn.onclick = function(e) {
-            console.log('Never Show clicked');
-            e.stopPropagation();
-            localStorage.setItem('lemonadeInstallChoice', 'never');
-            hidePopup();
-            showQuickMessage('Won\'t show this again');
-            return false;
-        };
-    }
-    
-    // 5. Click Outside (Overlay)
-    if (overlay) {
-        overlay.onclick = function(e) {
-            if (e.target === overlay) {
-                console.log('Clicked outside popup');
-                localStorage.setItem('lemonadeInstallChoice', 'later');
-                hidePopup();
-                showQuickMessage('Reminder set for later');
-            }
-        };
-    }
-    
-    // 6. Escape Key
-    document.onkeydown = function(e) {
-        if (e.key === 'Escape') {
-            const popup = document.getElementById('install-popup');
-            if (popup && popup.style.display === 'block') {
-                console.log('Escape key pressed');
-                localStorage.setItem('lemonadeInstallChoice', 'later');
-                hidePopup();
-                showQuickMessage('Reminder set');
-            }
+            
+            // Clear the saved prompt since it can't be used again
+            this.deferredPrompt = null;
+            
+            this.closePopup();
+        } else {
+            // If PWA prompt is not available, show manual install instructions
+            this.showManualInstallInstructions();
+            this.setRemindLater();
         }
-    };
+    }
     
-    console.log('All buttons setup complete');
+    showInstallSuccess() {
+        // Optional: Show a success message
+        alert('🎉 Lemonade app is being installed! Check your home screen.');
+    }
+    
+    showManualInstallInstructions() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        let instructions = '';
+        
+        if (isIOS) {
+            instructions = 'To install the app:\n1. Tap the Share button (📤)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right';
+        } else if (isAndroid) {
+            instructions = 'To install the app:\n1. Tap the menu button (⋮)\n2. Tap "Add to Home screen"\n3. Tap "Add"';
+        } else {
+            instructions = 'To install the app, look for the install icon (⬇️) in your browser\'s address bar or menu.';
+        }
+        
+        alert(instructions);
+    }
+    
+    setRemindLater() {
+        // User chose to be reminded later - show again in 24 hours
+        localStorage.setItem('installChoice', 'remind_later');
+        this.installButton.style.display = 'block'; // Keep button visible
+    }
+    
+    setNeverShow() {
+        // User chose to never see the popup again
+        localStorage.setItem('installChoice', 'never');
+        this.installButton.style.display = 'none'; // Hide install button
+    }
+    
+    // Check if app is already installed
+    isAppInstalled() {
+        return window.matchMedia('(display-mode: standalone)').matches || 
+               window.navigator.standalone ||
+               document.referrer.includes('android-app://');
+    }
+    
+    // Reset user choice (for testing)
+    resetChoice() {
+        localStorage.removeItem('installChoice');
+        localStorage.removeItem('showPopupTime');
+        this.installChoice = null;
+        this.showPopupTime = null;
+        this.installButton.style.display = 'none';
+        console.log('Install preferences reset');
+    }
 }
 
-// QUICK MESSAGE FUNCTION
-function showQuickMessage(text) {
-    // Remove any existing message
-    const existing = document.getElementById('quick-message');
-    if (existing) existing.remove();
+// Initialize immediately when script loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Don't initialize if app is already installed
+    const isAlreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                               window.navigator.standalone;
     
-    // Create message
-    const msg = document.createElement('div');
-    msg.id = 'quick-message';
-    msg.textContent = text;
-    msg.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #4CAF50;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        z-index: 99999;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        animation: fadeInUp 0.3s ease;
-    `;
-    
-    document.body.appendChild(msg);
-    
-    // Remove after 2 seconds
-    setTimeout(function() {
-        msg.style.animation = 'fadeOutDown 0.3s ease';
-        setTimeout(function() {
-            if (msg.parentNode) msg.parentNode.removeChild(msg);
-        }, 300);
-    }, 2000);
-}
-
-// MANUAL INSTRUCTIONS
-function showManualInstructions() {
-    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
-    
-    let instructions = '';
-    
-    if (isIOS) {
-        instructions = 'iOS: Tap Share → Add to Home Screen → Add';
-    } else if (isAndroid) {
-        instructions = 'Android: Tap menu → Add to Home screen → Add';
+    if (!isAlreadyInstalled) {
+        const manager = new InstallAppManager();
+        // Expose manager globally for debugging
+        window.installAppManager = manager;
     } else {
-        instructions = 'Desktop: Look for install icon (⬇️) in address bar';
+        console.log('App is already installed as PWA');
+        localStorage.setItem('installChoice', 'installed');
     }
-    
-    alert('How to install:\n\n' + instructions);
-}
-
-// PWA SETUP
-window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault();
-    window.deferredPrompt = e;
-    console.log('PWA install available');
 });
-
-window.addEventListener('appinstalled', function() {
-    console.log('App was installed!');
-    localStorage.setItem('lemonadeInstallChoice', 'installed');
-});
-
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-    }
-    
-    @keyframes fadeOutDown {
-        from {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px);
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// DEBUG: Test functions in console
-window.popupTest = {
-    reset: function() {
-        localStorage.removeItem('lemonadeInstallChoice');
-        console.log('✅ Preferences reset. Reload page.');
-        location.reload();
-    },
-    show: function() {
-        showPopup();
-    },
-    hide: function() {
-        hidePopup();
-    },
-    status: function() {
-        return {
-            choice: localStorage.getItem('lemonadeInstallChoice'),
-            hasPrompt: !!window.deferredPrompt
-        };
-    }
-};
-
-console.log('Popup script ready. Use window.popupTest.reset() to test.');
-        
-
-        
