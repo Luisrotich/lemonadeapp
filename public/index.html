@@ -615,9 +615,7 @@
     <!-- Modal Overlay -->
     <div class="modal-overlay" id="modal-overlay"></div>
 <!-- Install Button -->
-<button class="install-button" id="install-btn">
-    Install Lemonade🍋 app
-</button>
+
 
 <!-- Install Popup Modal -->
 <div class="install-popup-overlay" id="install-popup-overlay"></div>
@@ -684,8 +682,7 @@
 "></div>
 
 <script>
-
-    // Ultra-immediate popup check
+// Ultra-immediate popup check
 (function() {
     // Check localStorage immediately
     const installChoice = localStorage.getItem('installChoice');
@@ -735,6 +732,7 @@
         });
     }
 })();
+    
 // Hide popup initially to prevent flash before CSS loads
 document.addEventListener('DOMContentLoaded', function() {
     const popup = document.getElementById('install-popup');
