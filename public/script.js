@@ -3557,315 +3557,162 @@ document.head.appendChild(style);
 
 
  
-// Immediate Popup Manager for App Install
-class ImmediatePopupManager {
-    constructor() {
-        this.installPopup = document.getElementById('install-popup');
-        this.installOverlay = document.getElementById('install-popup-overlay');
-        this.closePopupBtn = document.getElementById('close-install-popup');
-        this.installNowBtn = document.getElementById('btn-install-now');
-        this.installLaterBtn = document.getElementById('btn-install-later');
-        this.neverShowBtn = document.getElementById('btn-never-show');
-        
-        this.deferredPrompt = null;
-        this.userChoice = localStorage.getItem('lemonadeInstallChoice');
-        this.popupShownTime = localStorage.getItem('lemonadePopupShownTime');
-        
-        this.init();
+    // IMMEDIATE POPUP - NO DELAYS
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - checking for popup elements');
+    
+    const popup = document.getElementById('install-popup');
+    const overlay = document.getElementById('install-popup-overlay');
+    
+    if (!popup || !overlay) {
+        console.error('Popup elements not found! Check your HTML IDs');
+        return;
     }
     
-    init() {
-        // Always hide popup initially (CSS should handle this too)
-        this.hidePopup();
-        
-        // Check if we should show popup immediately
-        if (this.shouldShowPopup()) {
-            this.showPopupImmediately();
-        }
-        
-        this.setupEventListeners();
-        this.setupPWAInstall();
-        this.setupAutoClose();
+    console.log('Popup elements found:', { popup, overlay });
+    
+    // FIRST: Check localStorage for previous choices
+    const userChoice = localStorage.getItem('lemonadeInstallChoice');
+    const isAlreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                               window.navigator.standalone;
+    
+    console.log('User choice from localStorage:', userChoice);
+    console.log('App already installed?', isAlreadyInstalled);
+    
+    // Don't show if user chose "never" or app is already installed
+    if (userChoice === 'never' || userChoice === 'installed' || isAlreadyInstalled) {
+        console.log('Not showing popup - user choice:', userChoice);
+        popup.style.display = 'none';
+        overlay.style.display = 'none';
+        return;
     }
     
-    shouldShowPopup() {
-        // Check if app is already installed
-        if (this.isAppInstalled()) {
-            localStorage.setItem('lemonadeInstallChoice', 'installed');
-            return false;
-        }
-        
-        // Check user's previous choice
-        if (this.userChoice === 'never') return false;
-        if (this.userChoice === 'installed') return false;
-        
-        // Check if popup was shown less than 24 hours ago
-        if (this.userChoice === 'later' && this.popupShownTime) {
-            const oneDay = 24 * 60 * 60 * 1000;
-            const timeSinceLastShow = Date.now() - parseInt(this.popupShownTime);
-            if (timeSinceLastShow < oneDay) return false;
-        }
-        
-        return true;
-    }
+    // FORCE SHOW THE POPUP IMMEDIATELY
+    console.log('FORCING POPUP TO SHOW IMMEDIATELY');
+    popup.style.display = 'block';
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
     
-    showPopupImmediately() {
-        // Wait for DOM to be fully ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(() => this.displayPopup(), 100);
+    // Add visual feedback that popup is active
+    popup.style.opacity = '1';
+    popup.style.visibility = 'visible';
+    overlay.style.opacity = '1';
+    overlay.style.visibility = 'visible';
+    
+    // Record that we showed the popup
+    localStorage.setItem('lemonadePopupShownTime', Date.now().toString());
+    
+    // Setup event listeners
+    setupPopupEvents();
+    
+    // Setup PWA install if available
+    setupPWAInstall();
+});
+
+function setupPopupEvents() {
+    const popup = document.getElementById('install-popup');
+    const overlay = document.getElementById('install-popup-overlay');
+    const closeBtn = document.getElementById('close-install-popup');
+    const installNowBtn = document.getElementById('btn-install-now');
+    const installLaterBtn = document.getElementById('btn-install-later');
+    const neverShowBtn = document.getElementById('btn-never-show');
+    
+    let deferredPrompt = null;
+    
+    // Close button
+    closeBtn.addEventListener('click', function() {
+        hidePopup();
+        localStorage.setItem('lemonadeInstallChoice', 'later');
+    });
+    
+    // Install later button
+    installLaterBtn.addEventListener('click', function() {
+        hidePopup();
+        localStorage.setItem('lemonadeInstallChoice', 'later');
+    });
+    
+    // Never show button
+    neverShowBtn.addEventListener('click', function() {
+        hidePopup();
+        localStorage.setItem('lemonadeInstallChoice', 'never');
+    });
+    
+    // Install now button
+    installNowBtn.addEventListener('click', function() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    localStorage.setItem('lemonadeInstallChoice', 'installed');
+                } else {
+                    console.log('User dismissed the install prompt');
+                    localStorage.setItem('lemonadeInstallChoice', 'later');
+                }
+                deferredPrompt = null;
             });
         } else {
-            setTimeout(() => this.displayPopup(), 100);
-        }
-    }
-    
-    displayPopup() {
-        // Show the popup
-        this.installPopup.style.display = 'block';
-        this.installOverlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        
-        // Add animation class
-        this.installPopup.classList.add('popup-active');
-        this.installOverlay.classList.add('overlay-active');
-        
-        // Record that we showed the popup
-        localStorage.setItem('lemonadePopupShownTime', Date.now().toString());
-        
-        console.log('Install popup shown immediately');
-    }
-    
-    hidePopup() {
-        this.installPopup.style.display = 'none';
-        this.installOverlay.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        
-        this.installPopup.classList.remove('popup-active');
-        this.installOverlay.classList.remove('overlay-active');
-    }
-    
-    setupEventListeners() {
-        // Close button
-        this.closePopupBtn.addEventListener('click', () => {
-            this.userChoiceLater();
-        });
-        
-        // Install now button
-        this.installNowBtn.addEventListener('click', () => {
-            this.triggerInstall();
-        });
-        
-        // Install later button
-        this.installLaterBtn.addEventListener('click', () => {
-            this.userChoiceLater();
-        });
-        
-        // Never show again button
-        this.neverShowBtn.addEventListener('click', () => {
-            this.userChoiceNever();
-        });
-        
-        // Close when clicking overlay
-        this.installOverlay.addEventListener('click', (e) => {
-            if (e.target === this.installOverlay) {
-                this.userChoiceLater();
-            }
-        });
-        
-        // Close with Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.installPopup.style.display === 'block') {
-                this.userChoiceLater();
-            }
-        });
-    }
-    
-    setupPWAInstall() {
-        // Listen for beforeinstallprompt event
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
-            e.preventDefault();
-            // Stash the event so it can be triggered later
-            this.deferredPrompt = e;
-            console.log('PWA install prompt available');
-        });
-        
-        // Listen for app installed event
-        window.addEventListener('appinstalled', () => {
-            console.log('App was installed successfully!');
-            localStorage.setItem('lemonadeInstallChoice', 'installed');
-            this.hidePopup();
-        });
-    }
-    
-    async triggerInstall() {
-        if (this.deferredPrompt) {
-            // Show the install prompt
-            this.deferredPrompt.prompt();
-            
-            // Wait for the user to respond
-            const { outcome } = await this.deferredPrompt.userChoice;
-            
-            console.log(`User response: ${outcome}`);
-            
-            if (outcome === 'accepted') {
-                localStorage.setItem('lemonadeInstallChoice', 'installed');
-                this.showSuccessMessage();
-            } else {
-                localStorage.setItem('lemonadeInstallChoice', 'later');
-            }
-            
-            // Clear the deferredPrompt for garbage collection
-            this.deferredPrompt = null;
-        } else {
-            // PWA install not available, show manual instructions
-            this.showManualInstructions();
+            // PWA not available, show manual instructions
+            showManualInstallInstructions();
             localStorage.setItem('lemonadeInstallChoice', 'later');
         }
-        
-        this.hidePopup();
+        hidePopup();
+    });
+    
+    // Close when clicking overlay
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+            hidePopup();
+            localStorage.setItem('lemonadeInstallChoice', 'later');
+        }
+    });
+    
+    // Close with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && popup.style.display === 'block') {
+            hidePopup();
+            localStorage.setItem('lemonadeInstallChoice', 'later');
+        }
+    });
+    
+    function hidePopup() {
+        popup.style.display = 'none';
+        overlay.style.display = 'none';
+        document.body.style.overflow = 'auto';
     }
     
-    userChoiceLater() {
-        localStorage.setItem('lemonadeInstallChoice', 'later');
-        this.hidePopup();
-    }
-    
-    userChoiceNever() {
-        localStorage.setItem('lemonadeInstallChoice', 'never');
-        this.hidePopup();
-    }
-    
-    showSuccessMessage() {
-        // Optional: Show a success toast/message
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent-color);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            z-index: 10001;
-            font-weight: 500;
-            animation: slideDown 0.3s ease;
-        `;
-        toast.textContent = '🎉 Lemonade app is being installed!';
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.animation = 'slideUp 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-    
-    showManualInstructions() {
+    function showManualInstallInstructions() {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const isAndroid = /Android/.test(navigator.userAgent);
         
-        let instructions = '';
+        let message = 'To install this app:\n\n';
         
         if (isIOS) {
-            instructions = '📱 iOS Installation:\n1. Tap the Share icon (📤)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"';
+            message += '📱 iOS:\n1. Tap Share button (📤)\n2. Tap "Add to Home Screen"\n3. Tap "Add"';
         } else if (isAndroid) {
-            instructions = '🤖 Android Installation:\n1. Tap the menu (⋮)\n2. Tap "Install app" or "Add to Home screen"\n3. Tap "Install"';
+            message += '🤖 Android:\n1. Tap menu (⋮)\n2. Tap "Add to Home screen"\n3. Tap "Add"';
         } else {
-            instructions = '💻 Desktop Installation:\nLook for the install icon (⬇️) in your browser address bar';
+            message += '💻 Desktop:\nLook for the install icon (⬇️) in your browser\'s address bar';
         }
         
-        alert(instructions);
-    }
-    
-    isAppInstalled() {
-        // Check various methods to detect if app is installed
-        return window.matchMedia('(display-mode: standalone)').matches || 
-               window.navigator.standalone ||
-               document.referrer.includes('android-app://');
-    }
-    
-    setupAutoClose() {
-        // Auto-close popup after 30 seconds if user doesn't interact
-        setTimeout(() => {
-            if (this.installPopup.style.display === 'block') {
-                console.log('Auto-closing install popup after 30 seconds');
-                this.userChoiceLater();
-            }
-        }, 30000);
-    }
-    
-    // Public method to reset preferences (for testing)
-    resetPreferences() {
-        localStorage.removeItem('lemonadeInstallChoice');
-        localStorage.removeItem('lemonadePopupShownTime');
-        this.userChoice = null;
-        this.popupShownTime = null;
-        console.log('Install preferences reset');
-        return 'Preferences reset successfully';
+        alert(message);
     }
 }
 
-// Initialize the popup manager immediately
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if popup elements exist
-    const popupExists = document.getElementById('install-popup');
+function setupPWAInstall() {
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        window.deferredPrompt = e;
+        console.log('PWA install prompt is available');
+    });
     
-    if (popupExists) {
-        const popupManager = new ImmediatePopupManager();
-        
-        // Expose to global scope for debugging
-        window.lemonadePopupManager = popupManager;
-        
-        console.log('Lemonade install popup manager initialized');
-    }
-});
+    window.addEventListener('appinstalled', () => {
+        console.log('App was installed successfully!');
+        localStorage.setItem('lemonadeInstallChoice', 'installed');
+    });
+}
 
-// Add CSS animations for the popup
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes popupSlideIn {
-        0% {
-            opacity: 0;
-            transform: translate(-50%, -40%) scale(0.95);
-        }
-        100% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-    }
-    
-    @keyframes overlayFadeIn {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
-    }
-    
-    @keyframes slideDown {
-        0% { transform: translate(-50%, -20px); opacity: 0; }
-        100% { transform: translate(-50%, 0); opacity: 1; }
-    }
-    
-    @keyframes slideUp {
-        0% { transform: translate(-50%, 0); opacity: 1; }
-        100% { transform: translate(-50%, -20px); opacity: 0; }
-    }
-    
-    .install-popup {
-        animation: popupSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-    }
-    
-    .install-popup-overlay {
-        animation: overlayFadeIn 0.3s ease-out !important;
-    }
-    
-    .popup-active {
-        display: block !important;
-    }
-    
-    .overlay-active {
-        display: block !important;
-    }
-`;
-document.head.appendChild(style);        
+// DEBUGGING HELP: Add this to check if script is running
+console.log('Popup script loaded - version: IMMEDIATE_SHOW');    
 
+        
