@@ -612,7 +612,38 @@
     <div class="modal-overlay" id="modal-overlay"></div>
 
     <!-- Install Button -->
-    <button class="install-button" id="install-btn" 
+     
+    <div class="install-popup-overlay" id="install-popup-overlay"></div>
+<div class="install-popup" id="install-popup">
+    <div class="install-popup-content">
+        <div class="install-popup-header">
+            <button class="close-install-popup" id="close-install-popup">&times;</button>
+        </div>
+        <div class="install-popup-body">
+            <div class="app-icon">
+                🍋
+            </div>
+            <h2>Install Lemonade App</h2>
+            <p>Get the best experience with our native app! Enjoy faster loading, push notifications, and offline access.</p>
+            
+            <div class="install-features">
+                <div class="install-feature">
+                    <i class="fas fa-bolt"></i>
+                    <span>Faster Performance</span>
+                </div>
+                <div class="install-feature">
+                    <i class="fas fa-bell"></i>
+                    <span>Push Notifications</span>
+                </div>
+                <div class="install-feature">
+                    <i class="fas fa-wifi-slash"></i>
+                    <span>Offline Access</span>
+                </div>
+                <div class="install-feature">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Home Screen Icon</span>
+                </div>
+                 <button class="install-button" id="install-btn" 
     style="display: none;
     position: fixed; 
     bottom: 30px; 
@@ -635,8 +666,17 @@
   onmousedown="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(255, 111, 0, 0.3)'"
 
     >
+   
+   
+    
         Install Lemonade🍋 app
     </button>
+            </div>
+        </div>
+    </div>
+</div>
+    
+   
 
     <script src="script.js"></script>
 </body>
