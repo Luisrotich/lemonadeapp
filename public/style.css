@@ -865,7 +865,6 @@ body {
     font-weight: 600;
     width: 100%;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(56, 197, 38, 0.3);
     overflow: hidden;
     display: flex;
@@ -1647,11 +1646,11 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    background: black;
     color: white;
     border: none;
     padding: 0.875rem 1.25rem;
-    border-radius: 25px;
+    border-radius: 15px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
@@ -1691,8 +1690,8 @@ body {
     width: 100%;
     height: 300px;
     object-fit: cover;
-    border-radius: 20px;
-    margin-right: 20px;
+    border-radius: 15px;
+    margin-right: 15px;
     margin-left: 15px;
     margin-bottom: 0.5rem;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -1736,7 +1735,7 @@ body {
 /* Product Info */
 .product-info {
     background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 255, 255, 0.95) 100%);
-    border-radius: 20px;
+    border-radius: 15px;
     padding: 2rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
@@ -1829,11 +1828,11 @@ body {
 }
 
 .add-to-cart-btn {
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    background: black;
     color: white;
     border: none;
     padding: 1.125rem;
-    border-radius: 25px;
+    border-radius: 15px;
     cursor: pointer;
     width: 100%;
     font-size: 1.1rem;
@@ -1870,7 +1869,7 @@ body {
     color: white;
     border: none;
     padding: 1.125rem;
-    border-radius: 25px;
+    border-radius: 15px;
     cursor: pointer;
     width: 100%;
     font-size: 1.1rem;
@@ -1904,7 +1903,7 @@ body {
 /* Reviews Section */
 .reviews-section {
     background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 255, 255, 0.95) 100%);
-    border-radius: 20px;
+    border-radius: 15px;
     padding: 2rem;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
     border: 1px solid rgba(0, 0, 0, 0.06);
@@ -1953,7 +1952,7 @@ body {
 }
 
 .star {
-    color: #ffc107;
+    color: #040404;
 }
 
 .review-count {
