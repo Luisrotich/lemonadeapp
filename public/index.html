@@ -668,10 +668,7 @@
         </div>
     </div>
 </div>
-   
-
-    <script src="script.js"></script>
-    <!-- Add this at the top of your body to prevent flash of unstyled popup -->
+      <!-- Add this at the top of your body to prevent flash of unstyled popup -->
 <div id="initial-loader" style="
     position: fixed;
     top: 0;
@@ -683,20 +680,8 @@
     display: none;
 "></div>
 
-<script>
 
-    
-// Hide popup initially to prevent flash before CSS loads
-document.addEventListener('DOMContentLoaded', function() {
-    const popup = document.getElementById('install-popup');
-    const overlay = document.getElementById('install-popup-overlay');
-    const loader = document.getElementById('initial-loader');
-    
-    if (popup) popup.style.display = 'none';
-    if (overlay) overlay.style.display = 'none';
-    if (loader) loader.style.display = 'none';
-});
-</script>
-
+    <script src="script.js"></script>
 </body>
+
 </html>
