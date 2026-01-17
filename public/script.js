@@ -3142,7 +3142,7 @@ class LemonadeApp {
             'samsung': 'Samsung Phones',
             'nokia': 'Nokia Phones',
             'Xiomi': 'Xiaomi Phones',
-
+            
             'Machinary': 'Machinary',
             'Shoes': 'Shoes',
             'Electoronics': 'Electoronics',
@@ -3245,9 +3245,6 @@ class LemonadeApp {
             'samsung': 'Samsung',
             'nokia': 'Nokia',
             'Xiomi': 'Xiaomi',
-            'Retaills': 'Retaills',
-            'Wholesales': 'Wholesales',
-            'Lemonade flash salles': 'Lemonade flash salles',
             'Machinary': 'Machinary',
             'Shoes': 'Shoes',
             'Electoronics': 'Electoronics',

@@ -3099,13 +3099,17 @@ input:checked + .slider:before {
             background: white;
         }
 
-        .blackmarket[data-category="Samsung"] {
+        .blackmarket[data-category="Lemonade flash salles"] {
             background: rgb(7, 7, 7);
             color: white;
         }
 
-        .blackmarket[data-category="oppo"] {
+        .blackmarket[data-category="Wholesales"] {
             background: orangered;
+            color: white;
+        }
+        .blackmarket[data-category="Retaills"] {
+            background: green;
             color: white;
         }
 
