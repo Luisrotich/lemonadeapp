@@ -2585,6 +2585,8 @@ class LemonadeApp {
             baseImage,
             baseImage.replace('300x200', '300x201'),
             baseImage.replace('300x200', '300x202'),
+            baseImage.replace('300x200', '301x200'),
+            baseImage.replace('300x200', '301x200'),
             baseImage.replace('300x200', '301x200')
         ];
         
