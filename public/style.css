@@ -3193,3 +3193,56 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   Immediate Popup Animation
+   ========================================================================== */
+
+@keyframes immediateSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes fadeInImmediate {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.install-popup-overlay {
+    animation: fadeInImmediate 0.2s ease-out !important;
+}
+
+.install-popup {
+    animation: immediateSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+/* Make sure popup is visible on load */
+.install-popup.popup-visible {
+    display: block !important;
+}
+
+/* Optional: Add a slight entrance animation for the install button */
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.install-button {
+    animation: slideInFromRight 0.5s ease-out 0.5s both;
+}
