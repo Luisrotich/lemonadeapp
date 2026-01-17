@@ -3557,53 +3557,194 @@ document.head.appendChild(style);
 
 
 
-        // Minimal Install Popup Handler
-function setupInstallPopup() {
-    const popup = document.getElementById('install-popup');
-    const overlay = document.getElementById('install-popup-overlay');
-    
-    if (!popup || !overlay) return;
-    
-    // Show popup after 2 seconds
-    setTimeout(() => {
-        popup.style.display = 'block';
-        overlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }, 2000);
-    
-    // Setup button click handlers
-    const closeBtn = document.getElementById('close-install-popup');
-    const laterBtn = document.getElementById('btn-install-later');
-    const neverBtn = document.getElementById('btn-never-show');
-    const installBtn = document.getElementById('btn-install-now');
-    
-    // Hide function
-    const hidePopup = () => {
-        popup.style.display = 'none';
-        overlay.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    };
-    
-    // Set up all button clicks
-    if (closeBtn) closeBtn.onclick = hidePopup;
-    if (laterBtn) laterBtn.onclick = hidePopup;
-    if (neverBtn) neverBtn.onclick = hidePopup;
-    
-    // Install button
-    if (installBtn) {
-        installBtn.onclick = () => {
-            alert('App installation is coming soon!');
-            hidePopup();
-        };
+        // Install App Logic with LocalStorage
+class InstallAppManager {
+    constructor() {
+        this.installButton = document.getElementById('install-btn');
+        this.installPopup = document.getElementById('install-popup');
+        this.installOverlay = document.getElementById('install-popup-overlay');
+        this.closePopupBtn = document.getElementById('close-install-popup');
+        this.installNowBtn = document.getElementById('btn-install-now');
+        this.installLaterBtn = document.getElementById('btn-install-later');
+        this.neverShowBtn = document.getElementById('btn-never-show');
+        
+        this.deferredPrompt = null;
+        this.installChoice = localStorage.getItem('installChoice');
+        this.showPopupTime = localStorage.getItem('showPopupTime');
+        
+        this.init();
     }
     
-    // Overlay click
-    overlay.onclick = hidePopup;
+    init() {
+        // Only show popup if user hasn't made a choice
+        if (!this.installChoice) {
+            this.setupInstallPrompt();
+            this.showPopupAfterDelay();
+        }
+        
+        this.setupEventListeners();
+        this.setupServiceWorker();
+    }
+    
+    setupInstallPrompt() {
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            this.deferredPrompt = e;
+            // Show install button
+            this.showInstallButton();
+        });
+        
+        window.addEventListener('appinstalled', () => {
+            // Hide install button
+            this.installButton.style.display = 'none';
+            // Set install choice to 'installed'
+            localStorage.setItem('installChoice', 'installed');
+            // Close popup if open
+            this.closePopup();
+        });
+    }
+    
+    setupEventListeners() {
+        // Install button click
+        this.installButton.addEventListener('click', () => {
+            this.showPopup();
+        });
+        
+        // Close popup
+        this.closePopupBtn.addEventListener('click', () => {
+            this.closePopup();
+            this.setRemindLater();
+        });
+        
+        // Install now button
+        this.installNowBtn.addEventListener('click', () => {
+            this.installApp();
+        });
+        
+        // Install later button
+        this.installLaterBtn.addEventListener('click', () => {
+            this.closePopup();
+            this.setRemindLater();
+        });
+        
+        // Never show again button
+        this.neverShowBtn.addEventListener('click', () => {
+            this.closePopup();
+            this.setNeverShow();
+        });
+        
+        // Close popup when clicking overlay
+        this.installOverlay.addEventListener('click', () => {
+            this.closePopup();
+            this.setRemindLater();
+        });
+    }
+    
+    setupServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    }
+    
+    showInstallButton() {
+        // Only show if user hasn't chosen "never show"
+        if (this.installChoice !== 'never') {
+            this.installButton.style.display = 'block';
+        }
+    }
+    
+    showPopupAfterDelay() {
+        // Check if we should show popup based on last show time
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        
+        if (!this.showPopupTime || (now - parseInt(this.showPopupTime)) > oneDay) {
+            // Wait 5 seconds after page load to show popup
+            setTimeout(() => {
+                if (!this.installChoice && this.deferredPrompt) {
+                    this.showPopup();
+                }
+            }, 5000);
+        }
+    }
+    
+    showPopup() {
+        this.installPopup.style.display = 'block';
+        this.installOverlay.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Record the time we showed the popup
+        localStorage.setItem('showPopupTime', Date.now().toString());
+    }
+    
+    closePopup() {
+        this.installPopup.style.display = 'none';
+        this.installOverlay.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    async installApp() {
+        if (this.deferredPrompt) {
+            // Show the install prompt
+            this.deferredPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            const { outcome } = await this.deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                localStorage.setItem('installChoice', 'installed');
+            } else {
+                console.log('User dismissed the install prompt');
+                this.setRemindLater();
+            }
+            
+            // Clear the saved prompt since it can't be used again
+            this.deferredPrompt = null;
+            
+            this.closePopup();
+        } else {
+            // If PWA prompt is not available, show manual install instructions
+            alert('To install the app, use the "Add to Home Screen" option in your browser menu.');
+            this.setRemindLater();
+        }
+    }
+    
+    setRemindLater() {
+        // User chose to be reminded later
+        localStorage.setItem('installChoice', 'remind_later');
+        this.installButton.style.display = 'block'; // Keep button visible
+    }
+    
+    setNeverShow() {
+        // User chose to never see the popup again
+        localStorage.setItem('installChoice', 'never');
+        this.installButton.style.display = 'none'; // Hide install button
+    }
+    
+    // Check if app is already installed
+    isAppInstalled() {
+        return window.matchMedia('(display-mode: standalone)').matches || 
+               window.navigator.standalone ||
+               document.referrer.includes('android-app://');
+    }
 }
 
-// Run when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupInstallPopup);
-} else {
-    setupInstallPopup();
-}
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Don't initialize if app is already installed
+    const manager = new InstallAppManager();
+    
+    // Expose manager globally if needed
+    window.installAppManager = manager;
+});
