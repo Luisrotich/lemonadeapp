@@ -577,8 +577,9 @@ class AdminDashboard {
         tbody.innerHTML = this.products.map(product => `
             <tr>
                 <td>
-                    <img src="${this.getProductImageUrl(product.image)}" class="product-image-cell" 
-                         onerror="this.src='https://via.placeholder.com/80/fff9c4/ff6f00?text=🍋'">
+                    <div class="product-images-preview">
+                        ${this.getProductImagesHTML(product)}
+                    </div>
                 </td>
                 <td>
                     <strong>${product.name}</strong><br>
@@ -604,6 +605,37 @@ class AdminDashboard {
                 </td>
             </tr>
         `).join('');
+    }
+
+    getProductImagesHTML(product) {
+        // Check if product has multiple images
+        if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+            let imagesHTML = '';
+            
+            // Show first image as main preview
+            const mainImage = product.images[0];
+            imagesHTML += `
+                <img src="${this.getProductImageUrl(mainImage)}" class="product-main-image" 
+                     onerror="this.src='https://via.placeholder.com/80/fff9c4/ff6f00?text=🍋'">
+            `;
+            
+            // If there are more images, show a counter badge
+            if (product.images.length > 1) {
+                imagesHTML += `
+                    <span class="more-images-badge" title="+${product.images.length - 1} more images">
+                        +${product.images.length - 1}
+                    </span>
+                `;
+            }
+            
+            return imagesHTML;
+        }
+        
+        // Fallback to single image or placeholder
+        return `
+            <img src="${this.getProductImageUrl(product.image)}" class="product-main-image" 
+                 onerror="this.src='https://via.placeholder.com/80/fff9c4/ff6f00?text=🍋'">
+        `;
     }
 
     getProductImageUrl(image) {
@@ -835,6 +867,7 @@ class AdminDashboard {
                             const joinedDate = new Date(customer.createdAt);
                             const joinedText = joinedDate instanceof Date && !isNaN(joinedDate) 
                                 ? joinedDate.toLocaleDateString() 
+
                                 : 'Unknown';
                             return `
                             <tr>
@@ -980,7 +1013,7 @@ class AdminDashboard {
     }
 }
 
-// Add CSS for animations
+// Add CSS for animations and image previews
 const adminStyles = document.createElement('style');
 adminStyles.textContent = `
     @keyframes slideIn {
@@ -1028,6 +1061,86 @@ adminStyles.textContent = `
         padding: 0.25rem 0.5rem;
         border-radius: 4px;
         font-weight: 600;
+    }
+    
+    /* Product images preview in table */
+    .product-images-preview {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .product-main-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .more-images-badge {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        cursor: help;
+    }
+    
+    /* Image preview in modal */
+    .image-preview-item {
+        position: relative;
+        display: inline-block;
+        margin: 5px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .image-preview-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+    
+    .image-order-badge {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 50%;
+    }
+    
+    .remove-image-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #f44336;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .remove-image-btn:hover {
+        background: #d32f2f;
+    }
+    
+    .no-images-text {
+        color: #999;
+        font-style: italic;
+        padding: 20px;
+        text-align: center;
     }
 `;
 document.head.appendChild(adminStyles);
