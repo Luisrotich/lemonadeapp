@@ -6,7 +6,7 @@ class AdminDashboard {
         this.customers = [];
         this.currentUser = null;
         this.baseURL = this.detectBaseURL();
-        this.currentProductImage = null;
+        this.currentProductImages = []; // Changed from currentProductImage to support multiple images
 
         this.init();
     }
@@ -124,240 +124,130 @@ class AdminDashboard {
         this.setupImageUpload();
     }
 
-   // In setupImageUpload() method, replace with:
-setupImageUpload() {
-    const imagesFileInput = document.getElementById('product-images-file');
-    const uploadBtn = document.querySelector('.btn-upload');
-    const imageUrlInput = document.getElementById('product-image-urls');
-    const previewContainer = document.getElementById('images-preview-container');
-    
-    // Clear existing product images
-    this.currentProductImages = [];
-    
-    if (uploadBtn && imagesFileInput) {
-        uploadBtn.addEventListener('click', () => {
-            imagesFileInput.click();
-        });
-
-        imagesFileInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            
-            // Limit to 6 images
-            if (files.length > 6) {
-                this.showNotification('Maximum 6 images allowed. Using first 6 images.', 'warning');
-                files.splice(6);
-            }
-            
-            // Clear previous previews
-            this.currentProductImages = [];
-            if (previewContainer) previewContainer.innerHTML = '';
-            
-            files.forEach((file, index) => {
-                if (!file.type.startsWith('image/')) {
-                    this.showNotification(`File ${file.name} is not an image`, 'error');
-                    return;
-                }
-
-                if (file.size > 5 * 1024 * 1024) {
-                    this.showNotification(`Image ${file.name} must be less than 5MB`, 'error');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const imageData = {
-                        url: event.target.result,
-                        order: index,
-                        filename: file.name
-                    };
-                    this.currentProductImages.push(imageData);
-                    this.updateImagePreviews();
-                };
-                reader.readAsDataURL(file);
-            });
-            
-            // Clear URL input if files are selected
-            if (imageUrlInput) imageUrlInput.value = '';
-        });
-    }
-
-    if (imageUrlInput) {
-        imageUrlInput.addEventListener('input', (e) => {
-            const urls = e.target.value.split(',').map(url => url.trim()).filter(url => url);
-            
-            if (urls.length > 0) {
-                // Clear file input if URLs are entered
-                if (imagesFileInput) imagesFileInput.value = '';
-                
-                // Clear and add URL images
-                this.currentProductImages = urls.map((url, index) => ({
-                    url: url,
-                    order: index,
-                    filename: `image-${index + 1}`
-                }));
-                
-                this.updateImagePreviews();
-            }
-        });
-    }
-}
-
-// Method to update image previews in admin modal
-updateImagePreviews() {
-    const previewContainer = document.getElementById('images-preview-container');
-    if (!previewContainer) return;
-    
-    previewContainer.innerHTML = '';
-    
-    if (this.currentProductImages.length === 0) {
-        previewContainer.innerHTML = '<p class="no-images-text">No images selected</p>';
-        return;
-    }
-    
-    // Sort images by order
-    const sortedImages = [...this.currentProductImages].sort((a, b) => a.order - b.order);
-    
-    sortedImages.forEach((image, index) => {
-        const previewItem = document.createElement('div');
-        previewItem.className = 'image-preview-item';
-        previewItem.innerHTML = `
-            <img src="${image.url}" alt="Product Image ${index + 1}">
-            <span class="image-order-badge">${index + 1}</span>
-            <button class="remove-image-btn" data-index="${index}">×</button>
-        `;
+    setupImageUpload() {
+        const imagesFileInput = document.getElementById('product-images-file');
+        const uploadBtn = document.querySelector('.btn-upload');
+        const imageUrlInput = document.getElementById('product-image-urls');
+        const previewContainer = document.getElementById('images-preview-container');
         
-        previewContainer.appendChild(previewItem);
-    });
-    
-    // Add event listeners to remove buttons
-    previewContainer.querySelectorAll('.remove-image-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const index = parseInt(e.target.getAttribute('data-index'));
-            this.removeImage(index);
-        });
-    });
-}
+        // Clear existing product images
+        this.currentProductImages = [];
+        
+        if (uploadBtn && imagesFileInput) {
+            uploadBtn.addEventListener('click', () => {
+                imagesFileInput.click();
+            });
 
-// Remove image from current selection
-removeImage(index) {
-    if (this.currentProductImages[index]) {
-        this.currentProductImages.splice(index, 1);
-        // Update order numbers
-        this.currentProductImages.forEach((img, i) => {
-            img.order = i;
-        });
-        this.updateImagePreviews();
-    }
-}
+            imagesFileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                
+                // Limit to 6 images
+                if (files.length > 6) {
+                    this.showNotification('Maximum 6 images allowed. Using first 6 images.', 'warning');
+                    files.splice(6);
+                }
+                
+                // Clear previous previews
+                this.currentProductImages = [];
+                if (previewContainer) previewContainer.innerHTML = '';
+                
+                files.forEach((file, index) => {
+                    if (!file.type.startsWith('image/')) {
+                        this.showNotification(`File ${file.name} is not an image`, 'error');
+                        return;
+                    }
 
-// Update populateProductForm() method to handle multiple images
-populateProductForm(product) {
-    document.getElementById('product-id').value = product.id;
-    document.getElementById('product-name').value = product.name;
-    document.getElementById('product-price').value = product.price;
-    document.getElementById('product-description').value = product.description || '';
-    document.getElementById('product-category').value = product.category;
-    document.getElementById('product-stock').value = product.stock;
-    document.getElementById('product-status').value = product.status;
-    
-    // Handle multiple images
-    this.currentProductImages = [];
-    if (product.images && Array.isArray(product.images)) {
-        this.currentProductImages = product.images.map((img, index) => ({
-            url: img,
-            order: index,
-            filename: `image-${index + 1}`
-        }));
-    } else if (product.image) {
-        // Single image (legacy support)
-        this.currentProductImages = [{
-            url: product.image,
-            order: 0,
-            filename: 'main-image'
-        }];
-    }
-    
-    this.updateImagePreviews();
-    
-    // Clear URL input when editing
-    document.getElementById('product-image-urls').value = '';
-}
+                    if (file.size > 5 * 1024 * 1024) {
+                        this.showNotification(`Image ${file.name} must be less than 5MB`, 'error');
+                        return;
+                    }
 
-// Clear form also needs to clear images
-clearProductForm() {
-    document.getElementById('product-form').reset();
-    document.getElementById('product-id').value = '';
-    document.getElementById('product-images-file').value = '';
-    document.getElementById('product-image-urls').value = '';
-    this.currentProductImages = [];
-    this.updateImagePreviews();
-}
-
-// Update saveProduct() method to handle multiple images
-async saveProduct() {
-    const productId = document.getElementById('product-id').value;
-    
-    // Collect all image URLs
-    const productImages = this.currentProductImages.map(img => img.url);
-    
-    const productData = {
-        name: document.getElementById('product-name').value.trim(),
-        price: parseFloat(document.getElementById('product-price').value),
-        description: document.getElementById('product-description').value.trim(),
-        category: document.getElementById('product-category').value,
-        stock: parseInt(document.getElementById('product-stock').value),
-        status: document.getElementById('product-status').value,
-        // Store as array of images
-        images: productImages.length > 0 ? productImages : [],
-        // Keep single image for backward compatibility
-        image: productImages.length > 0 ? productImages[0] : 'https://via.placeholder.com/300x200/fff9c4/ff6f00?text=🍋'
-    };
-
-    // Rest of the saveProduct method remains the same...
-    if (!productData.name) {
-        this.showNotification('Product name is required!', 'error');
-        return;
-    }
-
-    if (productData.price <= 0) {
-        this.showNotification('Price must be greater than 0!', 'error');
-        return;
-    }
-
-    this.showLoading();
-    
-    try {
-        const url = productId
-            ? `/api/products/${productId}`
-            : `/api/products`;
-        const method = productId ? 'PUT' : 'POST';
-
-        const response = await this.fetchWithFallback(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(productData)
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            this.showNotification(`Product ${productId ? 'updated' : 'created'} successfully!`, 'success');
-            await this.loadProducts();
-            this.hideProductModal();
-        } else {
-            throw new Error(data.message || 'Failed to save product');
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const imageData = {
+                            url: event.target.result,
+                            order: index,
+                            filename: file.name
+                        };
+                        this.currentProductImages.push(imageData);
+                        this.updateImagePreviews();
+                    };
+                    reader.readAsDataURL(file);
+                });
+                
+                // Clear URL input if files are selected
+                if (imageUrlInput) imageUrlInput.value = '';
+            });
         }
-    } catch (error) {
-        console.error('Error saving product:', error);
-        this.showNotification('Failed to save product', 'error');
-    } finally {
-        this.hideLoading();
+
+        if (imageUrlInput) {
+            imageUrlInput.addEventListener('input', (e) => {
+                const urls = e.target.value.split(',').map(url => url.trim()).filter(url => url);
+                
+                if (urls.length > 0) {
+                    // Clear file input if URLs are entered
+                    if (imagesFileInput) imagesFileInput.value = '';
+                    
+                    // Clear and add URL images
+                    this.currentProductImages = urls.map((url, index) => ({
+                        url: url,
+                        order: index,
+                        filename: `image-${index + 1}`
+                    }));
+                    
+                    this.updateImagePreviews();
+                }
+            });
+        }
     }
-}
 
+    // Method to update image previews in admin modal
+    updateImagePreviews() {
+        const previewContainer = document.getElementById('images-preview-container');
+        if (!previewContainer) return;
+        
+        previewContainer.innerHTML = '';
+        
+        if (this.currentProductImages.length === 0) {
+            previewContainer.innerHTML = '<p class="no-images-text">No images selected</p>';
+            return;
+        }
+        
+        // Sort images by order
+        const sortedImages = [...this.currentProductImages].sort((a, b) => a.order - b.order);
+        
+        sortedImages.forEach((image, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.innerHTML = `
+                <img src="${image.url}" alt="Product Image ${index + 1}">
+                <span class="image-order-badge">${index + 1}</span>
+                <button class="remove-image-btn" data-index="${index}">×</button>
+            `;
+            
+            previewContainer.appendChild(previewItem);
+        });
+        
+        // Add event listeners to remove buttons
+        previewContainer.querySelectorAll('.remove-image-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.getAttribute('data-index'));
+                this.removeImage(index);
+            });
+        });
+    }
 
-
-
+    // Remove image from current selection
+    removeImage(index) {
+        if (this.currentProductImages[index]) {
+            this.currentProductImages.splice(index, 1);
+            // Update order numbers
+            this.currentProductImages.forEach((img, i) => {
+                img.order = i;
+            });
+            this.updateImagePreviews();
+        }
+    }
 
     setupProductModal() {
         const modal = document.getElementById('product-modal');
@@ -738,23 +628,13 @@ async saveProduct() {
     showProductModal(product = null) {
         const modal = document.getElementById('product-modal');
         const title = document.getElementById('product-modal-title');
-        const previewImg = document.getElementById('image-preview');
         
         if (product) {
             title.textContent = 'Edit Product';
             this.populateProductForm(product);
-            if (product.image) {
-                previewImg.src = this.getProductImageUrl(product.image);
-                previewImg.style.display = 'block';
-                this.currentProductImage = product.image;
-            }
         } else {
             title.textContent = 'Add New Product';
             this.clearProductForm();
-            if (previewImg) {
-                previewImg.style.display = 'none';
-            }
-            this.currentProductImage = null;
         }
         
         modal.style.display = 'flex';
@@ -762,9 +642,10 @@ async saveProduct() {
 
     hideProductModal() {
         document.getElementById('product-modal').style.display = 'none';
-        this.currentProductImage = null;
+        this.currentProductImages = [];
     }
 
+    // Update populateProductForm() method to handle multiple images
     populateProductForm(product) {
         document.getElementById('product-id').value = product.id;
         document.getElementById('product-name').value = product.name;
@@ -773,17 +654,46 @@ async saveProduct() {
         document.getElementById('product-category').value = product.category;
         document.getElementById('product-stock').value = product.stock;
         document.getElementById('product-status').value = product.status;
-        document.getElementById('product-image-url').value = product.image && !product.image.startsWith('data:image') ? product.image : '';
+        
+        // Handle multiple images
+        this.currentProductImages = [];
+        if (product.images && Array.isArray(product.images)) {
+            this.currentProductImages = product.images.map((img, index) => ({
+                url: img,
+                order: index,
+                filename: `image-${index + 1}`
+            }));
+        } else if (product.image) {
+            // Single image (legacy support)
+            this.currentProductImages = [{
+                url: product.image,
+                order: 0,
+                filename: 'main-image'
+            }];
+        }
+        
+        this.updateImagePreviews();
+        
+        // Clear URL input when editing
+        document.getElementById('product-image-urls').value = '';
     }
 
+    // Clear form also needs to clear images
     clearProductForm() {
         document.getElementById('product-form').reset();
         document.getElementById('product-id').value = '';
-        document.getElementById('product-image-file').value = '';
+        document.getElementById('product-images-file').value = '';
+        document.getElementById('product-image-urls').value = '';
+        this.currentProductImages = [];
+        this.updateImagePreviews();
     }
 
+    // Update saveProduct() method to handle multiple images
     async saveProduct() {
         const productId = document.getElementById('product-id').value;
+        
+        // Collect all image URLs
+        const productImages = this.currentProductImages.map(img => img.url);
         
         const productData = {
             name: document.getElementById('product-name').value.trim(),
@@ -792,7 +702,10 @@ async saveProduct() {
             category: document.getElementById('product-category').value,
             stock: parseInt(document.getElementById('product-stock').value),
             status: document.getElementById('product-status').value,
-            image: this.currentProductImage || document.getElementById('product-image-url').value || 'https://via.placeholder.com/300x200/fff9c4/ff6f00?text=🍋'
+            // Store as array of images
+            images: productImages.length > 0 ? productImages : [],
+            // Keep single image for backward compatibility
+            image: productImages.length > 0 ? productImages[0] : 'https://via.placeholder.com/300x200/fff9c4/ff6f00?text=🍋'
         };
 
         if (!productData.name) {

@@ -409,93 +409,83 @@
             </div>
             
             <form id="product-form" enctype="multipart/form-data">
-                <input type="hidden" id="product-id">
-                
-                <div class="form-group">
-                    <label>Product Name *</label>
-                    <input type="text" id="product-name" required>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Price *</label>
-                        <input type="number" id="product-price" step="0.01" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Category *</label>
-                        <select id="product-category" required>
-                            <option value="Lemonade flash salles">Lemonade flash salles</option>
-                            <option value="Retaills">Retaills</option>
-                            <option value="Wholesales">Wholesales</option>
-
-                            <option value="Xiomi">Xiomi</option>
-                            <option value="Apple">Apple</option>
-                            <option value="Tecno">Tecno</option>
-                            <option value="nokia">Nokia</option>
-                            <option value="infinix">infinix</option>
-                            <option value="samsung">samsung</option>
-                            <option value="Hoodies">Hoodies</option>
-                            <option value="T- Shirts">T- Shirts</option>
-                             <option value="Machinary">Machinary</option>
-                            <option value="Home-Tools">Home-Tools</option>
-                            <option value="Laptops">Laptops</option>                            
-
-                            <option value="Shoes">Shoes</option>
-                            <option value="Electoronics">Electoronics</option>
-
-
-
-
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="product-description" rows="3"></textarea>
-                </div>
-                
-                <!-- Product Modal - Update the image section -->
-<div class="form-group">
-    <label>Product Images (Upload up to 6 different angles)</label>
-    <div class="image-upload-container">
-        <div class="upload-btn-wrapper">
-            <button class="btn-upload" type="button">
-                <i class="fas fa-images"></i>
-                Choose Images (Up to 6)
-            </button>
-            <input type="file" id="product-images-file" accept="image/*" multiple>
+    <input type="hidden" id="product-id">
+    
+    <div class="form-group">
+        <label>Product Name *</label>
+        <input type="text" id="product-name" required>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label>Price *</label>
+            <input type="number" id="product-price" step="0.01" required>
         </div>
-        <div>
-            <div id="images-preview-container" class="images-preview-grid">
-                <!-- Image previews will appear here -->
+        
+        <div class="form-group">
+            <label>Category *</label>
+                        <select id="product-category" required>
+    <option value="oppo">Oppo</option>
+    <option value="Apple">Apple</option>
+    <option value="Tecno">Tecno</option>
+    <option value="nokia">Nokia</option>
+    <option value="infinix">Infinix</option>
+    <option value="samsung">Samsung</option>
+    <option value="Hoodies">Hoodies</option>
+    <option value="T-Shirts">T-Shirts</option>
+    <option value="Laptops">Laptops</option>
+    <option value="Home-Tools">Home-Tools</option>
+    <option value="Shoes">Shoes</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Machinery">Machinery</option>
+    <option value="Lemonade flash sales">Lemonade flash sales</option>
+    <option value="Retails">Retails</option>
+    <option value="Wholesales">Wholesales</option>
+</select>
+                        
+               </div>
+    </div>
+    
+    <div class="form-group">
+        <label>Description</label>
+        <textarea id="product-description" rows="3"></textarea>
+    </div>
+    
+    <!-- Updated Image Section for multiple images -->
+    <div class="form-group">
+        <label>Product Images (Up to 6 angles)</label>
+        <div class="image-upload-container">
+            <div class="upload-btn-wrapper">
+                <button class="btn-upload" type="button">
+                    <i class="fas fa-images"></i>
+                    Upload Images
+                </button>
+                <input type="file" id="product-images-file" accept="image/*" multiple>
             </div>
-            <input type="text" id="product-image-urls" placeholder="Or enter image URLs (comma separated)">
+            <div>
+                <div id="images-preview-container" class="images-preview-grid">
+                    <p class="no-images-text">No images selected</p>
+                </div>
+                <input type="text" id="product-image-urls" placeholder="Enter image URLs (comma separated)">
+            </div>
         </div>
     </div>
-</div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Stock *</label>
-                        <input type="number" id="product-stock" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Min Stock</label>
-                        <input type="number" id="product-min-stock" value="5">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="product-status">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label>Stock *</label>
+            <input type="number" id="product-stock" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Status</label>
+            <select id="product-status">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+    </div> 
+        
                     
                     <div class="form-group">
                         <label>Tags</label>
@@ -509,7 +499,9 @@
                 </div>
             </form>
         </div>
+        
     </div>
+    
 
     <script src="admin.js"></script>
 </body>
