@@ -584,6 +584,7 @@ body {
    Cart View
    ========================================================================== */
 /* ==========================================================================
+   /* ==========================================================================
    Enhanced Cart View
    ========================================================================== */
 
@@ -676,7 +677,6 @@ body {
 }
 
 /* Product Image */
-
 .item-image img {
     width: 60px;
     height: 60px;
@@ -684,6 +684,7 @@ body {
     border-radius: 4px;
 }
 
+/* Item Details */
 .item-details {
     flex: 1;
     display: flex;
@@ -695,10 +696,6 @@ body {
     font-weight: bold;
     min-width: 100px;
     text-align: right;
-}
-
-.cart-item:hover .cart-item-image {
-    transform: scale(1.05);
 }
 
 /* Cart Item Info */
@@ -748,7 +745,6 @@ body {
     gap: 1rem;
     min-width: 140px;
 }
-
 /* Quantity Controls */
 .quantity-controls {
     display: flex;

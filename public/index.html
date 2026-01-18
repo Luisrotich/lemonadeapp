@@ -126,7 +126,10 @@
 
         <!-- Cart View -->
         <div class="view" id="cart-view">
-           
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button class="clear-cart-btn" id="clear-cart-top">Clear All</button>
+            </div>
             <div class="cart-items" id="cart-items">
                 <!-- Cart items will be loaded here -->
             </div>
@@ -138,10 +141,8 @@
                 <button class="checkout-btn" id="checkout-btn">
                     <i class="fas fa-shopping-cart"></i> Checkout
                 </button>
-                 <div class="cart-header">
-                <h2>Your Cart</h2>
                 <button class="clear-cart-btn" id="clear-cart-top">Clear All</button>
-            </div>
+
             </div>
         </div>
 
@@ -250,6 +251,7 @@
                 </div>
 
                 <!-- User Menu -->
+                <div class="user-menu" id="user-menu" style="display: none;">
                     <!-- Profile Section -->
                     <div class="menu-section">
                         <h3>My Account</h3>
@@ -284,7 +286,7 @@
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
                     </div>
-                
+                </div>
 
                 <!-- Profile Edit Section -->
                 <div class="account-section" id="profile-section" style="display: none;">
