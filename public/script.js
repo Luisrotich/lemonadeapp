@@ -1686,24 +1686,24 @@ class LemonadeApp {
                     const productImage = product ? product.image : 'https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱';
                     
                     return `
-                    <div class="cart-item" data-id="${item.id}">
-                        <div class="item-image">
-                            <img src="${productImage}" alt="${item.product}"
-                                 onerror="this.src='https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱'">
-                        </div>
-                        <div class="item-details">
-                            <div class="item-info">
-                                <h4>${item.product}</h4>
-                                <p class="item-price">ksh ${item.price.toFixed(2)} each</p>
-                            </div>
-                            <div class="item-actions">
-                               
-                            </div>
-                        </div>
-                        <div class="item-total">
-                            ksh ${(item.price * item.quantity).toFixed(2)}
-                        </div>
-                    </div>
+                  <div class="cart-item" data-id="${item.id}">
+    <div class="item-image">
+        <img src="${productImage}" alt="${item.product}"
+             onerror="this.src='https://via.placeholder.com/60x60/fff9c4/ff6f00?text=📱'">
+    </div>
+    <div class="item-details">
+        <div class="item-info">
+            <h4 style="margin: 0 0 5px 0;">${item.product}</h4>
+            <p class="item-price" style="margin: 0;">ksh ${item.price.toFixed(2)} each</p>
+        </div>
+        <div class="item-actions">
+            <!-- Add quantity controls here -->
+        </div>
+    </div>
+    <div class="item-total">
+        ksh ${(item.price * item.quantity).toFixed(2)}
+    </div>
+</div>
                     `;
                 }).join('');
             }
