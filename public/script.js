@@ -2573,49 +2573,108 @@ class LemonadeApp {
         document.querySelector('.bottom-nav').style.display = 'flex';
     }
 
-    loadProductImages(product) {
-        const mainImage = document.getElementById('main-product-image');
-        const thumbnailContainer = document.getElementById('thumbnail-container');
-        
-        if (!mainImage || !thumbnailContainer) return;
-        
-        // For demonstration, create multiple image variations
-        const baseImage = product.image || 'https://via.placeholder.com/300x200/fff9c4/ff6f00?text=🍋';
-        const imageUrls = [
-            baseImage,
-            baseImage.replace('300x200', '300x201'),
-            baseImage.replace('300x200', '300x202'),
-            baseImage.replace('300x200', '301x200'),
-            baseImage.replace('300x200', '301x200'),
-            baseImage.replace('300x200', '301x200')
-        ];
-        
-        // Set main image
-        mainImage.src = imageUrls[0];
-        
-        // Create thumbnails
-        thumbnailContainer.innerHTML = '';
-        imageUrls.forEach((url, index) => {
-            const thumbnail = document.createElement('img');
-            thumbnail.src = url;
-            thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
-            thumbnail.alt = `${product.name} - Image ${index + 1}`;
-            
-            thumbnail.addEventListener('click', () => {
-                this.setMainProductImage(url, index);
-            });
-            
-            thumbnailContainer.appendChild(thumbnail);
-        });
+ // Updated method to handle 6 different angle images
+loadProductImages(product) {
+    const mainImage = document.getElementById('main-product-image');
+    const thumbnailContainer = document.getElementById('thumbnail-container');
+    
+    if (!mainImage || !thumbnailContainer) return;
+    
+    // Get images array from product, fallback to single image
+    const productImages = product.images || (product.image ? [product.image] : []);
+    
+    // If no images, use placeholder
+    if (productImages.length === 0) {
+        productImages.push('https://via.placeholder.com/300x200/fff9c4/ff6f00?text=🍋');
     }
-
-    setMainProductImage(url, index) {
-        document.getElementById('main-product-image').src = url;
-        document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
-            thumb.classList.toggle('active', i === index);
+    
+    // Limit to 6 images max
+    const displayImages = productImages.slice(0, 6);
+    
+    // Set main image (first image)
+    mainImage.src = displayImages[0];
+    mainImage.alt = product.name;
+    
+    // Create thumbnails
+    thumbnailContainer.innerHTML = '';
+    displayImages.forEach((url, index) => {
+        const thumbnail = document.createElement('img');
+        thumbnail.src = url;
+        thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
+        thumbnail.alt = `${product.name} - Angle ${index + 1}`;
+        thumbnail.title = `View angle ${index + 1}`;
+        
+        thumbnail.addEventListener('click', () => {
+            this.setMainProductImage(url, index);
         });
-    }
+        
+        // Add loading attribute for better performance
+        thumbnail.loading = 'lazy';
+        
+        thumbnailContainer.appendChild(thumbnail);
+    });
+    
+    // Add CSS for thumbnail grid
+    this.addThumbnailStyles();
+}
 
+// Add thumbnail styles
+addThumbnailStyles() {
+    // Add styles if not already added
+    if (!document.getElementById('thumbnail-styles')) {
+        const style = document.createElement('style');
+        style.id = 'thumbnail-styles';
+        style.textContent = `
+            .thumbnail-container {
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 10px;
+                margin-top: 15px;
+                max-width: 100%;
+                overflow-x: auto;
+            }
+            
+            .thumbnail {
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 8px;
+                cursor: pointer;
+                border: 2px solid transparent;
+                transition: all 0.3s ease;
+            }
+            
+            .thumbnail:hover {
+                transform: scale(1.05);
+                border-color: var(--accent-color);
+            }
+            
+            .thumbnail.active {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.3);
+            }
+            
+            @media (max-width: 768px) {
+                .thumbnail-container {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+                
+                .thumbnail {
+                    width: 70px;
+                    height: 70px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+setMainProductImage(url, index) {
+    document.getElementById('main-product-image').src = url;
+    document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
+    });
+}
     loadProductReviews(product) {
         // Sample reviews - in real app, fetch from backend
         const reviews = [
