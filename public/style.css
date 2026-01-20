@@ -1571,11 +1571,23 @@ body {
     padding: 3rem 2rem;
     color: var(--text-light);
 }
+.product-images {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.product-images img {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+}
 
 /* Notifications */
 .notifications-list {
     display: flex;
-    flex-direction: column;
     gap: 1rem;
 }
 
@@ -1631,6 +1643,14 @@ body {
     opacity: 0.5;
 }
 
+.notification-body {
+    margin-bottom: 1rem;
+}
+
+.notification-body p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+}
 /* ==========================================================================
    Product Detail View
    ========================================================================== */
