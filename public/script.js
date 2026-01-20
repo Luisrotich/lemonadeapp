@@ -113,24 +113,22 @@ class LemonadeApp {
         
         // Ensure it starts with 254
         if (phone.startsWith('0')) {
-            phone = '254' + phone.substring(1);
-        } else if (phone.startsWith('7') || phone.startsWith('1')) {
-            phone = '254' + phone;
-        }
-        
+            phone = '0' + phone.substring(1);
+        } 
         // Ensure it's exactly 12 digits
-        if (phone.length !== 12) {
-            throw new Error('Invalid phone number format. Use 07XXXXXXXX or 2547XXXXXXXX');
+        if (phone.length !== 10) {
+            throw new Error('Invalid phone number format. Use 07XXXXXXXX ');
         }
         
         return phone;
     }
 
     // Validate phone number for M-Pesa
-    validateMpesaPhone(phone) {
-        const regex = /^(?:254|\+254|0)?(7(?:(?:[129][0-9])|(?:0[0-8])|(4[0-1]))[0-9]{6})$/;
-        return regex.test(phone);
-    }
+   
+ validateMpesaPhone(phone) {
+    const regex = /^07\d{8}$/;
+    return regex.test(phone);
+}
 
     // Show M-Pesa payment confirmation modal
     showMpesaPaymentConfirmation(amount, phoneNumber) {
