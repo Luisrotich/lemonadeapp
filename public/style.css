@@ -538,13 +538,12 @@ body {
 }
 
 .category-card {
-    background: orange;
+    background:rgb(254, 249, 225);
     border: 2px solid var(--border-color);
     border-radius: 15px;
     padding: 1.5rem 1rem;
     text-align: center;
     cursor: pointer;
-    color: white;
     transition: all 0.3s ease;
 }
 
@@ -615,7 +614,7 @@ body {
 }
 
 .clear-cart-btn {
-    background: red;
+    background: linear-gradient(135deg, var(--danger-color) 0%, #d32f2f 100%);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -748,6 +747,40 @@ body {
     gap: 1rem;
     min-width: 140px;
 }
+.cart-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.checkout-btn,
+.clear-cart-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+
+
+
+/* Clear cart button */
+.clear-cart-btn {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Hover effects */
+.checkout-btn:hover {
+    background: #218838;
+}
+
+.clear-cart-btn:hover {
+    background: #c82333;
+}
+
 /* Quantity Controls */
 .quantity-controls {
     display: flex;
@@ -866,51 +899,14 @@ body {
     font-size: 1.5rem;
 }
 
-.cart-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 15px;
-}
-
-.checkout-btn,
-.clear-cart-btn {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-/* Checkout button */
-.checkout-btn {
-    background: #28a745;
-    color: #fff;
-}
-
-/* Clear cart button */
-.clear-cart-btn {
-    background: red;
-    color: #fff;
-}
-
-/* Hover effects */
-.checkout-btn:hover {
-    background: #218838;
-}
-
-.clear-cart-btn:hover {
-    background: #c82333;
-}
-
 
 /* Checkout Button */
 .checkout-btn {
-    background: rgb(12, 220, 29);
+    background: rgb(44, 167, 16);
     color: white;
     border: none;
     padding: 1.25rem;
-    border-radius: 5px;
+    border-radius: 10px;
     font-size: 1.2rem;
     font-weight: 600;
     width: 100%;
