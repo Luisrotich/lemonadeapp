@@ -1781,13 +1781,10 @@ body {
     align-items: center;
     margin-bottom: 1rem;
 }
-
 .back-button {
     display: flex;
     align-items: center;
-    justify-content: center;   /* center content inside button */
     gap: 0.5rem;
-
     background: black;
     color: white;
     border: none;
@@ -1796,50 +1793,18 @@ body {
     cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
-
-    margin: 2rem auto;         /* center button horizontally */
+    margin-left: 30%;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(255, 83, 3, 0.3);
-
     position: relative;
     overflow: hidden;
-    display: inline-flex;      /* ensures gap works inside button */
-}
-
-/* Hover effect */
-.back-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 83, 3, 0.5);
 }
 
 
-.back-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s;
-}
 
-.back-button:hover::before {
-    left: 100%;
-}
 
-/* Icon styling */
-.back-button button i {
-    font-size: 1.1rem;
-}
 
-/* Mobile friendly */
-@media (max-width: 480px) {
-    .back-button button {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-    }
-}
+
 /* Product Gallery */
 .product-gallery {
     position: relative;
