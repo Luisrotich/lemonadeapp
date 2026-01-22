@@ -415,10 +415,7 @@
     <!-- Product Detail View -->
     <div class="product-detail-container" id="product-detail-view" style="display: none;">
         <div class="detail-header">
-            <button class="back-button" id="back-to-products">
-                <i class="fas fa-arrow-left"></i>
-                Back to Products
-            </button>
+           <br>
         </div>
     
         <div class="product-gallery">
@@ -442,7 +439,7 @@
             </p>
             
             <div class="quantity-selector">
-                <span class="quantity-label">Quantity:</span>
+                <span class="quantity-label"></span>
                 <div class="quantity-controls">
                     <button class="quantity-btn minus">-</button>
                     <span class="quantity-display">1</span>
@@ -450,13 +447,16 @@
                 </div>
             </div>
             
-            <button class="add-to-cart-btn" id="add-to-cart-detail">
-                <i class="fas fa-cart-plus"></i> Add to Cart
-            </button>
-            
-            <button class="buy-now-btn" id="buy-now-btn">
-                <i class="fas fa-bolt"></i> Buy Now
-            </button>
+            <div class="button-group">
+    <button class="add-to-cart-btn" id="add-to-cart-detail">
+        <i class="fas fa-cart-plus"></i> Add to Cart
+    </button>
+
+    <button class="buy-now-btn" id="buy-now-btn">
+        <i class="fas fa-bolt"></i> Buy Now
+    </button>
+</div>
+
         </div>
 
         <div class="reviews-section">
@@ -477,11 +477,21 @@
                     <div class="review-count" id="review-count"></div>
                 </div>
             </div>
-        </div>
+        
             <div class="review-list" id="review-list">
                 <!-- Reviews will be loaded here -->
             </div>
+            
         </div>
+        <div class="back-button">
+ <button class="back-button" id="back-to-products">
+                <i class="fas fa-arrow-left"></i>
+                Back to Products
+            </button>
+        </div>
+        </div>
+        
+        
     </div>
 
     <!-- Bottom Navigation -->
@@ -499,6 +509,8 @@
             <span>Cart</span>
             <span class="cart-badge" id="bottom-cart-count">0</span>
         </button>
+        
+
         <button class="nav-item" data-view="account-view">
             <i class="fas fa-user"></i>
             <span>Account</span>
