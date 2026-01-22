@@ -865,7 +865,7 @@ body {
 
 /* Checkout Button */
 .checkout-btn {
-    background: linear-gradient(135deg, var(--accent-color) 0%, #2e7d32 100%);
+    background: black;
     color: white;
     border: none;
     padding: 1.25rem;
@@ -928,7 +928,8 @@ body {
 }
 
 .continue-shopping-btn {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        background: linear-gradient(135deg,green, var(--secondary-color));
+
     color: white;
     border: none;
     padding: 1rem 2rem;
@@ -1052,7 +1053,7 @@ body {
 .user-avatar {
     width: 100px;
     height: 100px;
-    background: black;
+    background:green;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1090,7 +1091,7 @@ body {
 /* Auth Styles */
 .account-actions {
     margin-bottom: 1rem;
-    background: var(--card-bg);
+    background: orange;
     max-width: 600px;
     border-radius: 20px;
     padding: 1.5rem;
@@ -1101,7 +1102,7 @@ body {
 
 .auth-tabs {
     display: flex;
-    background: var(--bg-color);
+    background: white;
     border-radius: 25px;
     padding: 0.25rem;
     margin-bottom: 2rem;
@@ -1128,7 +1129,7 @@ body {
 }
 
 .auth-tab.active {
-    background: var(--primary-color);
+    background: orangered;
     color: white;
     box-shadow: 0 4px 15px rgba(255,111,0,0.3);
 }
@@ -1297,7 +1298,7 @@ body {
 
 /* Auth Button */
 .auth-btn {
-    background: linear-gradient(135deg, orange, var(--secondary-color));
+    background: linear-gradient(135deg,green, var(--secondary-color));
     color: white;
     border: none;
     padding: 1rem 1.5rem;
