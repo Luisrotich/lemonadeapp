@@ -3617,4 +3617,17 @@ document.head.appendChild(style);
  
 
         
-        
+        document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('first-visit-overlay');
+
+    // Check if user has visited before
+    if (!localStorage.getItem('hasVisited')) {
+        overlay.classList.add('show'); // show overlay
+
+        // Hide after 3 seconds
+        setTimeout(() => {
+            overlay.classList.remove('show');
+            localStorage.setItem('hasVisited', 'true'); // mark as visited
+        }, 3000);
+    }
+});
