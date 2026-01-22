@@ -1475,17 +1475,9 @@ class LemonadeApp {
             console.log('⚠️ No products received. Using fallback data.');
             
             // Fallback products
-            this.products = [
-                {
-                    id: 1,
-                    name: "Sample Product",
-                    category: "oppo",
-                    price: 299.99,
-                    image: "/uploads/placeholder.jpg",
-                    status: 'active',
-                    stock: 10
-                }
-            ];
+          
+            
+            
         }
         
         // First, clear any existing no-products message
@@ -1496,9 +1488,10 @@ class LemonadeApp {
         
         if (activeProducts.length === 0) {
             productsContainer.innerHTML = `
-                <div class="no-products">
-                    <p>No products available at the moment.</p>
-                </div>
+               <div class="no-products">
+    <p>Service temporarily unavailable. Our IT team is working on it. Please check back shortly.</p>
+</div>
+
             `;
             return;
         }
