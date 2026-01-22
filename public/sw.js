@@ -6,7 +6,7 @@ const urlsToCache = [
   '/style.css',
   '/script.js',
   '/manifest.json',
-  '/uploads/appicon.jpg'
+  '/upappicon.jpgloads/'
 ];
 
 // Install event - cache resources
