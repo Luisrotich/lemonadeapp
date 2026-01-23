@@ -13,7 +13,7 @@ body {
 
 /* Header - Enhanced for Desktop */
 .resources-header {
-    background: linear-gradient(135deg, #000, #222);
+    background: linear-gradient(135deg, #eb6403, #d97c0a);
     color: white;
     padding: 4rem 2rem 3rem;
     text-align: center;
@@ -41,7 +41,7 @@ body {
     position: absolute;
     left: 2.5rem;
     top: 2.5rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgb(2, 246, 10);
     border: none;
     color: white;
     font-size: 1.2rem;
@@ -461,7 +461,7 @@ body {
 
 /* Download button states */
 .resource-btn.update-available {
-    background: linear-gradient(90deg, #ff5303, #ff8c00);
+    background: linear-gradient(90deg, #0efc02, #ff8c00);
     animation: pulse 2s infinite;
 }
 
