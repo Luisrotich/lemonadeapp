@@ -378,3 +378,177 @@ body {
         50% { transform: translateY(-5px); }
     }
 }
+
+/* App Update Styles */
+#app-info {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+#app-info p {
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.version-status {
+    margin: 1rem 0;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: rgba(255, 83, 3, 0.1);
+    font-size: 0.9rem;
+}
+
+.status-checking {
+    color: #666;
+}
+
+.status-update-available {
+    color: #ff5303;
+    font-weight: 600;
+}
+
+.status-up-to-date {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.status-download-complete {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.status-error {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.download-controls {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.download-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff5303, #ff8c00);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ff5303;
+    min-width: 40px;
+}
+
+/* Download button states */
+.resource-btn.update-available {
+    background: linear-gradient(90deg, #ff5303, #ff8c00);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 83, 3, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 83, 3, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 83, 3, 0); }
+}
+
+/* Installation instructions modal */
+.install-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.install-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.install-content h3 {
+    color: #ff5303;
+    margin-bottom: 1rem;
+}
+
+.install-steps {
+    margin: 1.5rem 0;
+}
+
+.install-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.step-number {
+    background: #ff5303;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+/* Auto-check for updates */
+.update-notification {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border-left: 5px solid #ff5303;
+    z-index: 100;
+    animation: slideIn 0.3s ease;
+    display: none;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

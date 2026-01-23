@@ -1,0 +1,13 @@
+{
+  "version": "1.2.0",
+  "downloadUrl": "https://lemonadekenya.up.railway.app/download/app-v1.2.0.apk",
+  "fileSize": 25678901,
+  "releaseNotes": [
+    "Added new payment features",
+    "Improved performance by 40%",
+    "Fixed login issues",
+    "Added dark mode"
+  ],
+  "releaseDate": "2024-01-15",
+  "minAndroidVersion": "7.0"
+}

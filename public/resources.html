@@ -4,15 +4,10 @@
     <meta charset="UTF-8">
     <title>Resources | Lemonade Kenya</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Page Style -->
     <link rel="stylesheet" href="resources.css">
 </head>
 <body>
-
     <header class="resources-header">
         <button class="back-btn" onclick="window.location.href='index.html'">
             <i class="fas fa-arrow-left"></i>
@@ -22,41 +17,58 @@
     </header>
 
     <main class="resources-container">
-        <!-- App Download -->
+        <!-- App Download Card -->
         <div class="resource-card highlight">
             <i class="fas fa-download"></i>
-            <h3>Download Latest App</h3>
-            <p>
-                Get the newest version of the Lemonade Kenya app.<br>
-                <strong>Version:</strong> v1.2.0
-            </p>
-            <a href="https://lemonadekenya.up.railway.app/" class="resource-btn" download>
-                Download App
-            </a>
+            <h3>Lemonade Kenya App</h3>
+            <div id="app-info">
+                <p>
+                    <span id="current-version">Checking version...</span><br>
+                    <span id="app-size"></span>
+                </p>
+                <div class="version-status" id="version-status">
+                    <span class="status-checking">
+                        <i class="fas fa-sync fa-spin"></i> Checking for updates...
+                    </span>
+                </div>
+            </div>
+            <div class="download-controls">
+                <button id="download-btn" class="resource-btn" disabled>
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <div class="download-progress" id="download-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span class="progress-text" id="progress-text">0%</span>
+                </div>
+            </div>
         </div>
-<!--               
+
+        <!-- Other Resources -->
         <div class="resource-card">
             <i class="fas fa-file-pdf"></i>
             <h3>User Guide</h3>
             <p>Learn how to use Lemonade Kenya effectively.</p>
-            <a href="#" class="resource-btn">View</a>
+            <a href="docs/user-guide.pdf" class="resource-btn" target="_blank">View PDF</a>
         </div>
 
         <div class="resource-card">
             <i class="fas fa-video"></i>
             <h3>Tutorial Videos</h3>
             <p>Step-by-step video walkthroughs.</p>
-            <a href="#" class="resource-btn">Watch</a>
+            <a href="https://www.youtube.com/playlist?list=your-playlist" class="resource-btn" target="_blank">Watch</a>
         </div>
 
         <div class="resource-card">
             <i class="fas fa-link"></i>
             <h3>Helpful Links</h3>
             <p>External tools and partner platforms.</p>
-            <a href="#" class="resource-btn">Open</a>
+            <a href="https://lemonadekenya.up.railway.app/" class="resource-btn" target="_blank">Open</a>
         </div>
-        -->
     </main>
 
+    <!-- JavaScript -->
+    <script src="app-updater.js"></script>
 </body>
 </html>
