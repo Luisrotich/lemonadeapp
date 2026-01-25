@@ -1,6 +1,6 @@
 {
   "name": "lemonade-store",
-  "version": "1.0.0",
+  "version": "1.2.3",
   "description": "Mobile E-commerce Store",
   "main": "server.js",
   "scripts": {
