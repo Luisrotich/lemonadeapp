@@ -13,6 +13,75 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <style>
+        /* Bottom nav container */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-radius: 15px;
+    background-color: #daebd8;
+    border-top: 0.4535px solid white;
+    padding: 8px 0;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+    z-index: 100;
+}
+
+/* Buttons */
+.bottom-nav .nav-item {
+    background: white;
+    border: none;
+    outline: none;
+    display: flex;
+    border-radius: 10px;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+    color: #555;
+    position: relative;
+    cursor: pointer;
+    transition: color 0.6s, transform 0.2s;
+}
+
+/* Icon size */
+.bottom-nav .nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+/* Active state */
+.bottom-nav .nav-item.active {
+    color: #ed7207; /* lemon accent */
+}
+
+.bottom-nav .nav-item.active i {
+    transform: scale(1.2);
+}
+
+/* Hover effect */
+.bottom-nav .nav-item:hover {
+    color: #ff9100;
+    transform: translateY(-2px);
+}
+
+/* Cart badge */
+.cart-badge {
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    background: #061cbf;
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+    </style>
 
 </head>
 <body>
@@ -36,6 +105,12 @@
                 <li><a href="contact.html"><i class="fas fa-envelope lemon-icon"></i>Contact</a></li>
                 <li><a href="blog.html"><i class="fas fa-blog lemon-icon"></i>Blog</a></li>
                 <li><a href="help.html"><i class="fas fa-question-circle lemon-icon"></i>Help</a></li>
+<li class="disabled">
+  <a href="#">
+    <i class="fas fa-briefcase lemon-icon"></i> Careers/Hiring (Coming Soon)
+  </a>
+</li>
+
             </ul>
             
             <ul class="social-links">
@@ -500,26 +575,29 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <button class="nav-item active" data-view="home-view">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </button>
-        <button class="nav-item" data-view="categories-view">
-            <i class="fas fa-th-large"></i>
-            <span>Categories</span>
-        </button>
-        <button class="nav-item" data-view="cart-view">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Cart</span>
-            <span class="cart-badge" id="bottom-cart-count">0</span>
-        </button>
+   <nav class="bottom-nav">
+    <button class="nav-item active" data-view="home-view">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </button>
+    
+    <button class="nav-item" data-view="categories-view">
+        <i class="fas fa-th-large"></i>
+        <span>Categories</span>
+    </button>
 
-        <button class="nav-item" data-view="account-view">
-            <i class="fas fa-user"></i>
-            <span>Account</span>
-        </button>
-    </nav>
+    <button class="nav-item" data-view="cart-view">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Cart</span>
+        <span class="cart-badge" id="bottom-cart-count">0</span>
+    </button>
+
+    <button class="nav-item" data-view="account-view">
+        <i class="fas fa-user"></i>
+        <span>Account</span>
+    </button>
+</nav>
+
 
     <!-- Checkout Modal -->
     <div id="mpesa-modal" class="modal">
