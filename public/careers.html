@@ -3,771 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Our Team | Career Opportunities</title>
+    <title>Join Our Team - Exciting Opportunities</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="landing.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8f9fa;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header */
-        header {
-            background: linear-gradient(135deg, #ff9d00, #ff8c00);
-            color: white;
-            padding: 3rem 0;
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        header h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        header p {
-            font-size: 1.2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        /* Section Styles */
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 2.5rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #fc7600;
-        }
-
-        .section-title {
-            color: #ff6f01;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #eaeaea;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title i {
-            margin-right: 12px;
-            color: #25D366;
-        }
-
-        /* Benefits & Perks */
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .benefit-card {
-            background: #f8f9ff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid #e1e5f1;
-        }
-
-        .benefit-card h3 {
-            color: #1bae23;
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .benefit-card h3 i {
-            margin-right: 10px;
-            color: #25D366;
-        }
-
-        /* Growth & Learning */
-        .growth-list {
-            list-style: none;
-        }
-
-        .growth-list li {
-            padding: 1rem 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-
-        .growth-list li:last-child {
-            border-bottom: none;
-        }
-
-        .growth-list i {
-            color: #25D366;
-            margin-right: 15px;
-            font-size: 1.2rem;
-        }
-
-        /* Hiring Process */
-        .process-steps {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin-top: 2rem;
-        }
-
-        .process-step {
-            flex: 1;
-            min-width: 200px;
-            text-align: center;
-            padding: 1.5rem;
-            margin: 0.5rem;
-            background: #f8f9ff;
-            border-radius: 8px;
-            position: relative;
-        }
-
-        .step-number {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            background: #25D366;
-            color: white;
-            border-radius: 50%;
-            line-height: 40px;
-            margin-bottom: 1rem;
-            font-weight: bold;
-        }
-
-        /* Application Form */
-        .application-box {
-            background: linear-gradient(135deg, #f8f9ff, #e8ebff);
-            padding: 2.5rem;
-            border-radius: 12px;
-            margin-top: 1.5rem;
-        }
-
-        .application-form {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #092304;
-        }
-
-        .form-input,
-        .form-textarea,
-        .form-select {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid #e1e5f1;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus,
-        .form-textarea:focus,
-        .form-select:focus {
-            outline: none;
-            border-color: #25D366;
-        }
-
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-select {
-            background-color: white;
-        }
-
-        .form-hint {
-            font-size: 0.85rem;
-            color: #666;
-            margin-top: 0.3rem;
-            display: block;
-        }
-
-        .required {
-            color: #e74c3c;
-        }
-
-        .whatsapp-btn {
-            display: inline-block;
-            background: #25D366;
-            color: white;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-top: 1.5rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-            border: none;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .whatsapp-btn:hover {
-            background: #1da851;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.4);
-        }
-
-        .whatsapp-btn:disabled {
-            background: #95d5b2;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .whatsapp-btn i {
-            margin-right: 10px;
-            font-size: 1.4rem;
-        }
-
-        .application-note {
-            margin-top: 1.5rem;
-            font-style: italic;
-            color: #555;
-            text-align: center;
-        }
-
-        /* Employer Proof */
-        .testimonial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .testimonial {
-            background: #f8f9ff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-left: 4px solid #25D366;
-        }
-
-        .testimonial-text {
-            font-style: italic;
-            margin-bottom: 1rem;
-        }
-
-        .testimonial-author {
-            font-weight: bold;
-            color: #1a2a6c;
-        }
-
-        .awards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .award {
-            background: #fff;
-            border: 1px solid #e1e5f1;
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            color: #ff0000;
-        }
-
-        /* Form Validation */
-        .error-message {
-            color: #e74c3c;
-            font-size: 0.85rem;
-            margin-top: 0.3rem;
-            display: none;
-        }
-
-        .form-input.error,
-        .form-textarea.error,
-        .form-select.error {
-            border-color: #e74c3c;
-        }
-
-        .form-input.error + .error-message,
-        .form-textarea.error + .error-message,
-        .form-select.error + .error-message {
-            display: block;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
-            color: #666;
-            border-top: 1px solid #eee;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .process-steps {
-                flex-direction: column;
-            }
-            
-            .section {
-                padding: 1.5rem;
-            }
-            
-            header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            
-            .application-box {
-                padding: 1.5rem;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <h1>Join Our Team</h1>
-            <p>Build your career with us and be part of an innovative, supportive, and growth-focused environment.</p>
-        </div>
-    </header>
-
-    <div class="container">
-        <!-- Benefits & Perks Section -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-gift"></i> Benefits & Perks</h2>
-            <p>We offer a comprehensive package designed to support your personal and professional life.</p>
-            
-            <div class="benefits-grid">
-                <div class="benefit-card">
-                    <h3><i class="fas fa-money-bill-wave"></i> Competitive Salary & Bonuses</h3>
-                    <p>Attractive compensation with performance-based bonuses and annual salary reviews.</p>
-                </div>
-                
-                <div class="benefit-card">
-                    <h3><i class="fas fa-home"></i> Remote Work & Flexible Hours</h3>
-                    <p>Work from anywhere with flexible schedules that help you maintain work-life balance.</p>
-                </div>
-                
-                <div class="benefit-card">
-                    <h3><i class="fas fa-graduation-cap"></i> Learning & Development Budget</h3>
-                    <p>Annual budget for courses, books, conferences, and other learning resources.</p>
-                </div>
-                
-                <div class="benefit-card">
-                    <h3><i class="fas fa-heartbeat"></i> Comprehensive Health Cover</h3>
-                    <p>Full medical, dental, and vision insurance for you and your family.</p>
-                </div>
-                
-                <div class="benefit-card">
-                    <h3><i class="fas fa-umbrella-beach"></i> Generous Leave Policy</h3>
-                    <p>Unlimited PTO, parental leave, and paid holidays to recharge and refresh.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Growth & Learning Section -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-chart-line"></i> Growth & Learning</h2>
-            <p>We're committed to helping ambitious people achieve their career goals.</p>
-            
-            <ul class="growth-list">
-                <li>
-                    <i class="fas fa-user-tie"></i>
-                    <div>
-                        <h3>Clear Promotion Path</h3>
-                        <p>Transparent career progression framework with regular advancement opportunities.</p>
-                    </div>
-                </li>
-                
-                <li>
-                    <i class="fas fa-laptop-code"></i>
-                    <div>
-                        <h3>Training Programs</h3>
-                        <p>Regular workshops, technical training, and leadership development programs.</p>
-                    </div>
-                </li>
-                
-                <li>
-                    <i class="fas fa-hands-helping"></i>
-                    <div>
-                        <h3>Mentorship Program</h3>
-                        <p>One-on-one mentorship from senior leaders and cross-functional pairing.</p>
-                    </div>
-                </li>
-                
-                <li>
-                    <i class="fas fa-certificate"></i>
-                    <div>
-                        <h3>Certification Support</h3>
-                        <p>We cover the cost of relevant professional certifications and examinations.</p>
-                    </div>
-                </li>
-            </ul>
-        </section>
-
-        <!-- Hiring Process Section -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Hiring Process</h2>
-            <p>Our transparent process ensures you know what to expect every step of the way.</p>
-            
-            <div class="process-steps">
-                <div class="process-step">
-                    <div class="step-number">1</div>
-                    <h3>Initial Review</h3>
-                    <p>We review your application within 48 hours of submission.</p>
-                </div>
-                
-                <div class="process-step">
-                    <div class="step-number">2</div>
-                    <h3>Screening Call</h3>
-                    <p>30-minute conversation with our HR team.</p>
-                </div>
-                
-                <div class="process-step">
-                    <div class="step-number">3</div>
-                    <h3>Skills Assessment</h3>
-                    <p>Practical project or test related to the role (2-4 hours).</p>
-                </div>
-                
-                <div class="process-step">
-                    <div class="step-number">4</div>
-                    <h3>Final Interviews</h3>
-                    <p>Meet with team leads and department heads (2-3 interviews).</p>
-                </div>
-                
-                <div class="process-step">
-                    <div class="step-number">5</div>
-                    <h3>Offer</h3>
-                    <p>Decision within 1 week of final interview.</p>
-                </div>
-            </div>
-            
-            <p><strong>Total Timeline:</strong> 2-3 weeks from application to offer.</p>
-        </section>
-
-        <!-- Application Method Section -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-paper-plane"></i> Application Method</h2>
-            <p>Complete the form below and we'll send your application directly to our hiring team via WhatsApp.</p>
-            
-            <div class="application-box">
-                <h3 style="text-align: center; margin-bottom: 2rem;">Application Form</h3>
-                
-                <form id="applicationForm" class="application-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="fullName" class="form-label">Full Name <span class="required">*</span></label>
-                            <input type="text" id="fullName" class="form-input" required placeholder="John Doe">
-                            <div class="error-message">Please enter your full name</div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="phoneNumber" class="form-label">Phone Number <span class="required">*</span></label>
-                            <input type="tel" id="phoneNumber" class="form-input" required placeholder="+254 720 619 540">
-                            <div class="error-message">Please enter a valid phone number</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email Address <span class="required">*</span></label>
-                            <input type="email" id="email" class="form-input" required placeholder="john.doe@example.com">
-                            <div class="error-message">Please enter a valid email address</div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="position" class="form-label">Position Applying For <span class="required">*</span></label>
-                            <select id="position" class="form-select" required>
-                                <option value="" disabled selected>Select a position</option>
-                                <option value="Frontend Developer">Frontend Developer</option>
-                                <option value="Backend Developer">Backend Developer</option>
-                                <option value="Full Stack Developer">Full Stack Developer</option>
-                                <option value="UX/UI Designer">UX/UI Designer</option>
-                                <option value="Product Manager">Product Manager</option>
-                                <option value="Data Analyst">Data Analyst</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <div class="error-message">Please select a position</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="linkedin" class="form-label">LinkedIn Profile URL(Optional)</label>
-                        <input type="url" id="linkedin" class="form-input" placeholder="https://linkedin.com/in/yourprofile">
-                        <div class="error-message">Please enter a valid URL</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="github" class="form-label">GitHub / Portfolio URL (developers)</label>
-                        <input type="url" id="github" class="form-input" placeholder="https://github.com/yourusername or portfolio link">
-                        <div class="error-message">Please enter a valid URL</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="experience" class="form-label">Years of Experience <span class="required">*</span></label>
-                        <select id="experience" class="form-select" required>
-                            <option value="" disabled selected>Select experience level</option>
-                            <option value="0-1 years">0-1 years (Entry Level)</option>
-                            <option value="1-3 years">1-3 years (Junior)</option>
-                            <option value="3-5 years">3-5 years (Mid Level)</option>
-                            <option value="5-8 years">5-8 years (Senior)</option>
-                            <option value="8+ years">8+ years (Lead/Expert)</option>
-                        </select>
-                        <div class="error-message">Please select your experience level</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="coverLetter" class="form-label">Cover Letter / Introduction <span class="required">*</span></label>
-                        <textarea id="coverLetter" class="form-textarea" required placeholder="Tell us about yourself, your skills, and why you're interested in this position..."></textarea>
-                        <div class="error-message">Please write a cover letter or introduction</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="additionalInfo" class="form-label">Additional Information</label>
-                        <textarea id="additionalInfo" class="form-textarea" placeholder="Any other information you'd like to share..."></textarea>
-                    </div>
-                    
-                    <button type="submit" id="submitBtn" class="whatsapp-btn">
-                        <i class="fab fa-whatsapp"></i> Send Application via WhatsApp
-                    </button>
-                    
-                    <p class="application-note">
-                        <i class="fas fa-info-circle"></i> After submitting, you'll be redirected to WhatsApp with a pre-filled message containing all your application details.
-                    </p>
-                </form>
-            </div>
-            
-            <div style="margin-top: 2rem;">
-                <p><strong>Note:</strong> You can also attach your CV/resume directly in WhatsApp after sending the initial message.</p>
-            </div>
-        </section>
-
-        <!-- Employer Proof Section -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-award"></i> Employer Proof</h2>
-            <p>Don't just take our word for it. Here's what our team members say about working with us.</p>
-            
-            <div class="testimonial-grid">
-                <div class="testimonial">
-                    <p class="testimonial-text">"The growth opportunities here are incredible. I've been promoted twice in three years and the mentorship program completely transformed my career trajectory."</p>
-                    <p class="testimonial-author">– Luis k., Senior Developer</p>
-                </div>
-                
-                <div class="testimonial">
-                    <p class="testimonial-text">"The flexible work policy allowed me to balance my family commitments while advancing in my career. The health benefits are also the best I've ever had."</p>
-                    <p class="testimonial-author">– Jonah K., Product Manager</p>
-                </div>
-                
-                <div class="testimonial">
-                    <p class="testimonial-text">"I've earned three certifications since joining, all fully funded by the company. The learning culture here is genuinely supportive of professional development."</p>
-                    <p class="testimonial-author">– Odongo E., Data Analyst</p>
-                </div>
-            </div>
-            
-            <div style="margin-top: 2rem;">
-                <h3>Our Recognitions</h3>
-                <div class="awards">
-                    <div class="award">🏆 Best Workplace for Learning 2026</div>
-                    <div class="award">⭐ Top Remote-First Company 2026</div>
-                    <div class="award">🚀 Growing Tech Employer 2025/2026</div>
-                </div>
-            </div>
-        </section>
-    </div>
-
+   
     
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('applicationForm');
-            const submitBtn = document.getElementById('submitBtn');
+   <!-- Navigation -->
+<nav class="main-nav">
+    <div class="nav-container">
+        <!-- Logo -->
+        <div class="logo">
+            <a href="index.html">
+                <i class="fas fa-rocket"></i>
+                <span>CareerLaunch</span>
+            </a>
+        </div>
+
+        <!-- Desktop Navigation Links -->
+        <div class="nav-links">
+          
+            <a href="#opportunities" class="nav-link">
+                <i class="fas fa-briefcase"></i>
+                <span>Opportunities</span>
+            </a>
+            <a href="#benefits" class="nav-link">
+                <i class="fas fa-star"></i>
+                <span>Benefits</span>
+            </a>
+            <a href="#about" class="nav-link">
+                <i class="fas fa-info-circle"></i>
+                <span>About Us</span>
+            </a>
+          
             
-            // Form validation
-            function validateField(field) {
-                const value = field.value.trim();
-                const errorElement = field.nextElementSibling;
-                
-                if (field.required && !value) {
-                    field.classList.add('error');
-                    return false;
-                }
-                
-                if (field.type === 'email' && value) {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(value)) {
-                        field.classList.add('error');
-                        return false;
-                    }
-                }
-                
-                if (field.type === 'url' && value) {
-                    try {
-                        new URL(value);
-                    } catch (e) {
-                        field.classList.add('error');
-                        return false;
-                    }
-                }
-                
-                field.classList.remove('error');
-                return true;
-            }
+          
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="menu-toggle" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Mobile Navigation -->
+        <div class="mobile-nav">
+            <div class="mobile-nav-header">
+                <div class="logo">
+                    <i class="fas fa-rocket"></i>
+                    <span>CareerLaunch</span>
+                </div>
+                <button class="mobile-close-btn" aria-label="Close menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             
-            // Real-time validation
-            const inputs = form.querySelectorAll('input, textarea, select');
-            inputs.forEach(input => {
-                input.addEventListener('blur', () => validateField(input));
-                input.addEventListener('input', () => {
-                    if (input.classList.contains('error')) {
-                        validateField(input);
-                    }
-                });
-            });
+            <div class="mobile-nav-links">
+               
+                <a href="#opportunities" class="mobile-nav-link">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Opportunities</span>
+                </a>
+                <a href="#benefits" class="mobile-nav-link">
+                    <i class="fas fa-star"></i>
+                    <span>Benefits</span>
+                </a>
+                <a href="#about" class="mobile-nav-link">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About Us</span>
+                </a>
+               
+                
+             
+              
+           
             
-            // Form submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Validate all fields
-                let isValid = true;
-                inputs.forEach(input => {
-                    if (!validateField(input)) {
-                        isValid = false;
-                    }
-                });
-                
-                if (!isValid) {
-                    alert('Please fill in all required fields correctly.');
-                    return;
-                }
-                
-                // Get form values
-                const formData = {
-                    fullName: document.getElementById('fullName').value.trim(),
-                    phone: document.getElementById('phoneNumber').value.trim(),
-                    email: document.getElementById('email').value.trim(),
-                    position: document.getElementById('position').value,
-                    linkedin: document.getElementById('linkedin').value.trim(),
-                    github: document.getElementById('github').value.trim(),
-                    experience: document.getElementById('experience').value,
-                    coverLetter: document.getElementById('coverLetter').value.trim(),
-                    additionalInfo: document.getElementById('additionalInfo').value.trim(),
-                    date: new Date().toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    })
-                };
-                
-                // Create WhatsApp message
-                let whatsappMessage = `🚀 *NEW JOB APPLICATION* 🚀\n\n`;
-                whatsappMessage += `*Date:* ${formData.date}\n\n`;
-                whatsappMessage += `*Personal Information:*\n`;
-                whatsappMessage += `• *Full Name:* ${formData.fullName}\n`;
-                whatsappMessage += `• *Phone:* ${formData.phone}\n`;
-                whatsappMessage += `• *Email:* ${formData.email}\n\n`;
-                whatsappMessage += `*Application Details:*\n`;
-                whatsappMessage += `• *Position:* ${formData.position}\n`;
-                whatsappMessage += `• *Experience:* ${formData.experience}\n`;
-                
-                if (formData.linkedin) {
-                    whatsappMessage += `• *LinkedIn:* ${formData.linkedin}\n`;
-                }
-                
-                if (formData.github) {
-                    whatsappMessage += `• *GitHub/Portfolio:* ${formData.github}\n`;
-                }
-                
-                whatsappMessage += `\n*Cover Letter:*\n${formData.coverLetter}\n`;
-                
-                if (formData.additionalInfo) {
-                    whatsappMessage += `\n*Additional Information:*\n${formData.additionalInfo}\n`;
-                }
-                
-                whatsappMessage += `\n────────────────────\n`;
-                whatsappMessage += `*Application submitted via Career Page*\n`;
-                whatsappMessage += `*Candidate is expecting your response!*`;
-                
-                // Encode message for URL
-                const encodedMessage = encodeURIComponent(whatsappMessage);
-                
-                // Create WhatsApp URL
-                const whatsappURL = `https://wa.me/254720619540?text=${encodedMessage}`;
-                
-                // Update button text
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to WhatsApp...';
-                submitBtn.disabled = true;
-                
-                // Open WhatsApp in new tab after short delay
-                setTimeout(() => {
-                    window.open(whatsappURL, '_blank');
-                    
-                    // Reset button after 2 seconds
-                    setTimeout(() => {
-                        submitBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Send Application via WhatsApp';
-                        submitBtn.disabled = false;
-                        
-                        // Optional: Clear form
-                        if (confirm('Application sent! Would you like to clear the form for another application?')) {
-                            form.reset();
-                        }
-                    }, 2000);
-                }, 1000);
-            });
-            
-            // Smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    if(targetId !== '#') {
-                        const targetElement = document.querySelector(targetId);
-                        if(targetElement) {
-                            window.scrollTo({
-                                top: targetElement.offsetTop - 20,
-                                behavior: 'smooth'
-                            });
-                        }
-                    }
-                });
-            });
-        });
-    </script>
+            <!--
+                <div class="mobile-nav-footer">
+                <div class="mobile-social-links">
+                    <a href="#" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#" aria-label="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" aria-label="Facebook">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>-->
+                <p class="mobile-copyright">&copy; 2026 lemonade CareerLaunch</p>
+            </div>
+             </div>
+        </div>
+    </div>
+</nav>
+    </nav>
+    <!-- Add this between navbar and footer -->
+<main class="content-placeholder">
+    <i class="fas fa-rocket placeholder-icon"></i>
+    <h1>Welcome to Lemonade CareerLaunch</h1>
+    <p>Your journey to an exciting career starts here. We're currently updating our content. Check back soon for amazing opportunities!</p>
+  <button class="cta-button" onclick="window.open('https://lemonadecareers-production.up.railway.app/', '_blank')">
+    <i class="fas fa-paper-plane"></i>
+    <span>Apply Now</span>
+</button>
+
+</main>
+
+   
+
+
+   
+
+    <script src="landing.js"></script>
 </body>
 </html>
