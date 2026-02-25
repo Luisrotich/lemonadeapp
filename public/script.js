@@ -1538,7 +1538,7 @@ class LemonadeApp {
                             ${generateColorfulStars(product.rating || 4.)}
                         </div>
                         
-                        <p class="beta-tag">Lemonade Beta</p>
+                        <p class="beta-tag">Lemonade🍋 Express</p>
                     
                     </div>
                                     

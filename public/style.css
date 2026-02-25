@@ -3566,7 +3566,7 @@ body {
 
 /* Colorful Star Variations */
 .star-gold {
-    background: linear-gradient(135deg, #FFD700, #FFA500);
+    background: linear-gradient(135deg, #ff6201, #ff6a00);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -3574,7 +3574,7 @@ body {
 }
 
 .star-purple {
-    background: linear-gradient(135deg, #9B59B6, #8E44AD);
+    background: linear-gradient(135deg, #ff6201, #ff6a00);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -3582,7 +3582,7 @@ body {
 }
 
 .star-blue {
-    background: linear-gradient(135deg, #3498DB, #2980B9);
+    background: linear-gradient(135deg, #ff6201, #ff6a00);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -3590,7 +3590,7 @@ body {
 }
 
 .star-green {
-    background: linear-gradient(135deg, #2ECC71, #27AE60);
+    background: linear-gradient(135deg, #ff6201, #ff6a00);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -3598,7 +3598,7 @@ body {
 }
 
 .star-red {
-    background: linear-gradient(135deg, #E74C3C, #C0392B);
+    background: linear-gradient(135deg, #ff6201, #ff6a00);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
