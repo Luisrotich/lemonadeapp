@@ -3427,3 +3427,336 @@ body {
 #first-visit-overlay.show img {
     transform: scale(1);
 }
+
+
+/* Main Card Styling */
+.product-card2 {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.product-card2:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(255, 215, 0, 0.15);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+/* Image Container */
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(45deg, #f8f9fa, #fff9e6);
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card2:hover .image-container img {
+    transform: scale(1.08);
+}
+
+/* Stock Badge */
+.stock-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease;
+}
+
+.stock-badge.in-stock {
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid rgba(46, 204, 113, 0.5);
+    color: #27ae60;
+}
+
+.stock-badge.out-of-stock {
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid rgba(231, 76, 60, 0.5);
+    color: #c0392b;
+}
+
+/* Product Info */
+.product-info {
+    padding: 18px 16px 20px;
+}
+
+/* Product Title */
+.product-title2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 50px;
+}
+
+/* Price and Rating Row */
+.price-rating-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Price Styling */
+.price2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2c3e50;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.price2::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+/* Star Rating Container */
+.star-rating-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 215, 0, 0.08);
+    padding: 4px 10px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+/* Individual Star */
+.star {
+    font-size: 18px;
+    display: inline-block;
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+/* Colorful Star Variations */
+.star-gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+}
+
+.star-purple {
+    background: linear-gradient(135deg, #9B59B6, #8E44AD);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(155, 89, 182, 0.3));
+}
+
+.star-blue {
+    background: linear-gradient(135deg, #3498DB, #2980B9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(52, 152, 219, 0.3));
+}
+
+.star-green {
+    background: linear-gradient(135deg, #2ECC71, #27AE60);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(46, 204, 113, 0.3));
+}
+
+.star-red {
+    background: linear-gradient(135deg, #E74C3C, #C0392B);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(231, 76, 60, 0.3));
+}
+
+.star-orange {
+    background: linear-gradient(135deg, #F39C12, #E67E22);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(243, 156, 18, 0.3));
+}
+
+.star-pink {
+    background: linear-gradient(135deg, #FD1D1D, #FCB045);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(253, 29, 29, 0.3));
+}
+
+.star-bronze {
+    background: linear-gradient(135deg, #CD7F32, #B87333);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(205, 127, 50, 0.3));
+}
+
+.star-silver {
+    background: linear-gradient(135deg, #C0C0C0, #E8E8E8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(192, 192, 192, 0.3));
+}
+
+.star-empty {
+    color: #E0E0E0;
+    opacity: 0.5;
+}
+
+/* Rating Value */
+.rating-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: #FFA500;
+    background: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+/* Beta Tag - Premium Style */
+.beta-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(90deg, #FFF9E6, #FFF3D4);
+    border: 1.5px solid #FFD700;
+    border-radius: 40px;
+    padding: 8px 18px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+    transition: all 0.3s ease;
+    width: fit-content;
+}
+
+.beta-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transition: left 0.5s ease;
+}
+
+.beta-tag:hover::before {
+    left: 100%;
+}
+
+.beta-icon {
+    font-size: 18px;
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
+    animation: bounce 2s infinite;
+}
+
+.beta-text {
+    font-size: 13px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #FFA500, #FF4500);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+.beta-glow {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    width: 4px;
+    height: 4px;
+    background: #FFD700;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #FFD700;
+    animation: pulse 1.5s infinite;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.5);
+    }
+}
+
+/* Star hover effect */
+.star-rating-container:hover .star {
+    animation: starShine 0.5s ease;
+}
+
+@keyframes starShine {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+        filter: brightness(1.2);
+    }
+}

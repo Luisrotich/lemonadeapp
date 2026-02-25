@@ -1519,29 +1519,39 @@ class LemonadeApp {
                     .replace(/'/g, '&#39;');
                 
                 return `
-                    <div class="product-card2" 
-                         data-category="${product.category || 'all'}" 
-                         data-name="${product.name?.toLowerCase() || ''}">
+                                    <div class="product-card2" 
+                        data-category="${product.category || 'all'}" 
+                        data-name="${product.name?.toLowerCase() || ''}">
                         
                         <img src="${product.image || '/uploads/placeholder.jpg'}" 
-                             alt="${product.name || 'Product'}" 
-                             onclick="lemonadeApp.showProductDetail(${safeProduct})"
-                             style="cursor: pointer;"
-                             onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
+                            alt="${product.name || 'Product'}" 
+                            onclick="lemonadeApp.showProductDetail(${safeProduct})"
+                            style="cursor: pointer;"
+                            onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
                         
                         <h3 class="product-title2">${product.name || 'Unnamed Product'}</h3>
                         
                         <div class="price2">Ksh ${product.price?.toFixed(2) || '0.00'}</div>
                         
-                        ${product.stock > 0 ? `
-                            
-                        ` : `
-                            <button class="add-to-cart out-of-stock" disabled>
-                                Out of Stock
-                            </button>
-                        `}
+                        <!-- Star Rating with Colorful Stars -->
+                        <div class="star-rating-container">
+                            ${generateColorfulStars(product.rating || 4.)}
+                        </div>
+                        
+                        <p class="beta-tag">Lemonade Beta</p>
+                    
                     </div>
-                `;
+                                    
+                                                            
+                                            ${product.stock > 0 ? `
+                                                
+                                            ` : `
+                                                <button class="add-to-cart out-of-stock" disabled>
+                                                    Out of Stock
+                                                </button>
+                                            `}
+                                        </div>
+                                    `;
             }).join('');
 
         console.log('✅ Products rendered:', activeProducts.length);
