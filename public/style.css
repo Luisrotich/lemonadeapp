@@ -1962,7 +1962,7 @@ body {
 }
 
 .main-image {
-    width: 100%;
+    width: 600px;
     height: auto;
     aspect-ratio: 4/5; /* Maintains consistent ratio */
     max-height: 600px;
