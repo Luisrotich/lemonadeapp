@@ -1532,12 +1532,6 @@ class LemonadeApp {
                         <h3 class="product-title2">${product.name || 'Unnamed Product'}</h3>
                         
                         <div class="price2">Ksh ${product.price?.toFixed(2) || '0.00'}</div>
-                          <!-- Star Rating with Colorful Stars -->
-                        <div class="star-rating-container">
-                            ${generateColorfulStars(product.rating || 4.)}
-                        </div>
-                        
-                        <p class="beta-tag">Lemonade🍋 Express</p>
                         
                         ${product.stock > 0 ? `
                             
