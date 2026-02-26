@@ -3653,3 +3653,127 @@ document.addEventListener('DOMContentLoaded', () => {
 
         
   
+// Product Gallery with Zoom
+class ProductGallery {
+    constructor(container) {
+        this.container = container;
+        this.mainImage = container.querySelector('.main-image');
+        this.thumbnails = container.querySelectorAll('.thumbnail');
+        this.zoomLens = container.querySelector('.zoom-lens');
+        this.zoomResult = container.querySelector('.zoom-result');
+        this.zoomResultImg = this.zoomResult?.querySelector('img');
+        
+        this.init();
+    }
+    
+    init() {
+        this.initThumbnails();
+        this.initZoom();
+        this.initLightbox();
+        this.initNavigation();
+    }
+    
+    initThumbnails() {
+        this.thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                // Update active state
+                this.thumbnails.forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+                
+                // Update main image
+                this.mainImage.src = thumb.dataset.full || thumb.src;
+                if (this.zoomResultImg) {
+                    this.zoomResultImg.src = thumb.dataset.zoom || thumb.src;
+                }
+            });
+        });
+    }
+    
+    initZoom() {
+        if (!this.zoomLens || !this.zoomResult) return;
+        
+        const container = this.container.querySelector('.zoom-container');
+        
+        container.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Calculate lens position
+            const lensWidth = this.zoomLens.offsetWidth;
+            const lensHeight = this.zoomLens.offsetHeight;
+            
+            let left = x - lensWidth / 2;
+            let top = y - lensHeight / 2;
+            
+            // Constrain lens within container
+            left = Math.max(0, Math.min(left, rect.width - lensWidth));
+            top = Math.max(0, Math.min(top, rect.height - lensHeight));
+            
+            this.zoomLens.style.left = left + 'px';
+            this.zoomLens.style.top = top + 'px';
+            
+            // Update zoom result
+            if (this.zoomResultImg) {
+                const zoomRatio = 3; // Zoom level
+                this.zoomResultImg.style.transform = `scale(${zoomRatio})`;
+                this.zoomResultImg.style.transformOrigin = `${(left / rect.width) * 100}% ${(top / rect.height) * 100}%`;
+            }
+        });
+        
+        container.addEventListener('mouseleave', () => {
+            this.zoomLens.style.display = 'none';
+            this.zoomResult.style.display = 'none';
+        });
+        
+        container.addEventListener('mouseenter', () => {
+            this.zoomLens.style.display = 'block';
+            this.zoomResult.style.display = 'block';
+        });
+    }
+    
+    initLightbox() {
+        this.mainImage.addEventListener('click', () => {
+            const lightbox = document.createElement('div');
+            lightbox.className = 'lightbox active';
+            
+            const img = document.createElement('img');
+            img.src = this.mainImage.src;
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'lightbox-close';
+            closeBtn.innerHTML = '×';
+            closeBtn.onclick = () => lightbox.remove();
+            
+            lightbox.appendChild(img);
+            lightbox.appendChild(closeBtn);
+            
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) lightbox.remove();
+            });
+            
+            document.body.appendChild(lightbox);
+        });
+    }
+    
+    initNavigation() {
+        const prevBtn = this.container.querySelector('.gallery-nav.prev');
+        const nextBtn = this.container.querySelector('.gallery-nav.next');
+        
+        if (prevBtn && nextBtn) {
+            prevBtn.addEventListener('click', () => this.navigate(-1));
+            nextBtn.addEventListener('click', () => this.navigate(1));
+        }
+    }
+    
+    navigate(direction) {
+        const activeIndex = Array.from(this.thumbnails).findIndex(t => t.classList.contains('active'));
+        const newIndex = (activeIndex + direction + this.thumbnails.length) % this.thumbnails.length;
+        this.thumbnails[newIndex].click();
+    }
+}
+
+// Initialize gallery
+document.querySelectorAll('.product-gallery').forEach(gallery => {
+    new ProductGallery(gallery);
+});
