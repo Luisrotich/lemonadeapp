@@ -3427,3 +3427,65 @@ body {
 #first-visit-overlay.show img {
     transform: scale(1);
 }
+ .badge {
+      /* positioning inside the card */
+      position: absolute;
+      top: 18px;
+      left: 20px;
+      z-index: 5;
+
+      /* visual style — fresh lemonade badge */
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(125deg, #fef9c3, #fde047 70%, #facc15);
+      color: #1e3c2c;                 /* deep forest green */
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      padding: 0.5rem 1.2rem 0.5rem 0.9rem;
+      border-radius: 40px;
+      border: 1px solid #fff3b0;
+      box-shadow: 0 10px 16px -8px rgba(250, 204, 21, 0.6), 0 2px 0 0 #fef9c3 inset, 0 -1px 0 0 #d97706 inset;
+      backdrop-filter: blur(2px);
+      text-transform: uppercase;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+
+      /* extra lemon fresh detail */
+      transition: box-shadow 0.2s, filter 0.2s;
+    }
+
+    /* lemon icon via pseudo — but the text already includes 🍋.
+       we add a subtle extra glow to match “Lemonade Express” style */
+    .badge::before {
+      content: "🍋";
+      font-size: 1.3rem;
+      filter: drop-shadow(0 2px 4px #fbbf24);
+      line-height: 1;
+      margin-right: 2px;
+    }
+
+    /* the actual text inside .badge is "Lemonade🍋 Express" (includes lemon emoji too)
+       we style it inline — the pseudo before adds another lemon for extra zest.
+       keep it fun. */
+    .badge {
+      /* extra emoji support: make sure the existing 🍋 is visible */
+      font-size: 1rem;
+    }
+
+    /* optional hover effect on badge (still inside card) */
+    .product-card:hover .badge {
+      box-shadow: 0 14px 22px -10px #fbbf24, 0 2px 0 0 #fffbeb inset;
+      filter: brightness(1.03);
+    }
+
+    /* if we want the original lemon emoji and the pseudo one to coexist nicely,
+       we keep them both — double lemon = more lemonade! */
+    .badge {
+      &::before {
+        /* already defined */
+      }
+    }
+    /* (the above & is fine, but to be safe for all browsers we write standard: */
+    /* .badge::before already set, keep it */
+  </style>
