@@ -1534,7 +1534,7 @@ class LemonadeApp {
                         <div class="price2">Ksh ${product.price?.toFixed(2) || '0.00'}</div>
                         
                         ${product.stock > 0 ? `
-                            <p class="badge">Lemonade🍋 Express</p>
+                           
                         ` : `
                             <button class="add-to-cart out-of-stock" disabled>
                                 Out of Stock
