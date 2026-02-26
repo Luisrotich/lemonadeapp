@@ -498,12 +498,45 @@
            <br>
         </div>
     
-        <div class="product-gallery">
-            <img id="main-product-image" class="main-image" src="" alt="Product Image">
-            <div class="thumbnail-container" id="thumbnail-container">
-                <!-- Thumbnails will be loaded here -->
-            </div>
+      <div class="product-gallery">
+    <!-- Main Image Container with Zoom -->
+    <div class="zoom-container">
+        <img id="main-product-image" 
+             class="main-image" 
+             src="" 
+             alt="Product Image"
+             loading="lazy"
+             fetchpriority="high">
+        
+        <!-- Zoom Lens -->
+        <div class="zoom-lens"></div>
+        
+        <!-- Zoom Result -->
+        <div class="zoom-result">
+            <img src="" alt="Zoomed Product View">
         </div>
+        
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+            <button class="zoom-btn zoom-in" aria-label="Zoom in">+</button>
+            <button class="zoom-btn zoom-out" aria-label="Zoom out">−</button>
+        </div>
+    </div>
+    
+    <!-- Thumbnail Navigation -->
+    <div class="thumbnail-wrapper-container">
+        <button class="thumbnail-nav left" aria-label="Previous thumbnails">←</button>
+        <div class="thumbnail-container" id="thumbnail-container">
+            <!-- Thumbnails will be loaded dynamically here -->
+        </div>
+        <button class="thumbnail-nav right" aria-label="Next thumbnails">→</button>
+    </div>
+    
+    <!-- Image Counter (auto-updated by JS) -->
+    <div class="image-counter">
+        <span class="current">1</span>/<span class="total">6</span>
+    </div>
+</div>
 
         <div class="product-info">
             <h1 class="product-title" id="product-detail-title">Product Name</h1>
