@@ -1529,7 +1529,7 @@ class LemonadeApp {
                             style="cursor: pointer;"
                             onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
                         
-                        <span class="express-tag">Lemonade Express</span>
+                      
                         
                         <h3 class="product-title2">${product.name || 'Kids Watch for Girls Boys 6-15 Year Old - Smart Watch for Kids'}</h3>
                         
@@ -1541,25 +1541,21 @@ class LemonadeApp {
                                 <span class="star-filled"></span>
                                 <span class="star-half"></span>
                             </span>
-                            <a href="#" class="rating-count">(193)</a>
+                            <a href="#" class="rating-count">(200)</a>
                         </div>
-                        
-                        <div class="bought-text">300+ bought in past month</div>
-                        
+                                            
                         <div class="price-container">
                             <div class="current-price">KES <span>${product.price?.toFixed(2) || '2,834'}</span><sup>70</sup></div>
-                            <div class="list-price">List Price: <span>KES 3,736.23</span></div>
                         </div>
                         
-                        <div class="delivery-info"><strong>KES 1,810.76 delivery</strong> Tue, Mar 10</div>
+                        <div class="delivery-info"><strong>Takes on 3 days delivery</strong> to you .</div>
                         <div class="ships-info">Ships to Kenya</div>
                         
-                        <div class="featured-badge">Featured by Amazon influencers</div>
+                        <div class="featured-badge">Featured by Lemonade influencers</div>
                         
-                        <div class="see-options">See options</div>
                         
                         ${product.stock > 0 ? `
-                            <button class="add-to-cart">Add to Cart</button>
+                          <span class="express-tag">Lemonade Express</span>
                         ` : `
                             <button class="add-to-cart out-of-stock" disabled>
                                 Out of Stock
