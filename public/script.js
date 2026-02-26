@@ -1519,22 +1519,47 @@ class LemonadeApp {
                     .replace(/'/g, '&#39;');
                 
                 return `
-                    <div class="product-card2" 
-                         data-category="${product.category || 'all'}" 
-                         data-name="${product.name?.toLowerCase() || ''}">
+                    <div class="product-card2" data-category="${product.category || 'all'}" data-name="${product.name?.toLowerCase() || ''}">
+                        
+                        <span class="sponsored-badge">Sponsored</span>
                         
                         <img src="${product.image || '/uploads/placeholder.jpg'}" 
-                             alt="${product.name || 'Product'}" 
-                             onclick="lemonadeApp.showProductDetail(${safeProduct})"
-                             style="cursor: pointer;"
-                             onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
+                            alt="${product.name || 'Product'}" 
+                            onclick="lemonadeApp.showProductDetail(${safeProduct})"
+                            style="cursor: pointer;"
+                            onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/fff9c4/ff6f00?text=📱+Product'">
                         
-                        <h3 class="product-title2">${product.name || 'Unnamed Product'}</h3>
+                        <span class="express-tag">Lemonade Express</span>
                         
-                        <div class="price2">Ksh ${product.price?.toFixed(2) || '0.00'}</div>
+                        <h3 class="product-title2">${product.name || 'Kids Watch for Girls Boys 6-15 Year Old - Smart Watch for Kids'}</h3>
+                        
+                        <div class="rating-container">
+                            <span class="stars">
+                                <span class="star-filled"></span>
+                                <span class="star-filled"></span>
+                                <span class="star-filled"></span>
+                                <span class="star-filled"></span>
+                                <span class="star-half"></span>
+                            </span>
+                            <a href="#" class="rating-count">(193)</a>
+                        </div>
+                        
+                        <div class="bought-text">300+ bought in past month</div>
+                        
+                        <div class="price-container">
+                            <div class="current-price">KES <span>${product.price?.toFixed(2) || '2,834'}</span><sup>70</sup></div>
+                            <div class="list-price">List Price: <span>KES 3,736.23</span></div>
+                        </div>
+                        
+                        <div class="delivery-info"><strong>KES 1,810.76 delivery</strong> Tue, Mar 10</div>
+                        <div class="ships-info">Ships to Kenya</div>
+                        
+                        <div class="featured-badge">Featured by Amazon influencers</div>
+                        
+                        <div class="see-options">See options</div>
                         
                         ${product.stock > 0 ? `
-                           
+                            <button class="add-to-cart">Add to Cart</button>
                         ` : `
                             <button class="add-to-cart out-of-stock" disabled>
                                 Out of Stock
