@@ -495,12 +495,12 @@ body {
 /* Lemonade Express Tag */
 .express-tag {
     display: inline-block;
-    background: #ffd814;
-    color: #0f1111;
+    background: #ff4d00;
+    color: #ffffff;
     font-size: 0.7rem;
     font-weight: 600;
     padding: 0.2rem 0.5rem;
-    border-radius: 12px;
+    border-radius: 5px;
     margin-bottom: 0.5rem;
     width: fit-content;
     text-transform: uppercase;
@@ -545,7 +545,7 @@ body {
 
 .star-filled:before {
     content: "★";
-    color: #ffa41c;
+    color: #ff4d00;
 }
 
 .star-half:before {

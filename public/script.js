@@ -1549,13 +1549,13 @@ class LemonadeApp {
                         </div>
                         
                         <div class="delivery-info"><strong>Takes on 3 days delivery</strong> to you .</div>
-                        <div class="ships-info">Ships to Kenya</div>
+                        <div class="ships-info">Ships from China.</div>
                         
                         <div class="featured-badge">Featured by Lemonade influencers</div>
                         
                         
                         ${product.stock > 0 ? `
-                          <span class="express-tag">Lemonade Express</span>
+                          <span class="express-tag">Lemonade🍋 Express</span>
                         ` : `
                             <button class="add-to-cart out-of-stock" disabled>
                                 Out of Stock
