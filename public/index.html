@@ -80,61 +80,190 @@
     border-radius: 50%;
     font-weight: bold;
 }
+/* AI Chat Button Styles - Optimized for both mobile & desktop */
+.mobile-chatbot-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    padding: 10px 20px;
+    border-radius: 40px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    position: relative;
+    overflow: hidden;
+    min-width: 120px;
+}
 
+/* Button text */
+.mobile-chatbot-btn .chat-text {
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Chat icon */
+.mobile-chatbot-btn .chat-icon {
+    font-size: 18px;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+/* Glow effect */
+.mobile-chatbot-btn .chat-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 40px;
+    transition: transform 0.5s;
+    pointer-events: none;
+}
+
+/* Hover effects */
+.mobile-chatbot-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+    background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+}
+
+.mobile-chatbot-btn:hover .chat-glow {
+    transform: translate(-50%, -50%) scale(2);
+}
+
+/* Active/Click state */
+.mobile-chatbot-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* Focus state for accessibility */
+.mobile-chatbot-btn:focus {
+    outline: 2px solid #f59e0b;
+    outline-offset: 2px;
+}
+
+/* Desktop styles (default) */
+@media (min-width: 769px) {
+    .mobile-chatbot-btn {
+        padding: 12px 28px;
+        gap: 10px;
+        min-width: 140px;
+    }
+    
+    .mobile-chatbot-btn .chat-text {
+        font-size: 16px;
+    }
+    
+    .mobile-chatbot-btn .chat-icon {
+        font-size: 20px;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .mobile-chatbot-btn {
+        padding: 8px 16px;
+        gap: 6px;
+        min-width: 100px;
+    }
+    
+    .mobile-chatbot-btn .chat-text {
+        font-size: 14px;
+    }
+    
+    .mobile-chatbot-btn .chat-icon {
+        font-size: 16px;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .mobile-chatbot-btn {
+        padding: 6px 12px;
+        min-width: 80px;
+    }
+    
+    .mobile-chatbot-btn .chat-text {
+        font-size: 13px;
+    }
+    
+    .mobile-chatbot-btn .chat-icon {
+        font-size: 14px;
+    }
+}
+
+/* Optional: Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .mobile-chatbot-btn {
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+    }
+}
+.mobile-chatbot-btn.lemon {
+    background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.25);
+}
+
+.mobile-chatbot-btn.lemon .chat-text,
+.mobile-chatbot-btn.lemon .chat-icon {
+    color: #1e293b;  /* Dark text for contrast */
+}
+/* Better touch target on mobile */
+@media (max-width: 768px) {
+    .mobile-chatbot-btn {
+        /* Ensure minimum touch target size */
+        min-height: 44px;
+        min-width: 44px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Remove hover effects on mobile (since hover doesn't work well) */
+    .mobile-chatbot-btn:hover {
+        transform: none;
+    }
+    
+    /* Add active state for touch feedback */
+    .mobile-chatbot-btn:active {
+        transform: scale(0.97);
+        opacity: 0.9;
+    }
+}
     </style>
 
 </head>
 <body>
-
-    <!-- Top Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <h1>🍋 <span style="color: black;">Lemon</span>ade</h1>
-
-            <!-- Mobile menu toggle button -->
-            <button class="menu-toggle" id="menuToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-
-        <!-- Navigation Menu Bar -->
-        <nav class="nav-menu" id="navMenu">
-            <ul class="nav-links">
-                <li><a href="index.html" class="active"><i class="fas fa-lemon lemon-icon"></i>Home</a></li>
-                <li><a href="about.html"><i class="fas fa-lemon lemon-icon"></i>About</a></li>
-                <li><a href="contact.html"><i class="fas fa-envelope lemon-icon"></i>Contact</a></li>
-                <li><a href="blog.html"><i class="fas fa-blog lemon-icon"></i>Blog</a></li>
-                <li><a href="help.html"><i class="fas fa-question-circle lemon-icon"></i>Help</a></li>
-<li >
-  <a href="careers.html">
-    <i class="fas fa-briefcase lemon-icon"></i> Careers/Hiring 
-  </a>
-</li>
-
-            </ul>
-            
-            <ul class="social-links">
-                <li><a href="https://www.facebook.com/share/17iCVqVKhj/" target="_blank" class="facebook" title="Facebook">
-                    <i class="fab fa-facebook-f"></i>
-                </a></li>
-                <li><a href="https://x.com/Lemonade_kenya" target="_blank" class="instagram" title="Instagram">
-                    <i class="fab fa-instagram"></i>
-                </a></li>
-                <li><a href="https://www.instagram.com/lemonade_kenya?_r=MWxpa3Y2MmdnMmFqNw==" target="_blank" class="twitter" title="Twitter">
-                    <i class="fab fa-twitter"></i>
-                </a></li>
-                <li><a href="https://www.tiktok.com/@lemonade_kenya?_r=1&_t=ZM-92A1MDwWnoh" target="_blank" class="tiktok" title="tiktok">
-                    <i class="fab fa-tiktok"></i>
-                </a></li>
-            </ul>
-        </nav>
+<header class="main-header">
+    <div class="header-content">
+        <h1>🍋 <span style="color: black;">Lemon</span>ade</h1>
         
-        <!-- Search Bar -->
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="product-search" placeholder="Search products...">
-        </div>
-    </header>
+        <!-- AI Chat Button -->
+        <a href="https://lemonadechatbot-production.up.railway.app/" 
+           target="_blank" 
+           class="mobile-chatbot-btn" 
+           id="mobileChatBtn">
+            <!-- Example of a lemon icon using Font Awesome -->
+            <i class="fas fa-lemon"style="font-size: 24px; color: #FAFA33;"></i>
+
+            <span class="chat-text">AI </span>
+            <span class="chat-glow"></span>
+        </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="product-search" placeholder="Search products...">
+    </div>
+</header>
 
     <!-- Main Content Area -->
     <main class="main-content">
@@ -590,6 +719,11 @@
         <i class="fas fa-shopping-cart"></i>
         <span>Cart</span>
         <span class="cart-badge" id="bottom-cart-count">0</span>
+    </button>
+    
+    <button class="nav-item" onclick="window.location.href='resources.html'">
+    <i class="fas fa-book"></i>
+    <span>Resource</span>
     </button>
 
     <button class="nav-item" data-view="account-view">
