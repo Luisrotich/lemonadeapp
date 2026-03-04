@@ -1280,9 +1280,9 @@ body {
     text-align: center;
     margin-bottom: 2rem;
     padding: 1rem;
-    background: linear-gradient(135deg, orange, var(--secondary-color));
+    background: linear-gradient(135deg, rgb(255, 255, 255),);
     border-radius: 20px;
-    color: white;
+    color: rgb(2, 2, 2);
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden;
@@ -1303,7 +1303,7 @@ body {
 .user-avatar {
     width: 100px;
     height: 100px;
-    background:green;
+    background:rgb(255, 170, 0);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1324,7 +1324,7 @@ body {
 }
 
 .user-info h2 {
-    color: white;
+    color: rgb(255, 179, 0);
     margin-bottom: 0.5rem;
     font-size: 1.5rem;
     font-weight: 600;
@@ -1332,7 +1332,7 @@ body {
 }
 
 .user-info p {
-    color: rgba(255,255,255,0.9);
+    color: rgba(255, 136, 0, 0.9);
     font-size: 1rem;
     margin: 0;
 }
@@ -1340,7 +1340,7 @@ body {
 /* Auth Styles */
 .account-actions {
     margin-bottom: 1rem;
-    background: orange;
+    background: rgb(255, 255, 255);
     max-width: 600px;
     border-radius: 20px;
     padding: 1.5rem;
@@ -1378,7 +1378,7 @@ body {
 }
 
 .auth-tab.active {
-    background: orangered;
+    background: rgb(0, 0, 0);
     color: white;
     box-shadow: 0 4px 15px rgba(255,111,0,0.3);
 }
@@ -1547,7 +1547,7 @@ body {
 
 /* Auth Button */
 .auth-btn {
-    background: green;
+    background: rgb(254, 169, 0);
     color: white;
     border: none;
     padding: 1rem 1.5rem;
