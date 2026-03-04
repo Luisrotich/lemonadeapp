@@ -750,12 +750,13 @@ body {
 }
 
 .category-card {
-    background:rgb(254, 249, 225);
+    background:rgb(0, 0, 0);
     border: 2px solid var(--border-color);
     border-radius: 15px;
     padding: 1.5rem 1rem;
     text-align: center;
     cursor: pointer;
+    color: white;
     transition: all 0.3s ease;
 }
 
@@ -767,7 +768,7 @@ body {
 .category-card.active {
     border-color: var(--accent-color);
     background: linear-gradient(135deg, var(--accent-color) 0%, #ff9a3d 100%);
-    color: white;
+    color: rgb(12, 11, 10);
 }
 
 .category-card.active .category-icon {
