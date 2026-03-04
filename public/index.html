@@ -237,6 +237,232 @@
         opacity: 0.9;
     }
 }
+/* Resource View Styles - Updated */
+#resource-view {
+    padding: 20px;
+    padding-bottom: 80px;
+    background: #f4f7fb;
+    min-height: 100vh;
+}
+
+.resource-header {
+    margin-bottom: 2rem;
+}
+
+.resource-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.resource-header h1 i {
+    color: #f59e0b;
+    font-size: 1.8rem;
+}
+
+.resource-description {
+    color: #475569;
+    margin-top: 0.3rem;
+    font-size: 1rem;
+    border-left: 4px solid #f59e0b;
+    padding-left: 1rem;
+}
+
+/* Filter Bar */
+.resource-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.5rem 0 2rem 0;
+}
+
+.resource-filter-btn {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 0.6rem 1.4rem;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.resource-filter-btn i {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.resource-filter-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.resource-filter-btn.active {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: white;
+}
+
+.resource-filter-btn.active i {
+    color: white;
+}
+
+/* Resource Grid */
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Resource Cards */
+.resource-card {
+    background: white;
+    border-radius: 24px;
+    padding: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+    border: 1px solid rgba(203, 213, 225, 0.3);
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+}
+
+.resource-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 35px -8px rgba(245, 158, 11, 0.15);
+    border-color: #f59e0b;
+}
+
+.resource-card.hidden {
+    display: none;
+}
+
+.resource-card-icon {
+    background: #fef3c7;
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: #f59e0b;
+    font-size: 1.8rem;
+}
+
+.resource-card-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #f59e0b;
+    background: #fef3c7;
+    display: inline-block;
+    padding: 0.25rem 1rem;
+    border-radius: 30px;
+    margin-bottom: 0.8rem;
+    align-self: flex-start;
+}
+
+.resource-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.resource-card-desc {
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex: 1;
+}
+
+.resource-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.resource-tag {
+    background: #f1f5f9;
+    color: #334155;
+    padding: 0.3rem 0.9rem;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.resource-card-link {
+    text-decoration: none;
+    font-weight: 600;
+    color: #f59e0b;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #e9eef3;
+    padding-top: 1rem;
+    margin-top: 0.2rem;
+    transition: gap 0.2s;
+}
+
+.resource-card-link i {
+    font-size: 0.8rem;
+}
+
+.resource-card-link:hover {
+    gap: 12px;
+    color: #d97706;
+}
+
+/* Resource Footer */
+.resource-footer {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #64748b;
+    font-size: 0.9rem;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 1.5rem;
+}
+
+.resource-count-badge {
+    background: #e2e8f0;
+    padding: 0.3rem 1rem;
+    border-radius: 30px;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .resource-filter-bar {
+        gap: 0.5rem;
+    }
+    
+    .resource-filter-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .resource-grid {
+        grid-template-columns: 1fr;
+    }
+}
     </style>
 
 </head>
@@ -389,13 +615,61 @@
         <i class=""></i> Checkout             
     </button>
 
-    
+            
+        </div>
+
+                    </div>
+                </div>
+       
+
+      <!-- Resource/Learning View -->
+<div class="view" id="resource-view">
+    <div class="resource-header">
+        <h1>
+            <i class="fas fa-layer-group" style="color: #f59e0b;"></i> 
+            Resource Library
+        </h1>
+        <div class="resource-description">
+            <i class="fas fa-compass" style="margin-right: 6px;"></i> 
+            Curated tools, articles & guides for smarter shopping
+        </div>
+    </div>
+
+    <!-- Filter Chips -->
+    <div class="resource-filter-bar" id="resourceFilterBar">
+        <button class="resource-filter-btn active" data-filter="all">
+            <i class="fas fa-grid-2"></i> All
+        </button>
+        <button class="resource-filter-btn" data-filter="company">
+            <i class="fas fa-building"></i> Company
+        </button>
+        <button class="resource-filter-btn" data-filter="support">
+            <i class="fas fa-circle-question"></i> Support
+        </button>
+         <button class="resource-filter-btn" data-filter="contact">
+            <i class="fas fa-address-book"></i> Contact
+        </button>
+        <button class="resource-filter-btn" data-filter="content">
+            <i class="fas fa-blog"></i> Blog
+        </button>
+        <button class="resource-filter-btn" data-filter="social">
+            <i class="fas fa-hashtag"></i> Social
+        </button>
+        <button class="resource-filter-btn" data-filter="careers">
+            <i class="fas fa-briefcase"></i> Careers
+        </button>
+    </div>
+
+    <!-- Resources Grid -->
+    <div class="resource-grid" id="resourceGrid"></div>
+
+    <!-- Resource Footer -->
+    <div class="resource-footer">
+        <span><i class="far fa-bookmark"></i> discover · handpicked resources</span>
+        <span class="resource-count-badge" id="resourceCount">8 items</span>
+    </div>
 </div>
 
-            </div>
-        </div>
-       
-         
         <!-- Account View -->
         <div class="view" id="account-view">
             <div class="account-header">
@@ -721,9 +995,9 @@
         <span class="cart-badge" id="bottom-cart-count">0</span>
     </button>
     
-    <button class="nav-item" onclick="window.location.href='resources.html'">
-    <i class="fas fa-book"></i>
-    <span>Resource</span>
+    <button class="nav-item" data-view="resource-view">
+        <i class="fas fa-book"></i>
+        <span>Resource</span>
     </button>
 
     <button class="nav-item" data-view="account-view">
@@ -897,6 +1171,181 @@
     </button>
 
 
+<script>
+    (function() {
+        // Resource Data
+        const resources = [
+            {
+                title: "About Us",
+                desc: "Learn about our mission, team, and the story behind Lemonade🍋.",
+                category: "company",
+                icon: "fa-solid fa-building",
+                tags: ["company", "mission", "team"],
+                link: "about.html",
+                linkLabel: "about us"
+            },
+            {
+                title: "Help Center",
+                desc: "FAQs, tutorials, and guides to help you make the most of our services.",
+                category: "support",
+                icon: "fa-solid fa-circle-question",
+                tags: ["support", "FAQ", "guides"],
+                link: "help.html",
+                linkLabel: "get help"
+            },
+            {
+                title: "Blog",
+                desc: "Latest updates, industry insights, and stories from our team.",
+                category: "content",
+                icon: "fa-solid fa-blog",
+                tags: ["articles", "news", "updates"],
+                link: "blog.html",
+                linkLabel: "read blog"
+            },
+            {
+                title: "Contact",
+                desc: "Get in touch with our team for support, partnerships, or general inquiries.",
+                category: "contact",
+                icon: "fa-solid fa-envelope",
+                tags: ["email", "support", "inquiries"],
+                link: "contact.html",
+                linkLabel: "contact us"
+            },
+            {
+                title: "Careers",
+                desc: "Join our team – view open positions and learn about working with us.",
+                category: "careers",
+                icon: "fa-solid fa-briefcase",
+                tags: ["jobs", "hiring", "culture"],
+                link: "careers.html",
+                linkLabel: "view openings"
+            },
+            {
+                title: "X (Twitter)",
+                desc: "Follow us for updates, tips, and community highlights.",
+                category: "social",
+                icon: "fa-brands fa-x-twitter",
+                tags: ["social", "X", "updates"],
+                link: "https://x.com/Lemonade_kenya",
+                linkLabel: "follow"
+            },
+            {
+                title: "Instagram",
+                desc: "Visual stories, behind the scenes, and daily moments.",
+                category: "social",
+                icon: "fa-brands fa-instagram",
+                tags: ["social", "photos", "stories"],
+                link: "https://www.instagram.com/lemonade_mall?igsh=MWxpa3Y2MmdnMmFqNw==",
+                linkLabel: "follow"
+            },
+            {
+                title: "TikTok",
+                desc: "Short videos, trends, and creative content from our team.",
+                category: "social",
+                icon: "fa-brands fa-tiktok",
+                tags: ["social", "videos", "trending"],
+                link: "https://vm.tiktok.com/ZS9dN4f8kCoen-bZf7H/",
+                linkLabel: "follow"
+            },
+            {
+                title: "Facebook",
+                desc: "Join our community for events, announcements, and discussions.",
+                category: "social",
+                icon: "fa-brands fa-facebook",
+                tags: ["social", "community", "events"],
+                link: "https://www.facebook.com/share/15kPfqNCmm8/",
+                linkLabel: "like"
+            },
+           
+        ];
+
+        // Render Cards
+        const grid = document.getElementById('resourceGrid');
+        const countSpan = document.getElementById('resourceCount');
+
+        function renderCards(filter = 'all') {
+            let html = '';
+            let visibleCount = 0;
+
+            resources.forEach((res, index) => {
+                const category = res.category;
+                const iconClass = res.icon || 'fa-solid fa-file-lines';
+                const tagsHtml = res.tags.map(t => `<span class="resource-tag">${t}</span>`).join('');
+                
+                html += `
+                    <div class="resource-card" data-category="${category}" data-index="${index}">
+                        <div class="resource-card-icon"><i class="${iconClass}"></i></div>
+                        <span class="resource-card-category"><i class="fa-regular fa-folder-open" style="margin-right:4px;"></i>${category}</span>
+                        <div class="resource-card-title">${res.title}</div>
+                        <div class="resource-card-desc">${res.desc}</div>
+                        <div class="resource-card-tags">${tagsHtml}</div>
+                        <a href="${res.link}" class="resource-card-link">${res.linkLabel} <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+
+            // Apply filter
+            const cards = document.querySelectorAll('#resourceGrid .resource-card');
+            cards.forEach(card => {
+                const cat = card.dataset.category;
+                if (filter === 'all' || cat === filter) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            countSpan.innerText = visibleCount + (visibleCount === 1 ? ' item' : ' items');
+            return visibleCount;
+        }
+
+        // Initial render
+        renderCards('all');
+
+        // Filter button logic
+        const filterBar = document.getElementById('resourceFilterBar');
+        const filterBtns = filterBar.querySelectorAll('.resource-filter-btn');
+
+        function setActiveFilter(selectedFilter) {
+            filterBtns.forEach(btn => {
+                const filterValue = btn.dataset.filter;
+                if (filterValue === selectedFilter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        filterBar.addEventListener('click', (e) => {
+            const btn = e.target.closest('.resource-filter-btn');
+            if (!btn) return;
+
+            const filterValue = btn.dataset.filter;
+            if (!filterValue) return;
+
+            setActiveFilter(filterValue);
+
+            const cards = document.querySelectorAll('#resourceGrid .resource-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cat = card.dataset.category;
+                if (filterValue === 'all' || cat === filterValue) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            countSpan.innerText = visibleCount + (visibleCount === 1 ? ' item' : ' items');
+        });
+    })();
+</script>
     <script src="script.js?v=1.2.3"></script>
 </body>
 </html>

@@ -44,7 +44,7 @@
     }
 
     .rv-header h1 i {
-      color: #3b82f6;
+      color: #ff8000;
       font-size: 2rem;
     }
 
@@ -285,78 +285,89 @@
     (function() {
       // ---------- RESOURCE DATA ----------
       const resources = [
-        {
-          title: "Flexbox made simple",
-          desc: "A visual guide that finally makes sense of flex containers, axes and alignment.",
-          category: "article",
-          icon: "fa-brands fa-css3-alt",
-          tags: ["CSS", "layout", "beginner"],
-          link: "#",
-          linkLabel: "read article"
-        },
-        {
-          title: "CSS grid generator",
-          desc: "Interactive tool to build complex grid layouts in seconds. Copy code on the fly.",
-          category: "tool",
-          icon: "fa-solid fa-table-cells",
-          tags: ["grid", "generator", "visual"],
-          link: "#",
-          linkLabel: "open tool"
-        },
-        {
-          title: "React hooks deep dive",
-          desc: "Video course: useEffect, useMemo, custom hooks – with real world examples.",
-          category: "video",
-          icon: "fa-brands fa-react",
-          tags: ["react", "hooks", "intermediate"],
-          link: "#",
-          linkLabel: "watch series"
-        },
-        {
-          title: "API design checklist",
-          desc: " pragmatic checklist for RESTful & GraphQL APIs. Perfect for team reviews.",
-          category: "article",
-          icon: "fa-solid fa-plug",
-          tags: ["API", "backend", "best practice"],
-          link: "#",
-          linkLabel: "read"
-        },
-        {
-          title: "Color contrast analyser",
-          desc: "Check WCAG compliance, simulate color blindness, and tweak palettes.",
-          category: "tool",
-          icon: "fa-solid fa-eye-dropper",
-          tags: ["accessibility", "design", "WCAG"],
-          link: "#",
-          linkLabel: "use tool"
-        },
-        {
-          title: "Vue 3: the new features",
-          desc: "Short explainer video covering composition API, teleport, suspense.",
-          category: "video",
-          icon: "fa-brands fa-vuejs",
-          tags: ["vue", "frontend", "composition"],
-          link: "#",
-          linkLabel: "watch"
-        },
-        {
-          title: "Figma auto layout tips",
-          desc: "Article with live demos – speed up your UI workflow using auto layout.",
-          category: "article",
-          icon: "fa-brands fa-figma",
-          tags: ["Figma", "UI", "productivity"],
-          link: "#",
-          linkLabel: "read"
-        },
-        {
-          title: "Snippet manager",
-          desc: "Open source snippet storage with syntax highlight and tags (macOS/win).",
-          category: "tool",
-          icon: "fa-solid fa-code",
-          tags: ["snippets", "productivity", "devtool"],
-          link: "#",
-          linkLabel: "download"
-        }
+       {
+  title: "About us",
+  desc: "Learn about our mission, team, and the story behind our company.",
+  category: "company",
+  icon: "fa-solid fa-building",
+  tags: ["company", "mission", "team"],
+  link: "about.html",
+  linkLabel: "about us"
+},
+{
+  title: "Help center",
+  desc: "FAQs, tutorials, and guides to help you make the most of our services.",
+  category: "support",
+  icon: "fa-solid fa-circle-question",
+  tags: ["support", "FAQ", "guides"],
+  link: "help.html",
+  linkLabel: "get help"
+},
+{
+  title: "Blog",
+  desc: "Latest updates, industry insights, and stories from our team.",
+  category: "content",
+  icon: "fa-solid fa-blog",
+  tags: ["articles", "news", "updates"],
+  link: "blog.html",
+  linkLabel: "read blog"
+},
+{
+  title: "Contact",
+  desc: "Get in touch with our team for support, partnerships, or general inquiries.",
+  category: "contact",
+  icon: "fa-solid fa-envelope",
+  tags: ["email", "support", "inquiries"],
+  link: "contact.html",
+  linkLabel: "contact us"
+},
+{
+  title: "Careers",
+  desc: "Join our team – view open positions and learn about working with us.",
+  category: "careers",
+  icon: "fa-solid fa-briefcase",
+  tags: ["jobs", "hiring", "culture"],
+  link: "careers.html",
+  linkLabel: "view openings"
+},
+
+  {
+    title: "X (Twitter)",
+    desc: "Follow us for updates, tips, and community highlights.",
+    category: "social",
+    icon: "fa-brands fa-x-twitter",
+    tags: ["social", "X", "updates"],
+    link: "https://twitter.com/company",
+    linkLabel: "follow"
+  },
+  {
+    title: "Instagram",
+    desc: "Visual stories, behind the scenes, and daily moments.",
+    category: "social",
+    icon: "fa-brands fa-instagram",
+    tags: ["social", "photos", "stories"],
+    link: "https://instagram.com/company",
+    linkLabel: "follow"
+  },
+  {
+    title: "TikTok",
+    desc: "Short videos, trends, and creative content from our team.",
+    category: "social",
+    icon: "fa-brands fa-tiktok",
+    tags: ["social", "videos", "trending"],
+    link: "https://tiktok.com/@company",
+    linkLabel: "follow"
+  },
+  {
+    title: "Facebook",
+    desc: "Join our community for events, announcements, and discussions.",
+    category: "social",
+    icon: "fa-brands fa-facebook",
+    tags: ["social", "community", "events"],
+    link: "https://facebook.com/company",
+    linkLabel: "like"
+  }
+
       ];
 
       // ---------- RENDER CARDS ----------
